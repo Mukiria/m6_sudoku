@@ -1,0 +1,76 @@
+# Dart/Flutter
+.dart_tool/
+build/
+*.dart_tool/
+*.packages
+pubspec.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.gr.dart
+*.config.dart
+*.mocks.dart
+
+# Build outputs
+*.apk
+*.aab
+*.ipa
+*.dSYM/
+*.xcarchive/
+build/
+*.build/
+
+# Coverage
+coverage/
+*.lcov
+
+# Logs
+*.log
+
+# Localization
+*.arb
+!lib/l10n/*.arb
+
+# Flutter specific
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+
+# Pub cache
+.pub-cache/
+
+# Web
+web/build/
+
+# MacOS
+*.xcworkspace
+*.pbxproj
+*.xcscheme
+*.xcsettings
+
+# Android
+local.properties
+.gradle/
+*.keystore
+*.jks
+
+# iOS
+Pods/
+Podfile.lock
+*.xcworkspace
+
+# Environment
+.env
+.env.local

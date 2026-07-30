@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:m6_sudoku/features/sudoku/engine/generator/puzzle_generator.dart';
 import '../../domain/usecases/game_usecases.dart';
 

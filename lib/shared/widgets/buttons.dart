@@ -76,7 +76,7 @@ class AppButton extends StatelessWidget {
             ).copyWith(
               backgroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.disabled)) {
-                  return colorScheme.onSurface.withOpacity(0.12);
+                  return colorScheme.onSurface.withValues(alpha: 0.12);
                 }
                 return null;
               }),
@@ -100,21 +100,21 @@ class AppButton extends StatelessWidget {
               side: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.disabled)) {
                   return BorderSide(
-                    color: colorScheme.outline.withOpacity(0.5),
+                    color: colorScheme.outline.withValues(alpha: 0.5),
                   );
                 }
                 return BorderSide(color: colorScheme.primary, width: 1.5);
               }),
               foregroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.disabled)) {
-                  return colorScheme.onSurface.withOpacity(0.38);
+                  return colorScheme.onSurface.withValues(alpha: 0.38);
                 }
                 return colorScheme.primary;
               }),
             ).copyWith(
               foregroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.disabled)) {
-                  return colorScheme.onSurface.withOpacity(0.38);
+                  return colorScheme.onSurface.withValues(alpha: 0.38);
                 }
                 return colorScheme.primary;
               }),
@@ -314,7 +314,7 @@ class AppIconButton extends StatelessWidget {
       style: IconButton.styleFrom(
         backgroundColor: effectiveBackgroundColor,
         foregroundColor: effectiveColor,
-        disabledForegroundColor: colorScheme.onSurface.withOpacity(0.38),
+        disabledForegroundColor: colorScheme.onSurface.withValues(alpha: 0.38),
         disabledBackgroundColor: Colors.transparent,
         padding: EdgeInsets.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,

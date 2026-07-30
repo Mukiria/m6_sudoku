@@ -149,7 +149,7 @@ class HomeScreen extends ConsumerWidget {
               Text(
                 'Version ${AppConstants.appVersion}',
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                 ),
                 textAlign: TextAlign.center,
               ).animate().fadeIn(duration: 300.ms, delay: 700.ms),

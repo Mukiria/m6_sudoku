@@ -1,9 +1,111 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../domain/entities/puzzle.dart';
+import 'package:m6_sudoku/features/sudoku/engine/generator/puzzle_generator.dart';
 import '../../domain/usecases/game_usecases.dart';
 
 part 'game_provider.g.dart';
+
+class GameState {
+  GameState({
+    required this.puzzleId,
+    required this.userGrid,
+    required this.notes,
+    required this.timeElapsed,
+    required this.mistakes,
+    required this.hintsUsed,
+    required this.moveHistory,
+    required this.status,
+    required this.lastPlayed,
+    required this.difficulty,
+  });
+
+  final String puzzleId;
+  final List<List<int>> userGrid;
+  final List<List<Set<int>>> notes;
+  final int timeElapsed;
+  final int mistakes;
+  final int hintsUsed;
+  final List<Move> moveHistory;
+  final GameStatus status;
+  final DateTime lastPlayed;
+  final Difficulty difficulty;
+
+  GameState copyWith({
+    String? puzzleId,
+    List<List<int>>? userGrid,
+    List<List<Set<int>>>? notes,
+    int? timeElapsed,
+    int? mistakes,
+    int? hintsUsed,
+    List<Move>? moveHistory,
+    GameStatus? status,
+    DateTime? lastPlayed,
+    Difficulty? difficulty,
+  }) {
+    return GameState(
+      puzzleId: puzzleId ?? this.puzzleId,
+      userGrid: userGrid ?? this.userGrid,
+      notes: notes ?? this.notes,
+      timeElapsed: timeElapsed ?? this.timeElapsed,
+      mistakes: mistakes ?? this.mistakes,
+      hintsUsed: hintsUsed ?? this.hintsUsed,
+      moveHistory: moveHistory ?? this.moveHistory,
+      status: status ?? this.status,
+      lastPlayed: lastPlayed ?? this.lastPlayed,
+      difficulty: difficulty ?? this.difficulty,
+    );
+  }
+}
+
+@freezed
+class Move with _$Move {
+  const factory Move({
+    required int row,
+    required int col,
+    required int? previousValue,
+    required int? newValue,
+    required MoveType type,
+    required DateTime timestamp,
+  }) = _Move;
+}
+
+enum MoveType {
+  value,
+  note,
+  hint,
+  undo,
+  clear,
+}
+
+enum GameStatus {
+  playing,
+  paused,
+  completed,
+  failed,
+}
+
+enum Difficulty {
+  easy,
+  medium,
+  hard,
+  expert,
+  evil;
+
+  String get name {
+    switch (this) {
+      case Difficulty.easy:
+        return 'easy';
+      case Difficulty.medium:
+        return 'medium';
+      case Difficulty.hard:
+        return 'hard';
+      case Difficulty.expert:
+        return 'expert';
+      case Difficulty.evil:
+        return 'evil';
+    }
+  }
+}
 
 @riverpod
 class GameController extends _$GameController {

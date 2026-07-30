@@ -200,7 +200,7 @@ class NumberButton extends StatelessWidget {
                 ? [
                     BoxShadow(
                       color: extension.numberButtonSelectedBackground
-                          .withOpacity(0.3),
+                          .withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -368,9 +368,9 @@ class ActionButton extends StatelessWidget {
     }
 
     if (!isEnabled) {
-      backgroundColor = colorScheme.onSurface.withOpacity(0.12);
-      textColor = colorScheme.onSurface.withOpacity(0.38);
-      iconColor = colorScheme.onSurface.withOpacity(0.38);
+      backgroundColor = colorScheme.onSurface.withValues(alpha: 0.12);
+      textColor = colorScheme.onSurface.withValues(alpha: 0.38);
+      iconColor = colorScheme.onSurface.withValues(alpha: 0.38);
     }
 
     return Material(

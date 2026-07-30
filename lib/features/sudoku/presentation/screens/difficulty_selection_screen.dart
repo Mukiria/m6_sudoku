@@ -118,12 +118,12 @@ class DifficultyCard extends StatelessWidget {
               width: isSelected ? 2.5 : 1.5,
             ),
             color: isSelected
-                ? difficultyColor.withOpacity(0.1)
+                ? difficultyColor.withValues(alpha: 0.1)
                 : theme.colorScheme.surface,
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: difficultyColor.withOpacity(0.2),
+                      color: difficultyColor.withValues(alpha: 0.2),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -138,7 +138,7 @@ class DifficultyCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? difficultyColor
-                      : difficultyColor.withOpacity(0.1),
+                      : difficultyColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -168,14 +168,14 @@ class DifficultyCard extends StatelessWidget {
                           Icons.format_list_numbered_rounded,
                           size: 16,
                           color: theme.colorScheme.onSurfaceVariant
-                              .withOpacity(0.7),
+                              .withValues(alpha: 0.7),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           '${difficulty.cluesCount} clues',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant
-                                .withOpacity(0.7),
+                                .withValues(alpha: 0.7),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -183,14 +183,14 @@ class DifficultyCard extends StatelessWidget {
                           Icons.timer_rounded,
                           size: 16,
                           color: theme.colorScheme.onSurfaceVariant
-                              .withOpacity(0.7),
+                              .withValues(alpha: 0.7),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           _getEstimatedTime(difficulty),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant
-                                .withOpacity(0.7),
+                                .withValues(alpha: 0.7),
                           ),
                         ),
                       ],

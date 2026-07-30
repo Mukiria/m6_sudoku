@@ -64,7 +64,7 @@ class CompletionScreen extends ConsumerWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              difficultyColor.withOpacity(0.1),
+              difficultyColor.withValues(alpha: 0.1),
               colorScheme.surface,
             ],
           ),
@@ -86,7 +86,7 @@ class CompletionScreen extends ConsumerWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: difficultyColor.withOpacity(0.3),
+                        color: difficultyColor.withValues(alpha: 0.3),
                         blurRadius: 20,
                         spreadRadius: 5,
                       ),
@@ -231,7 +231,7 @@ class CompletionScreen extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Icon(icon, color: color, size: 28),

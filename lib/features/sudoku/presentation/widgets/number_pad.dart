@@ -201,10 +201,10 @@ class NumberPad extends ConsumerWidget {
           duration: const Duration(milliseconds: 150),
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: isEnabled ? color : color.withOpacity(0.3),
+            color: isEnabled ? color : color.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(AppConstants.borderRadius),
             border: Border.all(
-              color: isEnabled ? color : color.withOpacity(0.3),
+              color: isEnabled ? color : color.withValues(alpha: 0.3),
               width: 1.5,
             ),
           ),
@@ -214,7 +214,7 @@ class NumberPad extends ConsumerWidget {
               Icon(
                 icon,
                 size: 20,
-                color: isEnabled ? textColor : textColor.withOpacity(0.3),
+                color: isEnabled ? textColor : textColor.withValues(alpha: 0.3),
               ),
               const SizedBox(width: 8),
               Text(
@@ -222,7 +222,8 @@ class NumberPad extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: isEnabled ? textColor : textColor.withOpacity(0.3),
+                  color:
+                      isEnabled ? textColor : textColor.withValues(alpha: 0.3),
                 ),
               ),
             ],

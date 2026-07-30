@@ -34,7 +34,7 @@ class PauseMenu extends ConsumerWidget {
             height: 4,
             margin: const EdgeInsets.only(bottom: AppConstants.spacingLg),
             decoration: BoxDecoration(
-              color: colorScheme.onSurfaceVariant.withOpacity(0.3),
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),

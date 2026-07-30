@@ -7,11 +7,7 @@ import 'package:m6_sudoku/core/routing/app_router.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/game_entities.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
-import 'package:m6_sudoku/features/sudoku/presentation/screens/difficulty_selection_screen.dart';
-import 'package:m6_sudoku/features/statistics/presentation/screens/statistics_screen.dart';
-import 'package:m6_sudoku/features/settings/presentation/screens/settings_screen.dart';
 import 'package:m6_sudoku/shared/widgets/buttons.dart';
-import 'package:m6_sudoku/shared/widgets/cards.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -153,7 +149,7 @@ class HomeScreen extends ConsumerWidget {
               Text(
                 'Version ${AppConstants.appVersion}',
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                  color: colorScheme.onSurfaceVariant.withOpacity(0.5),
                 ),
                 textAlign: TextAlign.center,
               ).animate().fadeIn(duration: 300.ms, delay: 700.ms),

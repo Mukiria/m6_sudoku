@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../core/theme/app_theme_extension.dart';
+import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 
 class SudokuCell extends StatelessWidget {
   const SudokuCell({
@@ -200,7 +200,7 @@ class NumberButton extends StatelessWidget {
                 ? [
                     BoxShadow(
                       color: extension.numberButtonSelectedBackground
-                          .withValues(alpha: 0.3),
+                          .withOpacity(0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -236,7 +236,7 @@ class NumberButton extends StatelessWidget {
                         const BoxConstraints(minWidth: 16, minHeight: 16),
                     child: Center(
                       child: Text(
-                        count!.toString(),
+                        count.toString(),
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
@@ -368,9 +368,9 @@ class ActionButton extends StatelessWidget {
     }
 
     if (!isEnabled) {
-      backgroundColor = colorScheme.onSurface.withValues(alpha: 0.12);
-      textColor = colorScheme.onSurface.withValues(alpha: 0.38);
-      iconColor = colorScheme.onSurface.withValues(alpha: 0.38);
+      backgroundColor = colorScheme.onSurface.withOpacity(0.12);
+      textColor = colorScheme.onSurface.withOpacity(0.38);
+      iconColor = colorScheme.onSurface.withOpacity(0.38);
     }
 
     return Material(

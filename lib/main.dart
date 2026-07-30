@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'core/theme/app_theme.dart';
-import 'core/theme/app_theme_extension.dart';
-import 'core/routing/app_router.dart';
-import 'core/constants/app_constants.dart';
-import 'core/di/service_locator.dart';
-import 'features/settings/presentation/providers/settings_provider.dart';
+import 'package:m6_sudoku/core/constants/app_constants.dart';
+import 'package:m6_sudoku/core/routing/app_router.dart';
+import 'package:m6_sudoku/core/theme/app_theme.dart';
+import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
+import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await initializeDependencies();
 
   runApp(
     const ProviderScope(

@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
+import 'package:m6_sudoku/core/services/storage_service.dart';
+import 'package:m6_sudoku/core/errors/failures.dart';
 import '../../domain/entities/settings.dart';
-import '../../domain/repositories/settings_repository.dart';
-import '../../core/services/storage_service.dart';
-import '../../core/errors/failures.dart';
 
 class SettingsLocalDataSource {
   SettingsLocalDataSource(this._storage);

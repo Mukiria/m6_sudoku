@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/constants/app_constants.dart';
-import '../../core/theme/app_theme_extension.dart';
-import '../../shared/widgets/buttons.dart';
-import '../../shared/widgets/cards.dart';
-import '../providers/game_provider.dart';
+import 'package:m6_sudoku/core/constants/app_constants.dart';
+import 'package:m6_sudoku/core/routing/app_router.dart';
+import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
+import 'package:m6_sudoku/shared/widgets/buttons.dart';
 
 class PauseMenu extends ConsumerWidget {
   const PauseMenu({super.key});
@@ -33,7 +34,7 @@ class PauseMenu extends ConsumerWidget {
             height: 4,
             margin: const EdgeInsets.only(bottom: AppConstants.spacingLg),
             decoration: BoxDecoration(
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+              color: colorScheme.onSurfaceVariant.withOpacity(0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -64,7 +65,6 @@ class PauseMenu extends ConsumerWidget {
           const SizedBox(height: AppConstants.spacingMd),
           AppButton(
             onPressed: () {
-              ref.read(gameProvider.notifier).saveGame();
               context.go(AppRoutes.home);
             },
             variant: AppButtonVariant.outlined,
@@ -75,12 +75,14 @@ class PauseMenu extends ConsumerWidget {
           const SizedBox(height: AppConstants.spacingMd),
           AppButton(
             onPressed: () {
-              ref.read(gameProvider.notifier).newGame(
-                    Difficulty.values.firstWhere(
-                      (d) => d.name == gameState?.puzzle.difficulty,
-                      orElse: () => Difficulty.easy,
-                    ),
-                  );
+              if (gameState != null) {
+                ref.read(gameProvider.notifier).newGame(
+                      Difficulty.values.firstWhere(
+                        (d) => d.name == gameState!.difficulty.name,
+                        orElse: () => Difficulty.easy,
+                      ),
+                    );
+              }
               context.pop();
             },
             variant: AppButtonVariant.tonal,

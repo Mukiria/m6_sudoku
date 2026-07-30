@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
-import '../entities/settings.dart';
-import '../repositories/settings_repository.dart';
+import 'package:m6_sudoku/features/settings/domain/entities/settings.dart';
+import 'package:m6_sudoku/features/settings/domain/repositories/settings_repository.dart';
+import 'package:m6_sudoku/core/errors/failures.dart';
 import 'settings_local_datasource.dart';
-import '../../core/errors/failures.dart';
 
 class SettingsRepositoryImpl implements SettingsRepository {
   SettingsRepositoryImpl(this._dataSource);

@@ -1,30 +1,131 @@
 import 'package:flutter/material.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:equatable/equatable.dart';
 
-part 'settings.freezed.dart';
-part 'settings.g.dart';
+class Settings extends Equatable {
+  const Settings({
+    this.themeMode = ThemeMode.system,
+    this.soundEnabled = true,
+    this.hapticsEnabled = true,
+    this.autoNotes = true,
+    this.highlightErrors = true,
+    this.showTimer = true,
+    this.showHints = true,
+    this.autoClearNotes = true,
+    this.highlightRegions = true,
+    this.numberFirstInput = false,
+    this.selectedDifficulty = 'easy',
+    this.maxHints = 3,
+    this.maxUndoHistory = 50,
+    this.maxPuzzleHistory = 100,
+  });
 
-@freezed
-class Settings with _$Settings {
-  const factory Settings({
-    @Default(ThemeMode.system) ThemeMode themeMode,
-    @Default(true) bool soundEnabled,
-    @Default(true) bool hapticsEnabled,
-    @Default(true) bool autoNotes,
-    @Default(true) bool highlightErrors,
-    @Default(true) bool showTimer,
-    @Default(true) bool showHints,
-    @Default(true) bool autoClearNotes,
-    @Default(true) bool highlightRegions,
-    @Default(false) bool numberFirstInput,
-    @Default('easy') String selectedDifficulty,
-    @Default(3) int maxHints,
-    @Default(50) int maxUndoHistory,
-    @Default(100) int maxPuzzleHistory,
-  }) = _Settings;
+  final ThemeMode themeMode;
+  final bool soundEnabled;
+  final bool hapticsEnabled;
+  final bool autoNotes;
+  final bool highlightErrors;
+  final bool showTimer;
+  final bool showHints;
+  final bool autoClearNotes;
+  final bool highlightRegions;
+  final bool numberFirstInput;
+  final String selectedDifficulty;
+  final int maxHints;
+  final int maxUndoHistory;
+  final int maxPuzzleHistory;
 
-  factory Settings.fromJson(Map<String, dynamic> json) =>
-      _$SettingsFromJson(json);
+  Settings copyWith({
+    ThemeMode? themeMode,
+    bool? soundEnabled,
+    bool? hapticsEnabled,
+    bool? autoNotes,
+    bool? highlightErrors,
+    bool? showTimer,
+    bool? showHints,
+    bool? autoClearNotes,
+    bool? highlightRegions,
+    bool? numberFirstInput,
+    String? selectedDifficulty,
+    int? maxHints,
+    int? maxUndoHistory,
+    int? maxPuzzleHistory,
+  }) {
+    return Settings(
+      themeMode: themeMode ?? this.themeMode,
+      soundEnabled: soundEnabled ?? this.soundEnabled,
+      hapticsEnabled: hapticsEnabled ?? this.hapticsEnabled,
+      autoNotes: autoNotes ?? this.autoNotes,
+      highlightErrors: highlightErrors ?? this.highlightErrors,
+      showTimer: showTimer ?? this.showTimer,
+      showHints: showHints ?? this.showHints,
+      autoClearNotes: autoClearNotes ?? this.autoClearNotes,
+      highlightRegions: highlightRegions ?? this.highlightRegions,
+      numberFirstInput: numberFirstInput ?? this.numberFirstInput,
+      selectedDifficulty: selectedDifficulty ?? this.selectedDifficulty,
+      maxHints: maxHints ?? this.maxHints,
+      maxUndoHistory: maxUndoHistory ?? this.maxUndoHistory,
+      maxPuzzleHistory: maxPuzzleHistory ?? this.maxPuzzleHistory,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'themeMode': themeMode.name,
+      'soundEnabled': soundEnabled,
+      'hapticsEnabled': hapticsEnabled,
+      'autoNotes': autoNotes,
+      'highlightErrors': highlightErrors,
+      'showTimer': showTimer,
+      'showHints': showHints,
+      'autoClearNotes': autoClearNotes,
+      'highlightRegions': highlightRegions,
+      'numberFirstInput': numberFirstInput,
+      'selectedDifficulty': selectedDifficulty,
+      'maxHints': maxHints,
+      'maxUndoHistory': maxUndoHistory,
+      'maxPuzzleHistory': maxPuzzleHistory,
+    };
+  }
+
+  factory Settings.fromJson(Map<String, dynamic> json) {
+    return Settings(
+      themeMode: ThemeMode.values.firstWhere(
+        (e) => e.name == json['themeMode'],
+        orElse: () => ThemeMode.system,
+      ),
+      soundEnabled: json['soundEnabled'] ?? true,
+      hapticsEnabled: json['hapticsEnabled'] ?? true,
+      autoNotes: json['autoNotes'] ?? true,
+      highlightErrors: json['highlightErrors'] ?? true,
+      showTimer: json['showTimer'] ?? true,
+      showHints: json['showHints'] ?? true,
+      autoClearNotes: json['autoClearNotes'] ?? true,
+      highlightRegions: json['highlightRegions'] ?? true,
+      numberFirstInput: json['numberFirstInput'] ?? false,
+      selectedDifficulty: json['selectedDifficulty'] ?? 'easy',
+      maxHints: json['maxHints'] ?? 3,
+      maxUndoHistory: json['maxUndoHistory'] ?? 50,
+      maxPuzzleHistory: json['maxPuzzleHistory'] ?? 100,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+        themeMode,
+        soundEnabled,
+        hapticsEnabled,
+        autoNotes,
+        highlightErrors,
+        showTimer,
+        showHints,
+        autoClearNotes,
+        highlightRegions,
+        numberFirstInput,
+        selectedDifficulty,
+        maxHints,
+        maxUndoHistory,
+        maxPuzzleHistory,
+      ];
 }
 
 abstract class SettingsRepository {

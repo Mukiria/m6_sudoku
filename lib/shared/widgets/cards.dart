@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../core/theme/app_theme_extension.dart';
+import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 
 class AppCard extends StatelessWidget {
   const AppCard({
@@ -45,9 +45,9 @@ class AppCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(borderRadius),
-        splashColor: inkColor ?? colorScheme.primary.withValues(alpha: 0.1),
-        highlightColor: inkColor?.withValues(alpha: 0.05) ??
-            colorScheme.primary.withValues(alpha: 0.05),
+        splashColor: inkColor ?? colorScheme.primary.withOpacity(0.1),
+        highlightColor: inkColor?.withOpacity(0.05) ??
+            colorScheme.primary.withOpacity(0.05),
         child: Padding(padding: padding, child: child),
       ),
     );
@@ -92,8 +92,7 @@ class AppStatCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: (iconColor ?? colorScheme.primary)
-                        .withValues(alpha: 0.1),
+                    color: (iconColor ?? colorScheme.primary).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: IconTheme(
@@ -228,12 +227,12 @@ class DifficultyCard extends StatelessWidget {
                 width: isSelected ? 2.5 : 1.5,
               ),
               color: isSelected
-                  ? difficultyColor.withValues(alpha: 0.1)
+                  ? difficultyColor.withOpacity(0.1)
                   : colorScheme.surface,
               boxShadow: isSelected
                   ? [
                       BoxShadow(
-                        color: difficultyColor.withValues(alpha: 0.2),
+                        color: difficultyColor.withOpacity(0.2),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -251,7 +250,7 @@ class DifficultyCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? difficultyColor
-                            : difficultyColor.withValues(alpha: 0.1),
+                            : difficultyColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -321,11 +320,11 @@ class DifficultyCard extends StatelessWidget {
   }) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: color.withValues(alpha: 0.7)),
+        Icon(icon, size: 16, color: color.withOpacity(0.7)),
         const SizedBox(width: 8),
         Text(
           label,
-          style: TextStyle(fontSize: 13, color: color.withValues(alpha: 0.7)),
+          style: TextStyle(fontSize: 13, color: color.withOpacity(0.7)),
         ),
         const Spacer(),
         Text(

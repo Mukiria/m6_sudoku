@@ -138,6 +138,7 @@ class GameController extends _$GameController {
     } else if (_checkCompletion(newGrid, puzzle.solution)) {
       state = state!.copyWith(status: GameStatus.completed);
       _saveGame();
+      _checkAndUnlockAchievements(currentState);
     }
   }
 
@@ -591,6 +592,75 @@ class GameController extends _$GameController {
   void clearHintState() {
     if (state == null) return;
     state = state!.copyWith(hintState: null);
+  }
+
+  void _checkAndUnlockAchievements(GameState completedState) {
+    final currentState = state!;
+    final difficulty = currentState.difficulty.name;
+    final timeElapsed = currentState.timeElapsed;
+    final mistakes = currentState.mistakes;
+    final hintsUsed = currentState.hintsUsed;
+    final hour = DateTime.now().hour;
+
+    // First Win
+    ref.read(incrementAchievementProgressUseCaseProvider)('first_win', 1);
+
+    // Ten Wins
+    ref.read(incrementAchievementProgressUseCaseProvider)('ten_wins', 1);
+
+    // Hundred Wins
+    ref.read(incrementAchievementProgressUseCaseProvider)('hundred_wins', 1);
+
+    // Perfect Game (0 mistakes, 0 hints)
+    if (mistakes == 0 && hintsUsed == 0) {
+      ref.read(incrementAchievementProgressUseCaseProvider)('perfect_game', 1);
+      ref.read(incrementAchievementProgressUseCaseProvider)('five_perfect', 1);
+    }
+
+    // No Hints
+    if (hintsUsed == 0) {
+      ref.read(incrementAchievementProgressUseCaseProvider)('no_hints', 1);
+      ref.read(incrementAchievementProgressUseCaseProvider)('ten_no_hints', 1);
+    }
+
+    // Expert Winner
+    if (difficulty == 'expert') {
+      ref.read(incrementAchievementProgressUseCaseProvider)('expert_winner', 1);
+    }
+
+    // Evil Conqueror (secret)
+    if (difficulty == 'evil') {
+      ref.read(incrementAchievementProgressUseCaseProvider)('evil_conqueror', 1);
+    }
+
+    // All Difficulties - check what difficulties have been won
+    // This would need to track which difficulties have been won
+    // For now, increment and let the progress system handle it
+    // TODO: Implement difficulty tracking
+
+    // Speed Runner (under 3 minutes = 180 seconds)
+    if (timeElapsed < 180) {
+      ref.read(incrementAchievementProgressUseCaseProvider)('speed_runner', 1);
+    }
+
+    // Lightning Fast (Easy under 1 minute = 60 seconds)
+    if (difficulty == 'easy' && timeElapsed < 60) {
+      ref.read(incrementAchievementProgressUseCaseProvider)('lightning', 1);
+    }
+
+    // Streaks are handled by statistics
+
+    // Daily Champion - handled by daily challenge
+
+    // Night Owl (midnight - 4 AM)
+    if (hour >= 0 && hour < 4) {
+      ref.read(incrementAchievementProgressUseCaseProvider)('night_owl', 1);
+    }
+
+    // Early Bird (4 AM - 7 AM)
+    if (hour >= 4 && hour < 7) {
+      ref.read(incrementAchievementProgressUseCaseProvider)('early_bird', 1);
+    }
   }
 }
 

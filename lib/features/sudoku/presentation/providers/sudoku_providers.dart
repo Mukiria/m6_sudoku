@@ -2,12 +2,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:m6_sudoku/core/services/storage_service.dart';
 import 'package:m6_sudoku/features/sudoku/data/datasources/puzzle_local_datasource.dart';
 import 'package:m6_sudoku/features/sudoku/data/datasources/daily_challenge_local_datasource.dart';
+import 'package:m6_sudoku/features/sudoku/data/datasources/achievement_local_datasource.dart';
 import 'package:m6_sudoku/features/sudoku/data/repositories/puzzle_repository_impl.dart';
 import 'package:m6_sudoku/features/sudoku/data/repositories/daily_challenge_repository_impl.dart';
+import 'package:m6_sudoku/features/sudoku/data/repositories/achievement_repository_impl.dart';
 import 'package:m6_sudoku/features/sudoku/domain/repositories/puzzle_repository.dart';
 import 'package:m6_sudoku/features/sudoku/domain/repositories/daily_challenge_repository.dart';
+import 'package:m6_sudoku/features/sudoku/domain/repositories/achievement_repository.dart';
 import 'package:m6_sudoku/features/sudoku/domain/usecases/game_usecases.dart';
 import 'package:m6_sudoku/features/sudoku/domain/usecases/daily_challenge_usecases.dart';
+import 'package:m6_sudoku/features/sudoku/domain/usecases/achievement_usecases.dart';
 import 'package:m6_sudoku/features/sudoku/engine/generator/puzzle_generator.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 
@@ -97,4 +101,56 @@ final dailyChallengeStatsProvider = FutureProvider<DailyChallengeStats>((ref) as
   final useCase = ref.read(getDailyChallengeStatsUseCaseProvider);
   final result = await useCase();
   return result.fold((failure) => throw Exception(failure.message), (stats) => stats);
+});
+
+final achievementLocalDataSourceProvider = Provider<AchievementLocalDataSource>((ref) {
+  final storage = ref.read(storageServiceProvider);
+  return AchievementLocalDataSource(storage);
+});
+
+final achievementRepositoryProvider = Provider<AchievementRepository>((ref) {
+  final dataSource = ref.read(achievementLocalDataSourceProvider);
+  return AchievementRepositoryImpl(dataSource);
+});
+
+final getAchievementsUseCaseProvider = Provider<GetAchievementsUseCase>((ref) {
+  final repo = ref.read(achievementRepositoryProvider);
+  return GetAchievementsUseCase(repo);
+});
+
+final unlockAchievementUseCaseProvider = Provider<UnlockAchievementUseCase>((ref) {
+  final repo = ref.read(achievementRepositoryProvider);
+  return UnlockAchievementUseCase(repo);
+});
+
+final updateAchievementProgressUseCaseProvider = Provider<UpdateAchievementProgressUseCase>((ref) {
+  final repo = ref.read(achievementRepositoryProvider);
+  return UpdateAchievementProgressUseCase(repo);
+});
+
+final incrementAchievementProgressUseCaseProvider = Provider<IncrementAchievementProgressUseCase>((ref) {
+  final repo = ref.read(achievementRepositoryProvider);
+  return IncrementAchievementProgressUseCase(repo);
+});
+
+final getUnlockedAchievementsUseCaseProvider = Provider<GetUnlockedAchievementsUseCase>((ref) {
+  final repo = ref.read(achievementRepositoryProvider);
+  return GetUnlockedAchievementsUseCase(repo);
+});
+
+final getLockedAchievementsUseCaseProvider = Provider<GetLockedAchievementsUseCase>((ref) {
+  final repo = ref.read(achievementRepositoryProvider);
+  return GetLockedAchievementsUseCase(repo);
+});
+
+final achievementsProvider = FutureProvider<List<Achievement>>((ref) async {
+  final useCase = ref.read(getAchievementsUseCaseProvider);
+  final result = await useCase();
+  return result.fold((failure) => throw Exception(failure.message), (achievements) => achievements);
+});
+
+final unlockedAchievementsProvider = FutureProvider<List<Achievement>>((ref) async {
+  final useCase = ref.read(getUnlockedAchievementsUseCaseProvider);
+  final result = await useCase();
+  return result.fold((failure) => throw Exception(failure.message), (achievements) => achievements);
 });

@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:dartz/dartz.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
-import 'package:m6_sudoku/features/sudoku/domain/repositories/puzzle_repository.dart';
 import 'package:m6_sudoku/core/errors/failures.dart';
 import 'package:m6_sudoku/core/services/storage_service.dart';
 
@@ -16,14 +15,52 @@ class PuzzleLocalDataSource {
   static const String _gameStateKey = 'game_state';
   static const String _historyKey = 'puzzle_history';
   static const String _cacheKey = 'puzzle_cache_';
+  static const int _maxCachedPuzzlesPerDifficulty = 10;
 
   Future<Either<Failure, Puzzle>> generatePuzzle(String difficulty) async {
     try {
+      // Try to get a cached puzzle first
+      final cached = await _getCachedPuzzle(difficulty);
+      if (cached != null) {
+        await _storage.setString(_puzzleKey, jsonEncode(cached.toJson()));
+        return Right(cached);
+      }
+
+      // Generate new puzzle if no cache available
       final puzzle = _generatePuzzleForDifficulty(difficulty);
       await _storage.setString(_puzzleKey, jsonEncode(puzzle.toJson()));
+      await _cachePuzzle(puzzle);
       return Right(puzzle);
     } catch (e) {
       return Left(PuzzleGenerationFailure('Failed to generate puzzle: $e'));
+    }
+  }
+
+  Future<Puzzle?> _getCachedPuzzle(String difficulty) async {
+    try {
+      final jsonString = _storage.getString('$_cacheKey$difficulty');
+      if (jsonString == null) return null;
+      final list = jsonDecode(jsonString) as List;
+      if (list.isEmpty) return null;
+      final map = list.removeAt(0) as Map<String, dynamic>;
+      await _storage.setString('$_cacheKey$difficulty', jsonEncode(list));
+      return Puzzle.fromJson(map);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _cachePuzzle(Puzzle puzzle) async {
+    try {
+      final jsonString = _storage.getString('$_cacheKey${puzzle.difficulty}');
+      final list = jsonString != null ? jsonDecode(jsonString) as List : <dynamic>[];
+      list.insert(0, puzzle.toJson());
+      if (list.length > _maxCachedPuzzlesPerDifficulty) {
+        list.removeRange(_maxCachedPuzzlesPerDifficulty, list.length);
+      }
+      await _storage.setString('$_cacheKey${puzzle.difficulty}', jsonEncode(list));
+    } catch (_) {
+      // Silently fail caching
     }
   }
 

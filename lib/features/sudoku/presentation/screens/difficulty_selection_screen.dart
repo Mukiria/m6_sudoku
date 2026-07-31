@@ -12,6 +12,7 @@ import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
 import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart';
 import 'package:m6_sudoku/core/routing/app_router.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/screens/puzzle_loading_screen.dart';
 
 class DifficultySelectionScreen extends ConsumerWidget {
   const DifficultySelectionScreen({super.key});
@@ -54,7 +55,7 @@ class DifficultySelectionScreen extends ConsumerWidget {
                                     .read(settingsProvider.notifier)
                                     .updateDifficulty(difficulty.name);
                                 context.push(
-                                  AppRoutes.game,
+                                  AppRoutes.puzzleLoading,
                                   extra: difficulty.name,
                                 );
                               },

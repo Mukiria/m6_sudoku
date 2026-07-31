@@ -28,6 +28,7 @@ class GameState with _$GameState {
     required Set<CellPosition> conflictCells,
     required HintState? hintState,
     required DateTime lastSaved,
+    @Default(1) int saveVersion,
   }) = _GameState;
 
   factory GameState.fromJson(Map<String, dynamic> json) => _$GameStateFromJson(json);

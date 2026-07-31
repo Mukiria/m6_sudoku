@@ -67,6 +67,12 @@ class GameController extends _$GameController {
     }
   }
 
+  Future<void> continueGame(GameState savedState) async {
+    // Load the saved game state directly
+    state = savedState;
+    _startAutoSave();
+  }
+
   void selectCell(int row, int col) {
     if (state == null) return;
 
@@ -135,6 +141,9 @@ class GameController extends _$GameController {
       lastSaved: DateTime.now(),
     );
 
+    // Auto-save on every move
+    _saveGame();
+
     // Play sound
     if (isCorrect) {
       ref.read(audioServiceProvider).playClick();
@@ -186,6 +195,7 @@ class GameController extends _$GameController {
       lastSaved: DateTime.now(),
     );
     ref.read(audioServiceProvider).playClick();
+    _saveGame();
   }
 
   void clearCell(int row, int col) {
@@ -205,7 +215,7 @@ class GameController extends _$GameController {
         currentState.notes.map((row) => List<Set<int>>.from(row)).toList();
     newNotesGrid[row][col] = <int>{};
 
-    state = currentState.copyWith(
+state = currentState.copyWith(
       userGrid: newGrid,
       notes: newNotesGrid,
       moveHistory: [
@@ -222,7 +232,7 @@ class GameController extends _$GameController {
       lastPlayed: DateTime.now(),
       lastSaved: DateTime.now(),
     );
-    ref.read(audioServiceProvider).playClick();
+    _saveGame();
   }
 
   Future<void> useHint() async {
@@ -321,6 +331,7 @@ class GameController extends _$GameController {
       lastSaved: DateTime.now(),
     );
     ref.read(audioServiceProvider).playClick();
+    _saveGame();
   }
 
   void redo() {
@@ -360,7 +371,7 @@ class GameController extends _$GameController {
     // Recompute notes from scratch based on new grid
     final newNotesGrid = _recomputeNotes(newGrid, currentState.puzzle);
 
-    state = currentState.copyWith(
+state = currentState.copyWith(
       userGrid: newGrid,
       notes: newNotesGrid,
       mistakes: newMistakes,
@@ -372,11 +383,16 @@ class GameController extends _$GameController {
       lastSaved: DateTime.now(),
     );
     ref.read(audioServiceProvider).playClick();
+    _saveGame();
   }
 
   void toggleNoteMode() {
     if (state == null) return;
-    state = state!.copyWith(isNoteMode: !state!.isNoteMode);
+    state = state!.copyWith(
+      isNoteMode: !state!.isNoteMode,
+      lastSaved: DateTime.now(),
+    );
+    _saveGame();
   }
 
   void setSelectedNumber(int? number) {
@@ -417,7 +433,7 @@ class GameController extends _$GameController {
   }
 
   void _startAutoSave() {
-    // Auto-save every 30 seconds
+    // Periodic auto-save as backup (every 30 seconds)
     Future.delayed(const Duration(seconds: 30), () {
       if (state != null && state!.status == GameStatus.playing) {
         _saveGame();

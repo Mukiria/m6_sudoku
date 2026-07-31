@@ -163,6 +163,7 @@ class HomeScreen extends ConsumerWidget {
   }
 
   void _continueGame(BuildContext context, WidgetRef ref, GameState gameState) {
-    context.push(AppRoutes.game, extra: gameState.difficulty.name);
+    ref.read(gameControllerProvider.notifier).continueGame(gameState);
+    context.push(AppRoutes.game);
   }
 }

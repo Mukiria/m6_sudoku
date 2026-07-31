@@ -40,11 +40,16 @@ class _GameScreenState extends ConsumerState<GameScreen>
     _tabController.addListener(_onTabChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final difficulty = Difficulty.values.firstWhere(
-        (d) => d.name == widget.difficulty,
-        orElse: () => Difficulty.easy,
-      );
-      ref.read(gameControllerProvider.notifier).newGame(difficulty);
+      final gameState = ref.read(gameControllerProvider);
+      
+      // If there's no saved game state, create a new game
+      if (gameState == null || gameState.status != GameStatus.playing) {
+        final difficulty = Difficulty.values.firstWhere(
+          (d) => d.name == widget.difficulty,
+          orElse: () => Difficulty.easy,
+        );
+        ref.read(gameControllerProvider.notifier).newGame(difficulty);
+      }
       ref.read(timerControllerProvider.notifier).start();
     });
   }

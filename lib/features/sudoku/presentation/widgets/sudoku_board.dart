@@ -54,12 +54,29 @@ class SudokuBoard extends StatelessWidget {
               return Expanded(
                 child: Row(
                   children: List.generate(9, (col) {
-                    return _buildCell(context, row, col, cellSize);
+                    return _buildCell(context, row, col, cellSize)
+                        .animate()
+                        .fadeIn(
+                          duration: 300.ms,
+                          delay: Duration(milliseconds: (row * 9 + col) * 15),
+                        )
+                        .slideY(
+                          begin: 0.3,
+                          end: 0,
+                          duration: 300.ms,
+                          delay: Duration(milliseconds: (row * 9 + col) * 15),
+                          curve: Curves.easeOutCubic,
+                        );
                   }),
                 ),
               );
             }),
           ),
+        ).animate().fadeIn(duration: 300.ms).scale(
+          begin: const Offset(0.95, 0.95),
+          end: const Offset(1.0, 1.0),
+          duration: 400.ms,
+          curve: Curves.easeOutCubic,
         );
       },
     );
@@ -117,6 +134,8 @@ class SudokuBoard extends StatelessWidget {
           onTap: () => onCellTap(row, col),
           onLongPress: () => onCellLongPress(row, col),
           borderRadius: BorderRadius.zero,
+          splashColor: colorScheme.primary.withValues(alpha: 0.1),
+          highlightColor: colorScheme.primary.withValues(alpha: 0.05),
           child: _buildCellContent(
             value: value,
             notes: cellNotes,
@@ -129,9 +148,12 @@ class SudokuBoard extends StatelessWidget {
       ),
     ).animate(target: isSelected ? 1 : 0).scale(
       begin: const Offset(1, 1),
-      end: const Offset(1.02, 1.02),
-      duration: AppConstants.fastAnimation,
+      end: const Offset(1.03, 1.03),
+      duration: 150.ms,
       curve: Curves.easeOutBack,
+    ).then().shimmer(
+      duration: 1000.ms,
+      color: colorScheme.primary.withValues(alpha: 0.3),
     );
   }
 
@@ -148,10 +170,15 @@ class SudokuBoard extends StatelessWidget {
         child: Text(
           value.toString(),
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 26,
             fontWeight: isFixed ? FontWeight.w700 : FontWeight.w600,
             color: isConflicted ? Colors.red : textColor,
           ),
+        ).animate(target: value != null ? 1 : 0).scale(
+          begin: const Offset(0.5, 0.5),
+          end: const Offset(1.0, 1.0),
+          duration: 200.ms,
+          curve: Curves.easeOutBack,
         ),
       );
     }
@@ -167,7 +194,19 @@ class SudokuBoard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   for (int col = 0; col < 3; col++)
-                    _buildNote(row * 3 + col + 1, notes, noteColor),
+                    _buildNote(row * 3 + col + 1, notes, noteColor)
+                        .animate()
+                        .fadeIn(
+                          duration: 150.ms,
+                          delay: Duration(milliseconds: (row * 3 + col) * 20),
+                        )
+                        .scale(
+                          begin: const Offset(0.5, 0.5),
+                          end: const Offset(1.0, 1.0),
+                          duration: 150.ms,
+                          delay: Duration(milliseconds: (row * 3 + col) * 20),
+                          curve: Curves.easeOutBack,
+                        ),
                 ],
               ),
           ],
@@ -183,12 +222,12 @@ class SudokuBoard extends StatelessWidget {
       return Text(
         number.toString(),
         style: TextStyle(
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: FontWeight.w500,
           color: noteColor,
         ),
       );
     }
-    return const SizedBox(width: 10, height: 10);
+    return const SizedBox(width: 12, height: 12);
   }
 }

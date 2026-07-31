@@ -17,6 +17,48 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: AppRoutes.home,
     debugLogDiagnostics: true,
+    // Custom page transitions
+    pageBuilder: (context, state, child) {
+      return CustomTransitionPage(
+        key: state.pageKey,
+        child: child,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          // Different transitions for different routes
+          final routeName = state.matchedLocation;
+          
+          if (routeName == AppRoutes.game || routeName == AppRoutes.completion) {
+            // Slide up for game screens
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 1),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+              )),
+              child: child,
+            );
+          } else if (routeName == AppRoutes.achievements || routeName == AppRoutes.dailyChallenge) {
+            // Fade + scale for modal-like screens
+            return FadeTransition(
+              opacity: animation,
+              child: ScaleTransition(
+                scale: Tween<double>(begin: 0.95, end: 1.0).animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+                ),
+                child: child,
+              ),
+            );
+          } else {
+            // Default fade for other screens
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          }
+        },
+      );
+    },
     routes: [
       GoRoute(
         path: AppRoutes.home,

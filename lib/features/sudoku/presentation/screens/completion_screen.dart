@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:confetti/confetti.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 import 'package:m6_sudoku/shared/widgets/buttons.dart';
@@ -10,7 +11,7 @@ import 'package:m6_sudoku/features/statistics/presentation/providers/statistics_
 import 'package:m6_sudoku/core/routing/app_router.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 
-class CompletionScreen extends ConsumerWidget {
+class CompletionScreen extends ConsumerStatefulWidget {
   const CompletionScreen({
     super.key,
     required this.time,
@@ -23,6 +24,40 @@ class CompletionScreen extends ConsumerWidget {
   final int mistakes;
   final int hintsUsed;
   final String difficulty;
+
+  @override
+  ConsumerState<CompletionScreen> createState() => _CompletionScreenState();
+}
+
+class _CompletionScreenState extends ConsumerState<CompletionScreen>
+    with TickerProviderStateMixin {
+  late ConfettiController _confettiController;
+  late ConfettiController _confettiController2;
+
+  @override
+  void initState() {
+    super.initState();
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 3),
+    );
+    _confettiController2 = ConfettiController(
+      duration: const Duration(seconds: 3),
+    );
+    // Start confetti after a short delay
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        _confettiController.play();
+        _confettiController2.play();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    _confettiController2.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -62,164 +97,241 @@ class CompletionScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              difficultyColor.withValues(alpha: 0.1),
-              colorScheme.surface,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(AppConstants.spacingLg),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Spacer(),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  difficultyColor.withValues(alpha: 0.1),
+                  colorScheme.surface,
+                ],
+              ),
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(AppConstants.spacingLg),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Spacer(),
 
-                // Completion Animation
-                Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: difficultyColor,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: difficultyColor.withValues(alpha: 0.3),
-                            blurRadius: 20,
-                            spreadRadius: 5,
-                          ),
+                    // Confetti from top
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: ConfettiWidget(
+                        confettiController: _confettiController,
+                        blastDirection: 1.57, // radians (down)
+                        emissionFrequency: 0.05,
+                        numberOfParticles: 20,
+                        maxBlastForce: 10,
+                        minBlastForce: 5,
+                        colors: [
+                          difficultyColor,
+                          Colors.white,
+                          Colors.yellow,
+                          Colors.orange,
+                          Colors.pink,
                         ],
                       ),
-                      child: const Icon(
-                        Icons.check_rounded,
-                        color: Colors.white,
-                        size: 60,
-                      ),
-                    )
-                    .animate()
-                    .scale(duration: 600.ms, curve: Curves.elasticOut)
-                    .then()
-                    .shimmer(duration: 1000.ms),
-
-                const SizedBox(height: AppConstants.spacingXl),
-
-                Text(
-                      'Puzzle Complete!',
-                      style: theme.textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: colorScheme.onSurface,
-                      ),
-                    )
-                    .animate()
-                    .fadeIn(duration: 400.ms, delay: 300.ms)
-                    .slideY(begin: 0.3, end: 0),
-
-                const SizedBox(height: AppConstants.spacingSm),
-
-                Text(
-                      '${_capitalize(difficulty)} difficulty solved',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    )
-                    .animate()
-                    .fadeIn(duration: 400.ms, delay: 400.ms)
-                    .slideY(begin: 0.3, end: 0),
-
-                const SizedBox(height: AppConstants.spacingXl),
-
-                // Stats
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildCompletionStat(
-                      theme,
-                      icon: Icons.timer_rounded,
-                      label: 'Time',
-                      value: _formatTime(time),
-                      color: extension.timerText,
-                      delay: 500,
                     ),
-                    _buildCompletionStat(
-                      theme,
-                      icon: Icons.close_rounded,
-                      label: 'Mistakes',
-                      value: '$mistakes/3',
-                      color: extension.mistakeIndicatorColor,
-                      delay: 600,
+
+                    // Completion Animation
+                    Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            color: difficultyColor,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: difficultyColor.withValues(alpha: 0.3),
+                                blurRadius: 20,
+                                spreadRadius: 5,
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.check_rounded,
+                            color: Colors.white,
+                            size: 60,
+                          ),
+                        )
+                        .animate()
+                        .scale(duration: 600.ms, curve: Curves.elasticOut)
+                        .then()
+                        .shimmer(duration: 1000.ms),
+
+                    const SizedBox(height: AppConstants.spacingXl),
+
+                    Text(
+                          'Puzzle Complete!',
+                          style: theme.textTheme.displaySmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: colorScheme.onSurface,
+                          ),
+                        )
+                        .animate()
+                        .fadeIn(duration: 400.ms, delay: 300.ms)
+                        .slideY(begin: 0.3, end: 0),
+
+                    const SizedBox(height: AppConstants.spacingSm),
+
+                    Text(
+                          '${_capitalize(difficulty)} difficulty solved',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        )
+                        .animate()
+                        .fadeIn(duration: 400.ms, delay: 400.ms)
+                        .slideY(begin: 0.3, end: 0),
+
+                    const SizedBox(height: AppConstants.spacingXl),
+
+                    // Stats
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildCompletionStat(
+                          theme,
+                          icon: Icons.timer_rounded,
+                          label: 'Time',
+                          value: _formatTime(time),
+                          color: extension.timerText,
+                          delay: 500,
+                        ),
+                        _buildCompletionStat(
+                          theme,
+                          icon: Icons.close_rounded,
+                          label: 'Mistakes',
+                          value: '$mistakes/3',
+                          color: extension.mistakeIndicatorColor,
+                          delay: 600,
+                        ),
+                        _buildCompletionStat(
+                          theme,
+                          icon: Icons.lightbulb_rounded,
+                          label: 'Hints',
+                          value: '$hintsUsed/3',
+                          color: extension.hintIndicatorColor,
+                          delay: 700,
+                        ),
+                      ],
                     ),
-                    _buildCompletionStat(
-                      theme,
-                      icon: Icons.lightbulb_rounded,
-                      label: 'Hints',
-                      value: '$hintsUsed/3',
-                      color: extension.hintIndicatorColor,
-                      delay: 700,
+
+                    const Spacer(),
+
+                    // Confetti from bottom
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: ConfettiWidget(
+                        confettiController: _confettiController2,
+                        blastDirection: -1.57, // radians (up)
+                        emissionFrequency: 0.05,
+                        numberOfParticles: 20,
+                        maxBlastForce: 10,
+                        minBlastForce: 5,
+                        colors: [
+                          difficultyColor,
+                          Colors.white,
+                          Colors.yellow,
+                          Colors.orange,
+                          Colors.pink,
+                        ],
+                      ),
                     ),
+
+                    // Buttons
+                    Column(
+                      children: [
+                        AppButton(
+                              onPressed: () {
+                                ref
+                                    .read(gameControllerProvider.notifier)
+                                    .newGame(
+                                      Difficulty.values.firstWhere(
+                                        (d) => d.name == difficulty,
+                                        orElse: () => Difficulty.easy,
+                                      ),
+                                    );
+                                context.pop();
+                              },
+                              variant: AppButtonVariant.filled,
+                              size: AppButtonSize.large,
+                              icon: const Icon(Icons.refresh_rounded),
+                              child: const Text('Play Again'),
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 800.ms)
+                            .slideY(begin: 0.3, end: 0),
+                        const SizedBox(height: AppConstants.spacingMd),
+                        AppButton(
+                              onPressed: () => context.go(AppRoutes.home),
+                              variant: AppButtonVariant.outlined,
+                              size: AppButtonSize.large,
+                              icon: const Icon(Icons.home_rounded),
+                              child: const Text('Main Menu'),
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 900.ms)
+                            .slideY(begin: 0.3, end: 0),
+                        const SizedBox(height: AppConstants.spacingMd),
+                        AppButton(
+                              onPressed: () => context.go(AppRoutes.statistics),
+                              variant: AppButtonVariant.tonal,
+                              size: AppButtonSize.large,
+                              icon: const Icon(Icons.bar_chart_rounded),
+                              child: const Text('View Statistics'),
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 1000.ms)
+                            .slideY(begin: 0.3, end: 0),
+                      ],
+                    ),
+
+                    const SizedBox(height: AppConstants.spacingXl),
                   ],
                 ),
-
-                const Spacer(),
-
-                // Buttons
-                Column(
-                  children: [
-                    AppButton(
-                          onPressed: () {
-                            ref
-                                .read(gameControllerProvider.notifier)
-                                .newGame(
-                                  Difficulty.values.firstWhere(
-                                    (d) => d.name == difficulty,
-                                    orElse: () => Difficulty.easy,
-                                  ),
-                                );
-                            context.pop();
-                          },
-                          variant: AppButtonVariant.filled,
-                          size: AppButtonSize.large,
-                          icon: const Icon(Icons.refresh_rounded),
-                          child: const Text('Play Again'),
-                        )
-                        .animate()
-                        .fadeIn(duration: 400.ms, delay: 800.ms)
-                        .slideY(begin: 0.3, end: 0),
-                    const SizedBox(height: AppConstants.spacingMd),
-                    AppButton(
-                          onPressed: () => context.go(AppRoutes.home),
-                          variant: AppButtonVariant.outlined,
-                          size: AppButtonSize.large,
-                          icon: const Icon(Icons.home_rounded),
-                          child: const Text('Main Menu'),
-                        )
-                        .animate()
-                        .fadeIn(duration: 400.ms, delay: 900.ms)
-                        .slideY(begin: 0.3, end: 0),
-                    const SizedBox(height: AppConstants.spacingMd),
-                    AppButton(
-                          onPressed: () => context.go(AppRoutes.statistics),
-                          variant: AppButtonVariant.tonal,
-                          size: AppButtonSize.large,
-                          icon: const Icon(Icons.bar_chart_rounded),
-                          child: const Text('View Statistics'),
-                        )
-                        .animate()
-                        .fadeIn(duration: 400.ms, delay: 1000.ms)
-                        .slideY(begin: 0.3, end: 0),
-                  ],
-                ),
-
-                const SizedBox(height: AppConstants.spacingXl),
+              ),
+            ),
+          ),
+          // Side confetti
+          Align(
+            alignment: Alignment.centerLeft,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirection: 0, // right
+              emissionFrequency: 0.02,
+              numberOfParticles: 10,
+              maxBlastForce: 5,
+              minBlastForce: 2,
+              colors: [
+                difficultyColor,
+                Colors.white,
+                Colors.yellow,
               ],
             ),
           ),
-        ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: ConfettiWidget(
+              confettiController: _confettiController2,
+              blastDirection: 3.14, // left
+              emissionFrequency: 0.02,
+              numberOfParticles: 10,
+              maxBlastForce: 5,
+              minBlastForce: 2,
+              colors: [
+                difficultyColor,
+                Colors.white,
+                Colors.yellow,
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/constants/app_constants.dart';
-import '../../core/theme/app_theme_extension.dart';
-import '../../shared/widgets/cards.dart';
+import 'package:m6_sudoku/core/constants/app_constants.dart';
+import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
+import 'package:m6_sudoku/shared/widgets/cards.dart';
+import 'package:m6_sudoku/shared/widgets/buttons.dart';
+import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 import '../providers/statistics_provider.dart';
 
 class StatisticsScreen extends ConsumerWidget {

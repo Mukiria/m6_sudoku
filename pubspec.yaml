@@ -3,8 +3,8 @@ description: A production-ready Flutter Sudoku application built with Clean Arch
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.12.0 <4.0.0"
-  flutter: ">=3.44.7"
+  sdk: ">=3.7.0 <4.0.0"
+  flutter: ">=3.24.0"
 
 dependencies:
   flutter:
@@ -22,25 +22,7 @@ dependencies:
   freezed_annotation: ^2.4.4
   go_router: ^14.2.0
   google_fonts: ^6.2.1
-  intl: ^0.20.2
-  json_annotation: ^4.9.0
-  logger: ^2.4.0
-  path: ^1.9.0
-  riverpod_annotation: ^2.3.5
-  shared_preferences: ^2.2.3
-  uuid: ^4.4.0
-  collection: ^1.18.0
-  dartz: ^0.10.1
-  equatable: ^2.0.5
-  fl_chart: ^0.68.0
-  flutter_animate: ^4.5.0
-  flutter_riverpod: ^2.5.1
-  flutter_staggered_animations: ^1.1.1
-  flutter_svg: ^2.0.10+1
-  freezed_annotation: ^2.4.4
-  go_router: ^14.2.0
-  google_fonts: ^6.2.1
-  intl: ^0.20.2
+  intl: ^0.19.0
   json_annotation: ^4.9.0
   logger: ^2.4.0
   path: ^1.9.0

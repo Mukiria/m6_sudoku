@@ -15,6 +15,7 @@ class GameState with _$GameState {
     required int timeElapsed,
     required int mistakes,
     required int hintsUsed,
+    required int penaltyTime,
     required List<Move> moveHistory,
     required List<Move> redoStack,
     required GameStatus status,
@@ -25,11 +26,27 @@ class GameState with _$GameState {
     required bool isNoteMode,
     required Set<CellPosition> highlightedCells,
     required Set<CellPosition> conflictCells,
+    required HintState? hintState,
     required DateTime lastSaved,
   }) = _GameState;
 
   factory GameState.fromJson(Map<String, dynamic> json) => _$GameStateFromJson(json);
 }
+
+@freezed
+class HintState with _$HintState {
+  const factory HintState({
+    required HintType type,
+    required CellPosition cell,
+    required int value,
+    required String explanation,
+    required DateTime shownAt,
+  }) = _HintState;
+
+  factory HintState.fromJson(Map<String, dynamic> json) => _$HintStateFromJson(json);
+}
+
+enum HintType { directReveal, nakedSingle, hiddenSingle, nakedPair, hiddenPair, pointingPair, boxLineReduction }
 
 @freezed
 class Move with _$Move {

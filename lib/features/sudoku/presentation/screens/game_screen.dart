@@ -13,6 +13,7 @@ import 'package:m6_sudoku/features/sudoku/presentation/widgets/number_pad.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/game_header.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/pause_menu.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/sudoku_board.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/widgets/hint_overlay.dart';
 import 'package:m6_sudoku/core/routing/app_router.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 
@@ -30,6 +31,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
   late TabController _tabController;
   bool _showPauseMenu = false;
   bool _hasNavigated = false;
+  bool _showHintOverlay = false;
 
   @override
   void initState() {
@@ -150,8 +152,37 @@ class _GameScreenState extends ConsumerState<GameScreen>
     // Check game status after build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkGameStatus(gameState);
+      _checkHintState(gameState);
     });
+  }
 
+  void _checkHintState(GameState gameState) {
+    if (gameState.hintState != null && !_showHintOverlay) {
+      _showHintOverlay = true;
+      _showHintOverlayDialog(gameState.hintState!);
+    }
+  }
+
+  void _showHintOverlayDialog(HintState hintState) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => HintOverlay(
+        hintState: hintState,
+        onDismiss: () {
+          Navigator.of(context).pop();
+          setState(() {
+            _showHintOverlay = false;
+          });
+          // Clear hint state after dismissing
+          ref.read(gameControllerProvider.notifier).clearHintState();
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) {

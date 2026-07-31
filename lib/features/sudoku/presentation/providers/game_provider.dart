@@ -31,6 +31,7 @@ class GameController extends _$GameController {
         timeElapsed: 0,
         mistakes: 0,
         hintsUsed: 0,
+        penaltyTime: 0,
         moveHistory: [],
         redoStack: [],
         status: GameStatus.playing,
@@ -41,6 +42,7 @@ class GameController extends _$GameController {
         isNoteMode: false,
         highlightedCells: {},
         conflictCells: {},
+        hintState: null,
         lastSaved: DateTime.now(),
       ),
     );
@@ -210,9 +212,21 @@ class GameController extends _$GameController {
 
     result.fold((failure) => null, (hint) {
       if (hint != null) {
+        // Add penalty time (15 seconds for logical hints, 30 for direct reveal)
+        final penalty = hint.hintType == HintType.directReveal ? 30 : 15;
+        
         setValue(hint.row, hint.col, hint.value!);
         state = state!.copyWith(
           hintsUsed: currentState.hintsUsed + 1,
+          penaltyTime: currentState.penaltyTime + penalty,
+          timeElapsed: currentState.timeElapsed + penalty,
+          hintState: HintState(
+            type: hint.hintType,
+            cell: CellPosition(row: hint.row, col: hint.col),
+            value: hint.value!,
+            explanation: hint.explanation,
+            shownAt: DateTime.now(),
+          ),
           moveHistory: [
             ...currentState.moveHistory,
             Move(
@@ -492,6 +506,11 @@ class GameController extends _$GameController {
       }
     }
     return mistakes;
+  }
+
+  void clearHintState() {
+    if (state == null) return;
+    state = state!.copyWith(hintState: null);
   }
 }
 

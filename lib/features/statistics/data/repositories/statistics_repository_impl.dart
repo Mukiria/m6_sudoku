@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
-import '../entities/statistics.dart';
-import '../repositories/statistics_repository.dart';
-import 'statistics_local_datasource.dart';
-import '../../core/errors/failures.dart';
+import 'package:m6_sudoku/features/statistics/domain/entities/statistics.dart';
+import 'package:m6_sudoku/features/statistics/domain/repositories/statistics_repository.dart';
+import 'package:m6_sudoku/features/statistics/data/datasources/statistics_local_datasource.dart';
+import 'package:m6_sudoku/core/errors/failures.dart';
 
 class StatisticsRepositoryImpl implements StatisticsRepository {
   StatisticsRepositoryImpl(this._dataSource);

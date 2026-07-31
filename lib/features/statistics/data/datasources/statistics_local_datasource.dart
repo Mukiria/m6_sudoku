@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
-import '../../domain/entities/statistics.dart';
-import '../../domain/repositories/statistics_repository.dart';
-import '../../core/services/storage_service.dart';
-import '../../core/errors/failures.dart';
+import 'package:m6_sudoku/features/statistics/domain/entities/statistics.dart';
+import 'package:m6_sudoku/core/services/storage_service.dart';
+import 'package:m6_sudoku/core/errors/failures.dart';
 
 class StatisticsLocalDataSource {
   StatisticsLocalDataSource(this._storage);
@@ -50,15 +49,17 @@ class StatisticsLocalDataSource {
     }
   }
 
-  Future<Either<Failure, List<GameRecord>>> getRecentGames(
-      {int limit = 10}) async {
+  Future<Either<Failure, List<GameRecord>>> getRecentGames({
+    int limit = 10,
+  }) async {
     try {
       final jsonString = _storage.getString(_gamesKey);
       if (jsonString == null) return const Right([]);
       final list = jsonDecode(jsonString) as List;
-      final games = list
-          .map((e) => GameRecord.fromJson(e as Map<String, dynamic>))
-          .toList();
+      final games =
+          list
+              .map((e) => GameRecord.fromJson(e as Map<String, dynamic>))
+              .toList();
       return Right(games.take(limit).toList());
     } catch (e) {
       return Left(CacheFailure('Failed to get recent games: $e'));

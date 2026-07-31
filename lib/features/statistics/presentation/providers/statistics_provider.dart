@@ -1,11 +1,53 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../domain/entities/statistics.dart';
-import '../domain/usecases/statistics_usecases.dart';
+import 'package:m6_sudoku/features/statistics/domain/entities/statistics.dart';
+import 'package:m6_sudoku/features/statistics/domain/repositories/statistics_repository.dart';
+import 'package:m6_sudoku/features/statistics/data/repositories/statistics_repository_impl.dart';
+import 'package:m6_sudoku/features/statistics/data/datasources/statistics_local_datasource.dart';
+import 'package:m6_sudoku/core/services/storage_service.dart';
+import 'package:m6_sudoku/features/statistics/domain/usecases/statistics_usecases.dart';
+
+final storageServiceProvider = Provider<StorageService>((ref) {
+  throw UnimplementedError('Initialize storage service in main.dart');
+});
+
+final statisticsLocalDataSourceProvider = Provider<StatisticsLocalDataSource>((
+  ref,
+) {
+  final storage = ref.read(storageServiceProvider);
+  return StatisticsLocalDataSource(storage);
+});
+
+final statisticsRepositoryProvider = Provider<StatisticsRepository>((ref) {
+  final dataSource = ref.read(statisticsLocalDataSourceProvider);
+  return StatisticsRepositoryImpl(dataSource);
+});
+
+final getStatisticsUseCaseProvider = Provider<GetStatisticsUseCase>((ref) {
+  final repo = ref.read(statisticsRepositoryProvider);
+  return GetStatisticsUseCase(repo);
+});
+
+final updateStatisticsUseCaseProvider = Provider<UpdateStatisticsUseCase>((
+  ref,
+) {
+  final repo = ref.read(statisticsRepositoryProvider);
+  return UpdateStatisticsUseCase(repo);
+});
+
+final addGameRecordUseCaseProvider = Provider<AddGameRecordUseCase>((ref) {
+  final repo = ref.read(statisticsRepositoryProvider);
+  return AddGameRecordUseCase(repo);
+});
+
+final resetStatisticsUseCaseProvider = Provider<ResetStatisticsUseCase>((ref) {
+  final repo = ref.read(statisticsRepositoryProvider);
+  return ResetStatisticsUseCase(repo);
+});
 
 final statisticsProvider =
     StateNotifierProvider<StatisticsController, AsyncValue<Statistics>>((ref) {
-  return StatisticsController(ref);
-});
+      return StatisticsController(ref);
+    });
 
 final recentGamesProvider = StateProvider<List<GameRecord>>((ref) => []);
 
@@ -55,10 +97,8 @@ class StatisticsController extends StateNotifier<AsyncValue<Statistics>> {
       state = AsyncValue.data(updatedStats);
     }
 
-    _ref.read(recentGamesProvider.notifier).state = [
-      record,
-      ..._ref.read(recentGamesProvider),
-    ].take(10).toList();
+    _ref.read(recentGamesProvider.notifier).state =
+        [record, ..._ref.read(recentGamesProvider)].take(10).toList();
   }
 
   Statistics _updateStats(Statistics current, GameRecord record) {
@@ -76,10 +116,12 @@ class StatisticsController extends StateNotifier<AsyncValue<Statistics>> {
       }
     }
 
-    final newGamesWonByDiff =
-        Map<String, int>.from(current.gamesWonByDifficulty);
-    final newGamesPlayedByDiff =
-        Map<String, int>.from(current.gamesPlayedByDifficulty);
+    final newGamesWonByDiff = Map<String, int>.from(
+      current.gamesWonByDifficulty,
+    );
+    final newGamesPlayedByDiff = Map<String, int>.from(
+      current.gamesPlayedByDifficulty,
+    );
     newGamesPlayedByDiff[record.difficulty] =
         (newGamesPlayedByDiff[record.difficulty] ?? 0) + 1;
     if (record.completed) {
@@ -136,29 +178,3 @@ class StatisticsController extends StateNotifier<AsyncValue<Statistics>> {
     );
   }
 }
-
-final getStatisticsUseCaseProvider = Provider<GetStatisticsUseCase>((ref) {
-  final repo = ref.read(statisticsRepositoryProvider);
-  return GetStatisticsUseCase(repo);
-});
-
-final updateStatisticsUseCaseProvider =
-    Provider<UpdateStatisticsUseCase>((ref) {
-  final repo = ref.read(statisticsRepositoryProvider);
-  return UpdateStatisticsUseCase(repo);
-});
-
-final addGameRecordUseCaseProvider = Provider<AddGameRecordUseCase>((ref) {
-  final repo = ref.read(statisticsRepositoryProvider);
-  return AddGameRecordUseCase(repo);
-});
-
-final resetStatisticsUseCaseProvider = Provider<ResetStatisticsUseCase>((ref) {
-  final repo = ref.read(statisticsRepositoryProvider);
-  return ResetStatisticsUseCase(repo);
-});
-
-final getRecentGamesUseCaseProvider = Provider<GetRecentGamesUseCase>((ref) {
-  final repo = ref.read(statisticsRepositoryProvider);
-  return GetRecentGamesUseCase(repo);
-});

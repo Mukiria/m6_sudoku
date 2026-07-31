@@ -44,20 +44,21 @@ class AppButton extends StatelessWidget {
     final buttonBorderRadius = borderRadius ?? 12.0;
     final textStyle = _getTextStyle(theme, size);
 
-    Widget buttonChild = isLoading
-        ? SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                variant == AppButtonVariant.filled
-                    ? colorScheme.onPrimary
-                    : colorScheme.primary,
+    Widget buttonChild =
+        isLoading
+            ? SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  variant == AppButtonVariant.filled
+                      ? colorScheme.onPrimary
+                      : colorScheme.primary,
+                ),
               ),
-            ),
-          )
-        : _buildChildWithIcon(context, textStyle);
+            )
+            : _buildChildWithIcon(context, textStyle);
 
     switch (variant) {
       case AppButtonVariant.filled:
@@ -227,14 +228,17 @@ class AppButton extends StatelessWidget {
   TextStyle _getTextStyle(ThemeData theme, AppButtonSize size) {
     switch (size) {
       case AppButtonSize.small:
-        return theme.textTheme.labelSmall!
-            .copyWith(fontWeight: FontWeight.w600);
+        return theme.textTheme.labelSmall!.copyWith(
+          fontWeight: FontWeight.w600,
+        );
       case AppButtonSize.medium:
-        return theme.textTheme.labelLarge!
-            .copyWith(fontWeight: FontWeight.w600);
+        return theme.textTheme.labelLarge!.copyWith(
+          fontWeight: FontWeight.w600,
+        );
       case AppButtonSize.large:
-        return theme.textTheme.titleMedium!
-            .copyWith(fontWeight: FontWeight.w600);
+        return theme.textTheme.titleMedium!.copyWith(
+          fontWeight: FontWeight.w600,
+        );
     }
   }
 
@@ -250,24 +254,11 @@ class AppButton extends StatelessWidget {
   }
 }
 
-enum AppButtonVariant {
-  filled,
-  outlined,
-  text,
-  elevated,
-  tonal,
-}
+enum AppButtonVariant { filled, outlined, text, elevated, tonal }
 
-enum AppButtonSize {
-  small,
-  medium,
-  large,
-}
+enum AppButtonSize { small, medium, large }
 
-enum IconPosition {
-  start,
-  end,
-}
+enum IconPosition { start, end }
 
 class AppIconButton extends StatelessWidget {
   const AppIconButton({
@@ -326,11 +317,7 @@ class AppIconButton extends StatelessWidget {
       splashRadius: splashRadius,
     );
 
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Center(child: button),
-    );
+    return SizedBox(width: size, height: size, child: Center(child: button));
   }
 }
 
@@ -382,13 +369,14 @@ class AppFloatingActionButton extends StatelessWidget {
         focusElevation: focusElevation,
         hoverElevation: hoverElevation,
         highlightElevation: highlightElevation,
-        shape: shape ??
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(28),
-            ),
-        extendedPadding: extendedPadding ??
+        shape:
+            shape ??
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        extendedPadding:
+            extendedPadding ??
             const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        extendedTextStyle: extendedTextStyle ??
+        extendedTextStyle:
+            extendedTextStyle ??
             theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
         icon: extendedIcon,
         label: extendedLabel ?? child,
@@ -403,10 +391,9 @@ class AppFloatingActionButton extends StatelessWidget {
       focusElevation: focusElevation,
       hoverElevation: hoverElevation,
       highlightElevation: highlightElevation,
-      shape: shape ??
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
+      shape:
+          shape ??
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: child,
     );
   }

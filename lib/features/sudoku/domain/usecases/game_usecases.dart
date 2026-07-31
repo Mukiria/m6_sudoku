@@ -84,20 +84,13 @@ class GetHintUseCase {
 
   final PuzzleRepository _repository;
 
-  Future<Either<Failure, Cell?>> call({
-    required GameState state,
-  }) async {
+  Future<Either<Failure, Cell?>> call({required GameState state}) async {
     for (int r = 0; r < 9; r++) {
       for (int c = 0; c < 9; c++) {
         final cell = state.cells[r][c];
         if (cell.value == null && !cell.isFixed) {
           final solutionValue = state.puzzle.solution[r][c];
-          return Right(
-            cell.copyWith(
-              value: solutionValue,
-              isFixed: false,
-            ),
-          );
+          return Right(cell.copyWith(value: solutionValue, isFixed: false));
         }
       }
     }

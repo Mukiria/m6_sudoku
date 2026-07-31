@@ -10,11 +10,7 @@ import 'package:m6_sudoku/features/settings/presentation/providers/settings_prov
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(
-    const ProviderScope(
-      child: M6SudokuApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: M6SudokuApp()));
 }
 
 class M6SudokuApp extends ConsumerWidget {
@@ -40,12 +36,8 @@ class M6SudokuApp extends ConsumerWidget {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(
             textScaler: TextScaler.linear(
-              MediaQuery.of(context)
-                  .textScaler
-                  .clamp(
-                    minScaleFactor: 0.8,
-                    maxScaleFactor: 1.3,
-                  )
+              MediaQuery.of(context).textScaler
+                  .clamp(minScaleFactor: 0.8, maxScaleFactor: 1.3)
                   .scale(1.0),
             ),
           ),

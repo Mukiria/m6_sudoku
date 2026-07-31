@@ -40,8 +40,9 @@ class NumberPad extends ConsumerWidget {
                   icon: Icons.format_size_rounded,
                   label: 'Numbers',
                   isSelected: !isNoteMode,
-                  onTap: () =>
-                      ref.read(gameProvider.notifier).toggleNoteMode(false),
+                  onTap:
+                      () =>
+                          ref.read(gameProvider.notifier).toggleNoteMode(false),
                 ),
               ),
               Expanded(
@@ -49,8 +50,9 @@ class NumberPad extends ConsumerWidget {
                   icon: Icons.notes_rounded,
                   label: 'Notes',
                   isSelected: isNoteMode,
-                  onTap: () =>
-                      ref.read(gameProvider.notifier).toggleNoteMode(true),
+                  onTap:
+                      () =>
+                          ref.read(gameProvider.notifier).toggleNoteMode(true),
                 ),
               ),
             ],
@@ -74,8 +76,8 @@ class NumberPad extends ConsumerWidget {
                 return _buildActionButton(
                   icon: Icons.backspace_rounded,
                   label: 'Erase',
-                  onTap: () =>
-                      ref.read(gameProvider.notifier).clearSelectedCell(),
+                  onTap:
+                      () => ref.read(gameProvider.notifier).clearSelectedCell(),
                   color: extension.eraseButtonBackground,
                   textColor: extension.eraseButtonText,
                 );
@@ -89,8 +91,8 @@ class NumberPad extends ConsumerWidget {
                 number: number,
                 isSelected: isSelected,
                 isEnabled: true,
-                onTap: () =>
-                    ref.read(gameProvider.notifier).selectNumber(number),
+                onTap:
+                    () => ref.read(gameProvider.notifier).selectNumber(number),
                 count: count,
                 showCount: true,
               );
@@ -162,9 +164,10 @@ class NumberPad extends ConsumerWidget {
               Icon(
                 icon,
                 size: 20,
-                color: isSelected
-                    ? colorScheme.onPrimary
-                    : colorScheme.onSurfaceVariant,
+                color:
+                    isSelected
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: 8),
               Text(
@@ -172,9 +175,10 @@ class NumberPad extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: isSelected
-                      ? colorScheme.onPrimary
-                      : colorScheme.onSurfaceVariant,
+                  color:
+                      isSelected
+                          ? colorScheme.onPrimary
+                          : colorScheme.onSurfaceVariant,
                 ),
               ),
             ],

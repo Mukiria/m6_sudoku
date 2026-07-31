@@ -14,10 +14,7 @@ class PuzzleGenerator {
     return board;
   }
 
-  Board generatePuzzle({
-    int clues = 30,
-    int maxAttempts = 100,
-  }) {
+  Board generatePuzzle({int clues = 30, int maxAttempts = 100}) {
     final fullGrid = generateCompleteGrid();
     return _removeClues(fullGrid, clues, maxAttempts);
   }
@@ -84,13 +81,7 @@ class PuzzleGenerator {
   }
 }
 
-enum Difficulty {
-  easy,
-  medium,
-  hard,
-  expert,
-  evil;
-}
+enum Difficulty { easy, medium, hard, expert, evil }
 
 extension ListShuffle<T> on List<T> {
   void shuffle() {

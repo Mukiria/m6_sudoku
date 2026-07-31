@@ -64,25 +64,23 @@ class SudokuCell extends StatelessWidget {
     final noteColor = colorScheme.onSurfaceVariant;
 
     return AnimatedContainer(
-      duration: animationDuration,
-      curve: Curves.easeInOut,
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        border: Border.all(color: borderColor, width: borderWidth),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          onLongPress: onLongPress,
-          borderRadius: BorderRadius.zero,
-          child: _buildContent(textColor, noteColor),
-        ),
-      ),
-    )
-        .animate(
-          target: isSelected ? 1 : 0,
+          duration: animationDuration,
+          curve: Curves.easeInOut,
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            border: Border.all(color: borderColor, width: borderWidth),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              onLongPress: onLongPress,
+              borderRadius: BorderRadius.zero,
+              child: _buildContent(textColor, noteColor),
+            ),
+          ),
         )
+        .animate(target: isSelected ? 1 : 0)
         .scale(
           begin: const Offset(1, 1),
           end: const Offset(1.02, 1.02),
@@ -185,75 +183,82 @@ class NumberButton extends StatelessWidget {
     }
 
     return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: isEnabled ? onTap : null,
-        borderRadius: BorderRadius.circular(12),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          curve: Curves.easeInOut,
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            border: Border.all(color: borderColor, width: 1.5),
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: isEnabled ? onTap : null,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: extension.numberButtonSelectedBackground
-                          .withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Center(
-                child: Text(
-                  number.toString(),
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w600,
-                    color: textColor,
-                  ),
-                ),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.easeInOut,
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                border: Border.all(color: borderColor, width: 1.5),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow:
+                    isSelected
+                        ? [
+                          BoxShadow(
+                            color: extension.numberButtonSelectedBackground
+                                .withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                        : null,
               ),
-              if (showCount && count != null && count! > 0)
-                Positioned(
-                  top: 2,
-                  right: 2,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? colorScheme.onPrimary
-                          : colorScheme.primary,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    constraints:
-                        const BoxConstraints(minWidth: 16, minHeight: 16),
-                    child: Center(
-                      child: Text(
-                        count.toString(),
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w600,
-                          color: isSelected
-                              ? extension.numberButtonSelectedBackground
-                              : colorScheme.onPrimary,
-                        ),
-                        textAlign: TextAlign.center,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Center(
+                    child: Text(
+                      number.toString(),
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
+                        color: textColor,
                       ),
                     ),
                   ),
-                ),
-            ],
+                  if (showCount && count != null && count! > 0)
+                    Positioned(
+                      top: 2,
+                      right: 2,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color:
+                              isSelected
+                                  ? colorScheme.onPrimary
+                                  : colorScheme.primary,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Center(
+                          child: Text(
+                            count.toString(),
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w600,
+                              color:
+                                  isSelected
+                                      ? extension.numberButtonSelectedBackground
+                                      : colorScheme.onPrimary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
-    ).animate(target: isSelected ? 1 : 0).scale(
+        )
+        .animate(target: isSelected ? 1 : 0)
+        .scale(
           begin: const Offset(1, 1),
           end: const Offset(0.95, 0.95),
           duration: const Duration(milliseconds: 100),
@@ -280,40 +285,45 @@ class NoteButton extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          curve: Curves.easeInOut,
-          decoration: BoxDecoration(
-            color: isSelected
-                ? extension.noteButtonSelectedBackground
-                : extension.noteButtonBackground,
-            border: Border.all(
-              color: isSelected
-                  ? extension.noteButtonSelectedBackground
-                  : colorScheme.outlineVariant,
-              width: 1.5,
-            ),
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
             borderRadius: BorderRadius.circular(12),
-          ),
-          child: Center(
-            child: Text(
-              number.toString(),
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                color: isSelected
-                    ? extension.noteButtonSelectedText
-                    : extension.noteButtonText,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.easeInOut,
+              decoration: BoxDecoration(
+                color:
+                    isSelected
+                        ? extension.noteButtonSelectedBackground
+                        : extension.noteButtonBackground,
+                border: Border.all(
+                  color:
+                      isSelected
+                          ? extension.noteButtonSelectedBackground
+                          : colorScheme.outlineVariant,
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
+                  number.toString(),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color:
+                        isSelected
+                            ? extension.noteButtonSelectedText
+                            : extension.noteButtonText,
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
-    ).animate(target: isSelected ? 1 : 0).scale(
+        )
+        .animate(target: isSelected ? 1 : 0)
+        .scale(
           begin: const Offset(1, 1),
           end: const Offset(0.95, 0.95),
           duration: const Duration(milliseconds: 100),
@@ -385,41 +395,38 @@ class ActionButton extends StatelessWidget {
             color: backgroundColor,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: isLoading
-              ? SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(textColor),
-                  ),
-                )
-              : Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconTheme(
-                      data: IconThemeData(color: iconColor, size: 20),
-                      child: icon,
+          child:
+              isLoading
+                  ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(textColor),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: textColor,
+                  )
+                  : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconTheme(
+                        data: IconThemeData(color: iconColor, size: 20),
+                        child: icon,
                       ),
-                    ),
-                  ],
-                ),
+                      const SizedBox(width: 8),
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                        ),
+                      ),
+                    ],
+                  ),
         ),
       ),
     );
   }
 }
 
-enum ActionButtonVariant {
-  primary,
-  secondary,
-  destructive,
-}
+enum ActionButtonVariant { primary, secondary, destructive }

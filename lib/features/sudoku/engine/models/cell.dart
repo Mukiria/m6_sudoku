@@ -16,11 +16,7 @@ class Cell {
   bool get isEmpty => value == 0;
   bool get isFilled => value != 0;
 
-  Cell copyWith({
-    int? value,
-    List<int>? candidates,
-    bool? isGiven,
-  }) {
+  Cell copyWith({int? value, List<int>? candidates, bool? isGiven}) {
     return Cell(
       row: row,
       col: col,

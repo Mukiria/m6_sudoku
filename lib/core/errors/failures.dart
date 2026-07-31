@@ -1,4 +1,4 @@
-import 'package:equatable/equatable.dart';
+import 'package:m6_sudoku/core/utils/equatable.dart';
 
 abstract class Failure extends Equatable {
   const Failure([this.message = 'An error occurred']);
@@ -74,4 +74,8 @@ class SettingsFailure extends Failure {
 
 class StatisticsFailure extends Failure {
   const StatisticsFailure([super.message = 'Statistics error occurred']);
+}
+
+class PuzzleGenerationFailure extends Failure {
+  const PuzzleGenerationFailure([super.message = 'Puzzle generation failed']);
 }

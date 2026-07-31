@@ -55,16 +55,16 @@ class Cell extends Equatable {
 
   @override
   List<Object?> get props => [
-        row,
-        col,
-        value,
-        notes,
-        isFixed,
-        hasError,
-        isSelected,
-        isHighlighted,
-        isRelated,
-      ];
+    row,
+    col,
+    value,
+    notes,
+    isFixed,
+    hasError,
+    isSelected,
+    isHighlighted,
+    isRelated,
+  ];
 
   @override
   String toString() {
@@ -131,26 +131,21 @@ class Puzzle extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        grid,
-        solution,
-        difficulty,
-        cluesCount,
-        createdAt,
-        completedAt,
-        timeSpent,
-        mistakes,
-        hintsUsed,
-        isCompleted,
-      ];
+    id,
+    grid,
+    solution,
+    difficulty,
+    cluesCount,
+    createdAt,
+    completedAt,
+    timeSpent,
+    mistakes,
+    hintsUsed,
+    isCompleted,
+  ];
 }
 
-enum GameStatus {
-  playing,
-  paused,
-  completed,
-  failed,
-}
+enum GameStatus { playing, paused, completed, failed }
 
 class GameState extends Equatable {
   const GameState({
@@ -213,19 +208,19 @@ class GameState extends Equatable {
 
   @override
   List<Object?> get props => [
-        puzzle,
-        cells,
-        status,
-        selectedCell,
-        selectedNumber,
-        isNoteMode,
-        timeElapsed,
-        mistakes,
-        hintsUsed,
-        undoStack,
-        redoStack,
-        lastAction,
-      ];
+    puzzle,
+    cells,
+    status,
+    selectedCell,
+    selectedNumber,
+    isNoteMode,
+    timeElapsed,
+    mistakes,
+    hintsUsed,
+    undoStack,
+    redoStack,
+    lastAction,
+  ];
 }
 
 class GameAction extends Equatable {
@@ -253,23 +248,16 @@ class GameAction extends Equatable {
 
   @override
   List<Object?> get props => [
-        type,
-        row,
-        col,
-        previousValue,
-        newValue,
-        previousNotes,
-        newNotes,
-        previousMistakes,
-        newMistakes,
-      ];
+    type,
+    row,
+    col,
+    previousValue,
+    newValue,
+    previousNotes,
+    newNotes,
+    previousMistakes,
+    newMistakes,
+  ];
 }
 
-enum ActionType {
-  setValue,
-  setNotes,
-  clearCell,
-  useHint,
-  undo,
-  redo,
-}
+enum ActionType { setValue, setNotes, clearCell, useHint, undo, redo }

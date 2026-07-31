@@ -1,8 +1,5 @@
 abstract class AppException implements Exception {
-  const AppException([
-    this.message = 'An error occurred',
-    this.code,
-  ]);
+  const AppException([this.message = 'An error occurred', this.code]);
 
   final String message;
   final String? code;
@@ -62,10 +59,7 @@ class ForbiddenException extends AppException {
 }
 
 class TimeoutException extends AppException {
-  const TimeoutException([
-    super.message = 'Timeout',
-    super.code = 'TIMEOUT',
-  ]);
+  const TimeoutException([super.message = 'Timeout', super.code = 'TIMEOUT']);
 }
 
 class ParseException extends AppException {

@@ -284,26 +284,50 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
       cellFixedBorder: Color.lerp(cellFixedBorder, other.cellFixedBorder, t)!,
       cellNoteBackground:
           Color.lerp(cellNoteBackground, other.cellNoteBackground, t)!,
-      cellHighlightBackground: Color.lerp(
-          cellHighlightBackground, other.cellHighlightBackground, t)!,
+      cellHighlightBackground:
+          Color.lerp(
+            cellHighlightBackground,
+            other.cellHighlightBackground,
+            t,
+          )!,
       cellRelatedBackground:
           Color.lerp(cellRelatedBackground, other.cellRelatedBackground, t)!,
       numberButtonBackground:
           Color.lerp(numberButtonBackground, other.numberButtonBackground, t)!,
-      numberButtonSelectedBackground: Color.lerp(numberButtonSelectedBackground,
-          other.numberButtonSelectedBackground, t)!,
-      numberButtonDisabledBackground: Color.lerp(numberButtonDisabledBackground,
-          other.numberButtonDisabledBackground, t)!,
+      numberButtonSelectedBackground:
+          Color.lerp(
+            numberButtonSelectedBackground,
+            other.numberButtonSelectedBackground,
+            t,
+          )!,
+      numberButtonDisabledBackground:
+          Color.lerp(
+            numberButtonDisabledBackground,
+            other.numberButtonDisabledBackground,
+            t,
+          )!,
       numberButtonText:
           Color.lerp(numberButtonText, other.numberButtonText, t)!,
-      numberButtonSelectedText: Color.lerp(
-          numberButtonSelectedText, other.numberButtonSelectedText, t)!,
-      numberButtonDisabledText: Color.lerp(
-          numberButtonDisabledText, other.numberButtonDisabledText, t)!,
+      numberButtonSelectedText:
+          Color.lerp(
+            numberButtonSelectedText,
+            other.numberButtonSelectedText,
+            t,
+          )!,
+      numberButtonDisabledText:
+          Color.lerp(
+            numberButtonDisabledText,
+            other.numberButtonDisabledText,
+            t,
+          )!,
       noteButtonBackground:
           Color.lerp(noteButtonBackground, other.noteButtonBackground, t)!,
-      noteButtonSelectedBackground: Color.lerp(
-          noteButtonSelectedBackground, other.noteButtonSelectedBackground, t)!,
+      noteButtonSelectedBackground:
+          Color.lerp(
+            noteButtonSelectedBackground,
+            other.noteButtonSelectedBackground,
+            t,
+          )!,
       noteButtonText: Color.lerp(noteButtonText, other.noteButtonText, t)!,
       noteButtonSelectedText:
           Color.lerp(noteButtonSelectedText, other.noteButtonSelectedText, t)!,

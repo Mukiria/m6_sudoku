@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
@@ -60,7 +61,7 @@ class AppTheme {
       highlightColor: colorScheme.primary.withValues(alpha: 0.12),
       splashColor: colorScheme.primary.withValues(alpha: 0.12),
       splashFactory: InkRipple.splashFactory,
-      pageTransitionsTheme: const PageTransitionsTheme(
+      pageTransitionsTheme: PageTransitionsTheme(
         builders: {
           TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
@@ -89,8 +90,9 @@ class AppTheme {
         surfaceTintColor: colorScheme.surfaceTint,
         color: colorScheme.surface,
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.borderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.borderRadius.toDouble(),
+          ),
           side: BorderSide(color: colorScheme.outlineVariant, width: 1),
         ),
         margin: const EdgeInsets.all(8),
@@ -101,17 +103,15 @@ class AppTheme {
           shadowColor: Colors.transparent,
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 12,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           minimumSize: Size(
             AppConstants.buttonMinWidth.toDouble(),
             AppConstants.buttonHeight.toDouble(),
           ),
           shape: RoundedRectangleBorder(
-            borderRadius:
-                BorderRadius.circular(AppConstants.borderRadius.toDouble()),
+            borderRadius: BorderRadius.circular(
+              AppConstants.borderRadius.toDouble(),
+            ),
           ),
           textStyle: textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w600,
@@ -122,17 +122,15 @@ class AppTheme {
         style: FilledButton.styleFrom(
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 12,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           minimumSize: Size(
             AppConstants.buttonMinWidth.toDouble(),
             AppConstants.buttonHeight.toDouble(),
           ),
           shape: RoundedRectangleBorder(
-            borderRadius:
-                BorderRadius.circular(AppConstants.borderRadius.toDouble()),
+            borderRadius: BorderRadius.circular(
+              AppConstants.borderRadius.toDouble(),
+            ),
           ),
           textStyle: textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w600,
@@ -143,17 +141,15 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: colorScheme.primary,
           side: BorderSide(color: colorScheme.outline, width: 1.5),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 12,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           minimumSize: Size(
             AppConstants.buttonMinWidth.toDouble(),
             AppConstants.buttonHeight.toDouble(),
           ),
           shape: RoundedRectangleBorder(
-            borderRadius:
-                BorderRadius.circular(AppConstants.borderRadius.toDouble()),
+            borderRadius: BorderRadius.circular(
+              AppConstants.borderRadius.toDouble(),
+            ),
           ),
           textStyle: textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w600,
@@ -163,17 +159,15 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: colorScheme.primary,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 8,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           minimumSize: Size(
             AppConstants.buttonMinWidth.toDouble(),
             AppConstants.buttonHeight.toDouble(),
           ),
           shape: RoundedRectangleBorder(
-            borderRadius:
-                BorderRadius.circular(AppConstants.borderRadius.toDouble()),
+            borderRadius: BorderRadius.circular(
+              AppConstants.borderRadius.toDouble(),
+            ),
           ),
           textStyle: textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w600,
@@ -191,7 +185,8 @@ class AppTheme {
           iconSize: 24,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
-                AppConstants.smallBorderRadius.toDouble()),
+              AppConstants.smallBorderRadius.toDouble(),
+            ),
           ),
         ),
       ),
@@ -203,8 +198,9 @@ class AppTheme {
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.largeBorderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.largeBorderRadius.toDouble(),
+          ),
         ),
         extendedPadding: const EdgeInsets.symmetric(
           horizontal: 24,
@@ -222,45 +218,56 @@ class AppTheme {
           vertical: 16,
         ),
         border: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.borderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.borderRadius.toDouble(),
+          ),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.borderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.borderRadius.toDouble(),
+          ),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.borderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.borderRadius.toDouble(),
+          ),
           borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.borderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.borderRadius.toDouble(),
+          ),
           borderSide: BorderSide(color: colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.borderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.borderRadius.toDouble(),
+          ),
           borderSide: BorderSide(color: colorScheme.error, width: 2),
         ),
         disabledBorder: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.borderRadius.toDouble()),
-          borderSide:
-              BorderSide(color: colorScheme.outline.withValues(alpha: 0.5)),
+          borderRadius: BorderRadius.circular(
+            AppConstants.borderRadius.toDouble(),
+          ),
+          borderSide: BorderSide(
+            color: colorScheme.outline.withValues(alpha: 0.5),
+          ),
         ),
-        labelStyle:
-            textTheme.bodyLarge?.copyWith(color: colorScheme.onSurfaceVariant),
+        labelStyle: textTheme.bodyLarge?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
         hintStyle: textTheme.bodyLarge?.copyWith(
-            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6)),
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+        ),
         errorStyle: textTheme.bodySmall?.copyWith(color: colorScheme.error),
-        helperStyle:
-            textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
-        counterStyle:
-            textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+        helperStyle: textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+        counterStyle: textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
         prefixIconColor: colorScheme.onSurfaceVariant,
         suffixIconColor: colorScheme.onSurfaceVariant,
         iconColor: colorScheme.onSurfaceVariant,
@@ -340,8 +347,9 @@ class AppTheme {
         thumbColor: colorScheme.primary,
         overlayColor: colorScheme.primary.withValues(alpha: 0.12),
         valueIndicatorColor: colorScheme.primary,
-        valueIndicatorTextStyle:
-            textTheme.bodySmall?.copyWith(color: colorScheme.onPrimary),
+        valueIndicatorTextStyle: textTheme.bodySmall?.copyWith(
+          color: colorScheme.onPrimary,
+        ),
         trackHeight: 4,
         thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
         overlayShape: const RoundSliderOverlayShape(overlayRadius: 20),
@@ -354,8 +362,9 @@ class AppTheme {
         indicatorColor: colorScheme.primary,
         indicatorSize: TabBarIndicatorSize.label,
         labelStyle: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
-        unselectedLabelStyle:
-            textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w400),
+        unselectedLabelStyle: textTheme.labelLarge?.copyWith(
+          fontWeight: FontWeight.w400,
+        ),
         dividerColor: colorScheme.outlineVariant,
         overlayColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.hovered))
@@ -372,10 +381,12 @@ class AppTheme {
         backgroundColor: colorScheme.surface,
         selectedItemColor: colorScheme.primary,
         unselectedItemColor: colorScheme.onSurfaceVariant,
-        selectedLabelStyle:
-            textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600),
-        unselectedLabelStyle:
-            textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w400),
+        selectedLabelStyle: textTheme.labelSmall?.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: textTheme.labelSmall?.copyWith(
+          fontWeight: FontWeight.w400,
+        ),
         type: BottomNavigationBarType.fixed,
         showSelectedLabels: true,
         showUnselectedLabels: true,
@@ -410,15 +421,17 @@ class AppTheme {
         backgroundColor: colorScheme.surface,
         surfaceTintColor: colorScheme.surfaceTint,
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.largeBorderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.largeBorderRadius.toDouble(),
+          ),
         ),
         titleTextStyle: textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.w600,
           color: colorScheme.onSurface,
         ),
-        contentTextStyle:
-            textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
+        contentTextStyle: textTheme.bodyLarge?.copyWith(
+          color: colorScheme.onSurface,
+        ),
         actionsPadding: const EdgeInsets.all(16),
       ),
       bottomSheetTheme: BottomSheetThemeData(
@@ -440,12 +453,14 @@ class AppTheme {
       snackBarTheme: SnackBarThemeData(
         elevation: 6,
         backgroundColor: colorScheme.inverseSurface,
-        contentTextStyle:
-            textTheme.bodyLarge?.copyWith(color: colorScheme.onInverseSurface),
+        contentTextStyle: textTheme.bodyLarge?.copyWith(
+          color: colorScheme.onInverseSurface,
+        ),
         actionTextColor: colorScheme.primary,
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.borderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.borderRadius.toDouble(),
+          ),
         ),
         behavior: SnackBarBehavior.floating,
         showCloseIcon: true,
@@ -463,42 +478,47 @@ class AppTheme {
         dense: true,
         visualDensity: VisualDensity.compact,
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.smallBorderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.smallBorderRadius.toDouble(),
+          ),
         ),
         tileColor: Colors.transparent,
         selectedTileColor: colorScheme.primaryContainer,
         iconColor: colorScheme.onSurfaceVariant,
         textColor: colorScheme.onSurface,
-        titleTextStyle:
-            textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
-        subtitleTextStyle:
-            textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-        leadingAndTrailingTextStyle:
-            textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+        titleTextStyle: textTheme.bodyLarge?.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
+        subtitleTextStyle: textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+        leadingAndTrailingTextStyle: textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: colorScheme.surfaceContainerHighest,
-        disabledColor:
-            colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        disabledColor: colorScheme.surfaceContainerHighest.withValues(
+          alpha: 0.5,
+        ),
         selectedColor: colorScheme.primaryContainer,
         secondarySelectedColor: colorScheme.secondaryContainer,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 4,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        labelStyle: textTheme.labelMedium?.copyWith(
+          color: colorScheme.onSurface,
         ),
-        labelStyle:
-            textTheme.labelMedium?.copyWith(color: colorScheme.onSurface),
-        secondaryLabelStyle: textTheme.labelMedium
-            ?.copyWith(color: colorScheme.onSecondaryContainer),
+        secondaryLabelStyle: textTheme.labelMedium?.copyWith(
+          color: colorScheme.onSecondaryContainer,
+        ),
         brightness: Brightness.light,
         elevation: 0,
         pressElevation: 0,
         shadowColor: Colors.transparent,
         selectedShadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.largeBorderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.largeBorderRadius.toDouble(),
+          ),
           side: BorderSide(color: colorScheme.outlineVariant),
         ),
         side: BorderSide(color: colorScheme.outlineVariant),
@@ -508,8 +528,9 @@ class AppTheme {
         color: colorScheme.surface,
         surfaceTintColor: colorScheme.surfaceTint,
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.borderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.borderRadius.toDouble(),
+          ),
         ),
         textStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
         labelTextStyle: WidgetStateProperty.all(
@@ -519,15 +540,14 @@ class AppTheme {
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
           color: colorScheme.inverseSurface,
-          borderRadius:
-              BorderRadius.circular(AppConstants.smallBorderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.smallBorderRadius.toDouble(),
+          ),
         ),
-        textStyle:
-            textTheme.bodySmall?.copyWith(color: colorScheme.onInverseSurface),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 8,
+        textStyle: textTheme.bodySmall?.copyWith(
+          color: colorScheme.onInverseSurface,
         ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         preferBelow: true,
         excludeFromSemantics: false,
         verticalOffset: 24,
@@ -541,9 +561,11 @@ class AppTheme {
       ),
       scrollbarTheme: ScrollbarThemeData(
         thumbColor: WidgetStateProperty.all(
-            colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
+          colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+        ),
         trackColor: WidgetStateProperty.all(
-            colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)),
+          colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        ),
         thickness: WidgetStateProperty.all(6),
         radius: const Radius.circular(3),
         minThumbLength: 48,
@@ -554,8 +576,9 @@ class AppTheme {
       timePickerTheme: TimePickerThemeData(
         backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.largeBorderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.largeBorderRadius.toDouble(),
+          ),
         ),
         hourMinuteTextStyle: textTheme.displayMedium?.copyWith(
           color: colorScheme.onSurface,
@@ -572,8 +595,9 @@ class AppTheme {
       datePickerTheme: DatePickerThemeData(
         backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(AppConstants.largeBorderRadius.toDouble()),
+          borderRadius: BorderRadius.circular(
+            AppConstants.largeBorderRadius.toDouble(),
+          ),
         ),
         headerBackgroundColor: colorScheme.primaryContainer,
         headerForegroundColor: colorScheme.onPrimaryContainer,
@@ -589,16 +613,16 @@ class AppTheme {
           fontWeight: FontWeight.w500,
         ),
         dayStyle: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
-        todayBackgroundColor:
-            WidgetStateProperty.all(colorScheme.primaryContainer),
-        todayForegroundColor:
-            WidgetStateProperty.all(colorScheme.onPrimaryContainer),
+        todayBackgroundColor: WidgetStateProperty.all(
+          colorScheme.primaryContainer,
+        ),
+        todayForegroundColor: WidgetStateProperty.all(
+          colorScheme.onPrimaryContainer,
+        ),
         yearBackgroundColor: WidgetStateProperty.all(colorScheme.surface),
         yearForegroundColor: WidgetStateProperty.all(colorScheme.onSurface),
       ),
-      extensions: <ThemeExtension<dynamic>>[
-        AppThemeExtension.light,
-      ],
+      extensions: <ThemeExtension<dynamic>>[AppThemeExtension.light],
     );
   }
 
@@ -634,8 +658,9 @@ class AppTheme {
       inversePrimary: Color(0xFF1976D2),
     );
 
-    final TextTheme textTheme =
-        GoogleFonts.interTextTheme(ThemeData.dark().textTheme).apply(
+    final TextTheme textTheme = GoogleFonts.interTextTheme(
+      ThemeData.dark().textTheme,
+    ).apply(
       bodyColor: colorScheme.onSurface,
       displayColor: colorScheme.onSurface,
     );
@@ -652,9 +677,7 @@ class AppTheme {
       hoverColor: colorScheme.primary.withValues(alpha: 0.08),
       highlightColor: colorScheme.primary.withValues(alpha: 0.12),
       splashColor: colorScheme.primary.withValues(alpha: 0.12),
-      extensions: <ThemeExtension<dynamic>>[
-        AppThemeExtension.dark,
-      ],
+      extensions: <ThemeExtension<dynamic>>[AppThemeExtension.dark],
     );
   }
 }

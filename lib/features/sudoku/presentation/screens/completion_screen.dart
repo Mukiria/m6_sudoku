@@ -48,7 +48,9 @@ class CompletionScreen extends ConsumerWidget {
 
     // Record the game
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(statisticsProvider.notifier).recordGame(
+      ref
+          .read(statisticsProvider.notifier)
+          .recordGame(
             difficulty: difficulty,
             timeSeconds: time,
             mistakes: mistakes,
@@ -79,25 +81,25 @@ class CompletionScreen extends ConsumerWidget {
 
                 // Completion Animation
                 Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: difficultyColor,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: difficultyColor.withValues(alpha: 0.3),
-                        blurRadius: 20,
-                        spreadRadius: 5,
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: difficultyColor,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: difficultyColor.withValues(alpha: 0.3),
+                            blurRadius: 20,
+                            spreadRadius: 5,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.check_rounded,
-                    color: Colors.white,
-                    size: 60,
-                  ),
-                )
+                      child: const Icon(
+                        Icons.check_rounded,
+                        color: Colors.white,
+                        size: 60,
+                      ),
+                    )
                     .animate()
                     .scale(duration: 600.ms, curve: Curves.elasticOut)
                     .then()
@@ -106,12 +108,12 @@ class CompletionScreen extends ConsumerWidget {
                 const SizedBox(height: AppConstants.spacingXl),
 
                 Text(
-                  'Puzzle Complete!',
-                  style: theme.textTheme.displaySmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: colorScheme.onSurface,
-                  ),
-                )
+                      'Puzzle Complete!',
+                      style: theme.textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.onSurface,
+                      ),
+                    )
                     .animate()
                     .fadeIn(duration: 400.ms, delay: 300.ms)
                     .slideY(begin: 0.3, end: 0),
@@ -119,11 +121,11 @@ class CompletionScreen extends ConsumerWidget {
                 const SizedBox(height: AppConstants.spacingSm),
 
                 Text(
-                  '${difficulty.capitalize()} difficulty solved',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                )
+                      '${difficulty.capitalize()} difficulty solved',
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    )
                     .animate()
                     .fadeIn(duration: 400.ms, delay: 400.ms)
                     .slideY(begin: 0.3, end: 0),
@@ -167,42 +169,44 @@ class CompletionScreen extends ConsumerWidget {
                 Column(
                   children: [
                     AppButton(
-                      onPressed: () {
-                        ref.read(gameProvider.notifier).newGame(
-                              Difficulty.values.firstWhere(
-                                (d) => d.name == difficulty,
-                                orElse: () => Difficulty.easy,
-                              ),
-                            );
-                        context.pop();
-                      },
-                      variant: AppButtonVariant.filled,
-                      size: AppButtonSize.large,
-                      icon: const Icon(Icons.refresh_rounded),
-                      child: const Text('Play Again'),
-                    )
+                          onPressed: () {
+                            ref
+                                .read(gameProvider.notifier)
+                                .newGame(
+                                  Difficulty.values.firstWhere(
+                                    (d) => d.name == difficulty,
+                                    orElse: () => Difficulty.easy,
+                                  ),
+                                );
+                            context.pop();
+                          },
+                          variant: AppButtonVariant.filled,
+                          size: AppButtonSize.large,
+                          icon: const Icon(Icons.refresh_rounded),
+                          child: const Text('Play Again'),
+                        )
                         .animate()
                         .fadeIn(duration: 400.ms, delay: 800.ms)
                         .slideY(begin: 0.3, end: 0),
                     const SizedBox(height: AppConstants.spacingMd),
                     AppButton(
-                      onPressed: () => context.go(AppRoutes.home),
-                      variant: AppButtonVariant.outlined,
-                      size: AppButtonSize.large,
-                      icon: const Icon(Icons.home_rounded),
-                      child: const Text('Main Menu'),
-                    )
+                          onPressed: () => context.go(AppRoutes.home),
+                          variant: AppButtonVariant.outlined,
+                          size: AppButtonSize.large,
+                          icon: const Icon(Icons.home_rounded),
+                          child: const Text('Main Menu'),
+                        )
                         .animate()
                         .fadeIn(duration: 400.ms, delay: 900.ms)
                         .slideY(begin: 0.3, end: 0),
                     const SizedBox(height: AppConstants.spacingMd),
                     AppButton(
-                      onPressed: () => context.go(AppRoutes.statistics),
-                      variant: AppButtonVariant.tonal,
-                      size: AppButtonSize.large,
-                      icon: const Icon(Icons.bar_chart_rounded),
-                      child: const Text('View Statistics'),
-                    )
+                          onPressed: () => context.go(AppRoutes.statistics),
+                          variant: AppButtonVariant.tonal,
+                          size: AppButtonSize.large,
+                          icon: const Icon(Icons.bar_chart_rounded),
+                          child: const Text('View Statistics'),
+                        )
                         .animate()
                         .fadeIn(duration: 400.ms, delay: 1000.ms)
                         .slideY(begin: 0.3, end: 0),
@@ -227,31 +231,31 @@ class CompletionScreen extends ConsumerWidget {
     required int delay,
   }) {
     return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Icon(icon, color: color, size: 28),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: color,
-          ),
-        ),
-        Text(
-          label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
-    )
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(icon, color: color, size: 28),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: color,
+              ),
+            ),
+            Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        )
         .animate()
         .fadeIn(duration: 400.ms, delay: delay.ms)
         .slideY(begin: 0.3, end: 0);

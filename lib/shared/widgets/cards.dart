@@ -46,7 +46,8 @@ class AppCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(borderRadius),
         splashColor: inkColor ?? colorScheme.primary.withValues(alpha: 0.1),
-        highlightColor: inkColor?.withValues(alpha: 0.05) ??
+        highlightColor:
+            inkColor?.withValues(alpha: 0.05) ??
             colorScheme.primary.withValues(alpha: 0.05),
         child: Padding(padding: padding, child: child),
       ),
@@ -92,13 +93,16 @@ class AppStatCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: (iconColor ?? colorScheme.primary)
-                        .withValues(alpha: 0.1),
+                    color: (iconColor ?? colorScheme.primary).withValues(
+                      alpha: 0.1,
+                    ),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: IconTheme(
                     data: IconThemeData(
-                        color: iconColor ?? colorScheme.primary, size: 20),
+                      color: iconColor ?? colorScheme.primary,
+                      size: 20,
+                    ),
                     child: icon!,
                   ),
                 ),
@@ -134,21 +138,23 @@ class AppStatCard extends StatelessWidget {
                       ? Icons.trending_up
                       : Icons.trending_down,
                   size: 14,
-                  color: trendIsPositive == true
-                      ? Colors.green
-                      : (trendIsPositive == false
-                          ? Colors.red
-                          : colorScheme.onSurfaceVariant),
+                  color:
+                      trendIsPositive == true
+                          ? Colors.green
+                          : (trendIsPositive == false
+                              ? Colors.red
+                              : colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(width: 4),
                 Text(
                   trend!,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: trendIsPositive == true
-                        ? Colors.green
-                        : (trendIsPositive == false
-                            ? Colors.red
-                            : colorScheme.onSurfaceVariant),
+                    color:
+                        trendIsPositive == true
+                            ? Colors.green
+                            : (trendIsPositive == false
+                                ? Colors.red
+                                : colorScheme.onSurfaceVariant),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -211,102 +217,113 @@ class DifficultyCard extends StatelessWidget {
     }
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeInOut,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color:
-                    isSelected ? difficultyColor : colorScheme.outlineVariant,
-                width: isSelected ? 2.5 : 1.5,
-              ),
-              color: isSelected
-                  ? difficultyColor.withValues(alpha: 0.1)
-                  : colorScheme.surface,
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: difficultyColor.withValues(alpha: 0.2),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: isSelected
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color:
+                        isSelected
                             ? difficultyColor
-                            : difficultyColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        difficultyLabel,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: isSelected ? Colors.white : difficultyColor,
+                            : colorScheme.outlineVariant,
+                    width: isSelected ? 2.5 : 1.5,
+                  ),
+                  color:
+                      isSelected
+                          ? difficultyColor.withValues(alpha: 0.1)
+                          : colorScheme.surface,
+                  boxShadow:
+                      isSelected
+                          ? [
+                            BoxShadow(
+                              color: difficultyColor.withValues(alpha: 0.2),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                          : null,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                isSelected
+                                    ? difficultyColor
+                                    : difficultyColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            difficultyLabel,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color:
+                                  isSelected ? Colors.white : difficultyColor,
+                            ),
+                          ),
                         ),
-                      ),
+                        const Spacer(),
+                        if (isSelected)
+                          Icon(
+                            Icons.check_circle_rounded,
+                            color: difficultyColor,
+                            size: 24,
+                          ).animate().scale(
+                            duration: 200.ms,
+                            curve: Curves.elasticOut,
+                          ),
+                      ],
                     ),
-                    const Spacer(),
-                    if (isSelected)
-                      Icon(
-                        Icons.check_circle_rounded,
-                        color: difficultyColor,
-                        size: 24,
-                      )
-                          .animate()
-                          .scale(duration: 200.ms, curve: Curves.elasticOut),
+                    const SizedBox(height: 16),
+                    if (cluesCount != null) ...[
+                      _buildInfoRow(
+                        icon: Icons.format_list_numbered_rounded,
+                        label: 'Clues',
+                        value: cluesCount.toString(),
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    if (bestTime != null) ...[
+                      _buildInfoRow(
+                        icon: Icons.timer_rounded,
+                        label: 'Best Time',
+                        value: _formatTime(bestTime!),
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    if (completionRate != null) ...[
+                      _buildInfoRow(
+                        icon: Icons.percent_rounded,
+                        label: 'Completion',
+                        value: '${(completionRate! * 100).toStringAsFixed(0)}%',
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ],
                   ],
                 ),
-                const SizedBox(height: 16),
-                if (cluesCount != null) ...[
-                  _buildInfoRow(
-                    icon: Icons.format_list_numbered_rounded,
-                    label: 'Clues',
-                    value: cluesCount.toString(),
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(height: 8),
-                ],
-                if (bestTime != null) ...[
-                  _buildInfoRow(
-                    icon: Icons.timer_rounded,
-                    label: 'Best Time',
-                    value: _formatTime(bestTime!),
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(height: 8),
-                ],
-                if (completionRate != null) ...[
-                  _buildInfoRow(
-                    icon: Icons.percent_rounded,
-                    label: 'Completion',
-                    value: '${(completionRate! * 100).toStringAsFixed(0)}%',
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ],
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    ).animate(target: isSelected ? 1 : 0).scale(
+        )
+        .animate(target: isSelected ? 1 : 0)
+        .scale(
           begin: const Offset(1, 1),
           end: const Offset(1.02, 1.02),
           duration: 200.ms,

@@ -82,7 +82,8 @@ class PuzzleLocalDataSource {
       if (jsonString == null) return const Right([]);
       final list = jsonDecode(jsonString) as List;
       return Right(
-          list.map((e) => Puzzle.fromJson(e as Map<String, dynamic>)).toList());
+        list.map((e) => Puzzle.fromJson(e as Map<String, dynamic>)).toList(),
+      );
     } catch (e) {
       return Left(CacheFailure('Failed to get puzzle history: $e'));
     }
@@ -91,15 +92,14 @@ class PuzzleLocalDataSource {
   Future<Either<Failure, void>> savePuzzleToHistory(Puzzle puzzle) async {
     try {
       final historyResult = await getPuzzleHistory();
-      return historyResult.fold(
-        (failure) => Left(failure),
-        (history) {
-          final updated = [puzzle, ...history].take(100).toList();
-          _storage.setString(
-              _historyKey, jsonEncode(updated.map((p) => p.toJson()).toList()));
-          return const Right(null);
-        },
-      );
+      return historyResult.fold((failure) => Left(failure), (history) {
+        final updated = [puzzle, ...history].take(100).toList();
+        _storage.setString(
+          _historyKey,
+          jsonEncode(updated.map((p) => p.toJson()).toList()),
+        );
+        return const Right(null);
+      });
     } catch (e) {
       return Left(StorageFailure('Failed to save puzzle to history: $e'));
     }

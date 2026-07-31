@@ -113,8 +113,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
                         padding: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
                           color: extension.gridBackgroundColor,
-                          borderRadius:
-                              BorderRadius.circular(AppConstants.borderRadius),
+                          borderRadius: BorderRadius.circular(
+                            AppConstants.borderRadius,
+                          ),
                           border: Border.all(
                             color: extension.subGridLineColor,
                             width: 2.5,
@@ -129,10 +130,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
               const SizedBox(height: AppConstants.spacingMd),
               NumberPad(
                 selectedNumber: gameState.selectedNumber,
-                onNumberSelected: (number) =>
-                    ref.read(gameProvider.notifier).selectNumber(number),
-                onNoteModeToggle: () =>
-                    ref.read(gameProvider.notifier).toggleNoteMode(),
+                onNumberSelected:
+                    (number) =>
+                        ref.read(gameProvider.notifier).selectNumber(number),
+                onNoteModeToggle:
+                    () => ref.read(gameProvider.notifier).toggleNoteMode(),
                 isNoteMode: gameState.isNoteMode,
                 counts: _getNumberCounts(gameState),
                 disabledNumbers: _getDisabledNumbers(gameState),
@@ -162,7 +164,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
                     label: 'Erase',
                     onPressed: () {
                       if (gameState.selectedCell != null) {
-                        ref.read(gameProvider.notifier).clearCell(
+                        ref
+                            .read(gameProvider.notifier)
+                            .clearCell(
                               gameState.selectedCell!.row,
                               gameState.selectedCell!.col,
                             );
@@ -195,15 +199,17 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   decoration: BoxDecoration(
                     border: Border(
                       right: BorderSide(
-                        color: col % 3 == 2
-                            ? extension.subGridLineColor
-                            : extension.gridLineColor,
+                        color:
+                            col % 3 == 2
+                                ? extension.subGridLineColor
+                                : extension.gridLineColor,
                         width: col % 3 == 2 ? 2 : 1,
                       ),
                       bottom: BorderSide(
-                        color: row % 3 == 2
-                            ? extension.subGridLineColor
-                            : extension.gridLineColor,
+                        color:
+                            row % 3 == 2
+                                ? extension.subGridLineColor
+                                : extension.gridLineColor,
                         width: row % 3 == 2 ? 2 : 1,
                       ),
                     ),
@@ -216,8 +222,10 @@ class _GameScreenState extends ConsumerState<GameScreen>
                     hasError: cell.hasError,
                     isHighlighted: cell.isHighlighted,
                     isRelated: cell.isRelated,
-                    onTap: () =>
-                        ref.read(gameProvider.notifier).selectCell(row, col),
+                    onTap:
+                        () => ref
+                            .read(gameProvider.notifier)
+                            .selectCell(row, col),
                     onLongPress: () => _showCellOptions(row, col, gameState),
                   ),
                 ),
@@ -264,38 +272,43 @@ class _GameScreenState extends ConsumerState<GameScreen>
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(AppConstants.spacingLg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Cell Options', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: AppConstants.spacingLg),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      builder:
+          (context) => Container(
+            padding: const EdgeInsets.all(AppConstants.spacingLg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                AppButton(
-                  onPressed: () {
-                    ref.read(gameProvider.notifier).clearCell(row, col);
-                    Navigator.pop(context);
-                  },
-                  variant: AppButtonVariant.outlined,
-                  child: const Text('Clear'),
+                Text(
+                  'Cell Options',
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
-                AppButton(
-                  onPressed: () {
-                    // Toggle note mode for this cell
-                    Navigator.pop(context);
-                  },
-                  variant: AppButtonVariant.filled,
-                  child:
-                      Text(cell.notes.isNotEmpty ? 'Clear Notes' : 'Add Notes'),
+                const SizedBox(height: AppConstants.spacingLg),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    AppButton(
+                      onPressed: () {
+                        ref.read(gameProvider.notifier).clearCell(row, col);
+                        Navigator.pop(context);
+                      },
+                      variant: AppButtonVariant.outlined,
+                      child: const Text('Clear'),
+                    ),
+                    AppButton(
+                      onPressed: () {
+                        // Toggle note mode for this cell
+                        Navigator.pop(context);
+                      },
+                      variant: AppButtonVariant.filled,
+                      child: Text(
+                        cell.notes.isNotEmpty ? 'Clear Notes' : 'Add Notes',
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 }

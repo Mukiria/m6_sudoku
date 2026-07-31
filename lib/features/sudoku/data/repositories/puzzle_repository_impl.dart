@@ -17,13 +17,14 @@ class PuzzleRepositoryImpl implements PuzzleRepository {
   @override
   Future<Either<Failure, Puzzle>> getPuzzle(String id) {
     return _dataSource.getCurrentPuzzle().then(
-          (result) => result.fold(
-            (failure) => Left(failure),
-            (puzzle) => puzzle != null
+      (result) => result.fold(
+        (failure) => Left(failure),
+        (puzzle) =>
+            puzzle != null
                 ? Right(puzzle)
                 : Left(NotFoundFailure('Puzzle not found')),
-          ),
-        );
+      ),
+    );
   }
 
   @override

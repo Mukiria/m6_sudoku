@@ -20,10 +20,7 @@ class DifficultySelectionScreen extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Select Difficulty'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Select Difficulty'), centerTitle: true),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppConstants.spacingLg),
@@ -39,25 +36,29 @@ class DifficultySelectionScreen extends ConsumerWidget {
               const SizedBox(height: AppConstants.spacingLg),
               Expanded(
                 child: ListView(
-                  children: Difficulty.values.map((difficulty) {
-                    final index = Difficulty.values.indexOf(difficulty);
-                    final isSelected =
-                        settings.selectedDifficulty == difficulty.name;
+                  children:
+                      Difficulty.values.map((difficulty) {
+                        final index = Difficulty.values.indexOf(difficulty);
+                        final isSelected =
+                            settings.selectedDifficulty == difficulty.name;
 
-                    return DifficultyCard(
-                      difficulty: difficulty,
-                      isSelected: isSelected,
-                      onTap: () {
-                        ref
-                            .read(settingsProvider.notifier)
-                            .updateDifficulty(difficulty.name);
-                        context.push(AppRoutes.game, extra: difficulty.name);
-                      },
-                    )
-                        .animate()
-                        .fadeIn(duration: 300.ms, delay: (index * 100).ms)
-                        .slideX(begin: 0.2, end: 0);
-                  }).toList(),
+                        return DifficultyCard(
+                              difficulty: difficulty,
+                              isSelected: isSelected,
+                              onTap: () {
+                                ref
+                                    .read(settingsProvider.notifier)
+                                    .updateDifficulty(difficulty.name);
+                                context.push(
+                                  AppRoutes.game,
+                                  extra: difficulty.name,
+                                );
+                              },
+                            )
+                            .animate()
+                            .fadeIn(duration: 300.ms, delay: (index * 100).ms)
+                            .slideX(begin: 0.2, end: 0);
+                      }).toList(),
                 ),
               ),
             ],
@@ -112,33 +113,39 @@ class DifficultyCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppConstants.largeBorderRadius),
             border: Border.all(
-              color: isSelected
-                  ? difficultyColor
-                  : theme.colorScheme.outlineVariant,
+              color:
+                  isSelected
+                      ? difficultyColor
+                      : theme.colorScheme.outlineVariant,
               width: isSelected ? 2.5 : 1.5,
             ),
-            color: isSelected
-                ? difficultyColor.withValues(alpha: 0.1)
-                : theme.colorScheme.surface,
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: difficultyColor.withValues(alpha: 0.2),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : null,
+            color:
+                isSelected
+                    ? difficultyColor.withValues(alpha: 0.1)
+                    : theme.colorScheme.surface,
+            boxShadow:
+                isSelected
+                    ? [
+                      BoxShadow(
+                        color: difficultyColor.withValues(alpha: 0.2),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                    : null,
           ),
           child: Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? difficultyColor
-                      : difficultyColor.withValues(alpha: 0.1),
+                  color:
+                      isSelected
+                          ? difficultyColor
+                          : difficultyColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -167,8 +174,9 @@ class DifficultyCard extends StatelessWidget {
                         Icon(
                           Icons.format_list_numbered_rounded,
                           size: 16,
-                          color: theme.colorScheme.onSurfaceVariant
-                              .withValues(alpha: 0.7),
+                          color: theme.colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.7,
+                          ),
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -182,8 +190,9 @@ class DifficultyCard extends StatelessWidget {
                         Icon(
                           Icons.timer_rounded,
                           size: 16,
-                          color: theme.colorScheme.onSurfaceVariant
-                              .withValues(alpha: 0.7),
+                          color: theme.colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.7,
+                          ),
                         ),
                         const SizedBox(width: 4),
                         Text(

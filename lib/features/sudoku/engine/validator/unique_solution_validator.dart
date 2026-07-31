@@ -7,8 +7,11 @@ class UniqueSolutionValidator {
     return counter.count == 1;
   }
 
-  static void _countSolutions(Board board, _SolutionCounter counter,
-      {int limit = 2}) {
+  static void _countSolutions(
+    Board board,
+    _SolutionCounter counter, {
+    int limit = 2,
+  }) {
     if (counter.count >= limit) return;
 
     int index = -1;

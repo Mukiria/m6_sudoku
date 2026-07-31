@@ -76,7 +76,9 @@ class PauseMenu extends ConsumerWidget {
           AppButton(
             onPressed: () {
               if (gameState != null) {
-                ref.read(gameProvider.notifier).newGame(
+                ref
+                    .read(gameProvider.notifier)
+                    .newGame(
                       Difficulty.values.firstWhere(
                         (d) => d.name == gameState!.difficulty.name,
                         orElse: () => Difficulty.easy,

@@ -1,29 +1,61 @@
 import 'package:equatable/equatable.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'statistics.freezed.dart';
-part 'statistics.g.dart';
+class Statistics extends Equatable {
+  const Statistics({
+    required this.gamesPlayed,
+    required this.gamesWon,
+    required this.currentStreak,
+    required this.bestStreak,
+    required this.totalTimeSeconds,
+    required this.hintsUsed,
+    required this.mistakesMade,
+    required this.bestTimesByDifficulty,
+    required this.gamesWonByDifficulty,
+    required this.gamesPlayedByDifficulty,
+    required this.lastPlayed,
+  });
 
-@freezed
-class Statistics with _$Statistics {
-  const factory Statistics({
-    required int gamesPlayed,
-    required int gamesWon,
-    required int currentStreak,
-    required int bestStreak,
-    required int totalTimeSeconds,
-    required int hintsUsed,
-    required int mistakesMade,
-    required Map<String, int> bestTimesByDifficulty,
-    required Map<String, int> gamesWonByDifficulty,
-    required Map<String, int> gamesPlayedByDifficulty,
-    required DateTime? lastPlayed,
-  }) = _Statistics;
+  final int gamesPlayed;
+  final int gamesWon;
+  final int currentStreak;
+  final int bestStreak;
+  final int totalTimeSeconds;
+  final int hintsUsed;
+  final int mistakesMade;
+  final Map<String, int> bestTimesByDifficulty;
+  final Map<String, int> gamesWonByDifficulty;
+  final Map<String, int> gamesPlayedByDifficulty;
+  final DateTime? lastPlayed;
 
-  factory Statistics.fromJson(Map<String, dynamic> json) =>
-      _$StatisticsFromJson(json);
-
-  const Statistics._();
+  Statistics copyWith({
+    int? gamesPlayed,
+    int? gamesWon,
+    int? currentStreak,
+    int? bestStreak,
+    int? totalTimeSeconds,
+    int? hintsUsed,
+    int? mistakesMade,
+    Map<String, int>? bestTimesByDifficulty,
+    Map<String, int>? gamesWonByDifficulty,
+    Map<String, int>? gamesPlayedByDifficulty,
+    DateTime? lastPlayed,
+  }) {
+    return Statistics(
+      gamesPlayed: gamesPlayed ?? this.gamesPlayed,
+      gamesWon: gamesWon ?? this.gamesWon,
+      currentStreak: currentStreak ?? this.currentStreak,
+      bestStreak: bestStreak ?? this.bestStreak,
+      totalTimeSeconds: totalTimeSeconds ?? this.totalTimeSeconds,
+      hintsUsed: hintsUsed ?? this.hintsUsed,
+      mistakesMade: mistakesMade ?? this.mistakesMade,
+      bestTimesByDifficulty:
+          bestTimesByDifficulty ?? this.bestTimesByDifficulty,
+      gamesWonByDifficulty: gamesWonByDifficulty ?? this.gamesWonByDifficulty,
+      gamesPlayedByDifficulty:
+          gamesPlayedByDifficulty ?? this.gamesPlayedByDifficulty,
+      lastPlayed: lastPlayed ?? this.lastPlayed,
+    );
+  }
 
   double get winRate => gamesPlayed > 0 ? gamesWon / gamesPlayed : 0.0;
 
@@ -31,7 +63,6 @@ class Statistics with _$Statistics {
     final hours = totalTimeSeconds ~/ 3600;
     final minutes = (totalTimeSeconds % 3600) ~/ 60;
     final seconds = totalTimeSeconds % 60;
-
     if (hours > 0) {
       return '${hours}h ${minutes}m ${seconds}s';
     } else if (minutes > 0) {
@@ -40,27 +71,114 @@ class Statistics with _$Statistics {
     return '${seconds}s';
   }
 
-  String getAverageTime(int gamesWon, int totalTime) {
-    if (gamesWon == 0) return 'N/A';
-    final avgSeconds = totalTime ~/ gamesWon;
-    final minutes = avgSeconds ~/ 60;
-    final seconds = avgSeconds % 60;
-    return '${minutes}m ${seconds}s';
+  Map<String, dynamic> toJson() {
+    return {
+      'gamesPlayed': gamesPlayed,
+      'gamesWon': gamesWon,
+      'currentStreak': currentStreak,
+      'bestStreak': bestStreak,
+      'totalTimeSeconds': totalTimeSeconds,
+      'hintsUsed': hintsUsed,
+      'mistakesMade': mistakesMade,
+      'bestTimesByDifficulty': bestTimesByDifficulty,
+      'gamesWonByDifficulty': gamesWonByDifficulty,
+      'gamesPlayedByDifficulty': gamesPlayedByDifficulty,
+      'lastPlayed': lastPlayed?.toIso8601String(),
+    };
   }
+
+  factory Statistics.fromJson(Map<String, dynamic> json) {
+    return Statistics(
+      gamesPlayed: json['gamesPlayed'] ?? 0,
+      gamesWon: json['gamesWon'] ?? 0,
+      currentStreak: json['currentStreak'] ?? 0,
+      bestStreak: json['bestStreak'] ?? 0,
+      totalTimeSeconds: json['totalTimeSeconds'] ?? 0,
+      hintsUsed: json['hintsUsed'] ?? 0,
+      mistakesMade: json['mistakesMade'] ?? 0,
+      bestTimesByDifficulty: Map<String, int>.from(
+        json['bestTimesByDifficulty'] ?? {},
+      ),
+      gamesWonByDifficulty: Map<String, int>.from(
+        json['gamesWonByDifficulty'] ?? {},
+      ),
+      gamesPlayedByDifficulty: Map<String, int>.from(
+        json['gamesPlayedByDifficulty'] ?? {},
+      ),
+      lastPlayed:
+          json['lastPlayed'] != null
+              ? DateTime.parse(json['lastPlayed'])
+              : null,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    gamesPlayed,
+    gamesWon,
+    currentStreak,
+    bestStreak,
+    totalTimeSeconds,
+    hintsUsed,
+    mistakesMade,
+    bestTimesByDifficulty,
+    gamesWonByDifficulty,
+    gamesPlayedByDifficulty,
+    lastPlayed,
+  ];
 }
 
-@freezed
-class GameRecord with _$GameRecord {
-  const factory GameRecord({
-    required String id,
-    required DateTime date,
-    required String difficulty,
-    required int timeSeconds,
-    required int mistakes,
-    required int hintsUsed,
-    required bool completed,
-  }) = _GameRecord;
+class GameRecord extends Equatable {
+  const GameRecord({
+    required this.id,
+    required this.date,
+    required this.difficulty,
+    required this.timeSeconds,
+    required this.mistakes,
+    required this.hintsUsed,
+    required this.completed,
+  });
 
-  factory GameRecord.fromJson(Map<String, dynamic> json) =>
-      _$GameRecordFromJson(json);
+  final String id;
+  final DateTime date;
+  final String difficulty;
+  final int timeSeconds;
+  final int mistakes;
+  final int hintsUsed;
+  final bool completed;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'date': date.toIso8601String(),
+      'difficulty': difficulty,
+      'timeSeconds': timeSeconds,
+      'mistakes': mistakes,
+      'hintsUsed': hintsUsed,
+      'completed': completed,
+    };
+  }
+
+  factory GameRecord.fromJson(Map<String, dynamic> json) {
+    return GameRecord(
+      id: json['id'] ?? '',
+      date: DateTime.parse(json['date']),
+      difficulty: json['difficulty'] ?? '',
+      timeSeconds: json['timeSeconds'] ?? 0,
+      mistakes: json['mistakes'] ?? 0,
+      hintsUsed: json['hintsUsed'] ?? 0,
+      completed: json['completed'] ?? false,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    id,
+    date,
+    difficulty,
+    timeSeconds,
+    mistakes,
+    hintsUsed,
+    completed,
+  ];
 }

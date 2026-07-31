@@ -1,28 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../domain/entities/settings.dart';
-import '../domain/usecases/settings_usecases.dart';
+import 'package:m6_sudoku/features/settings/domain/entities/settings.dart';
+import 'package:m6_sudoku/features/settings/domain/usecases/settings_usecases.dart';
+import 'package:m6_sudoku/features/settings/domain/repositories/settings_repository.dart';
 
-final settingsProvider =
-    StateNotifierProvider<SettingsController, Settings>((ref) {
+final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
+  throw UnimplementedError('Initialize settings repository in main.dart');
+});
+
+final getSettingsUseCaseProvider = Provider<GetSettingsUseCase>((ref) {
+  final repo = ref.read(settingsRepositoryProvider);
+  return GetSettingsUseCase(repo);
+});
+
+final saveSettingsUseCaseProvider = Provider<SaveSettingsUseCase>((ref) {
+  final repo = ref.read(settingsRepositoryProvider);
+  return SaveSettingsUseCase(repo);
+});
+
+final resetSettingsUseCaseProvider = Provider<ResetSettingsUseCase>((ref) {
+  final repo = ref.read(settingsRepositoryProvider);
+  return ResetSettingsUseCase(repo);
+});
+
+final settingsProvider = StateNotifierProvider<SettingsController, Settings>((
+  ref,
+) {
   return SettingsController(ref);
 });
 
 final themeModeProvider = StateProvider<ThemeMode>((ref) {
   final settings = ref.watch(settingsProvider);
-  switch (settings.themeMode) {
-    case 'light':
-      return ThemeMode.light;
-    case 'dark':
-      return ThemeMode.dark;
-    case 'system':
-    default:
-      return ThemeMode.system;
-  }
+  return settings.themeMode;
 });
 
 class SettingsController extends StateNotifier<Settings> {
-  SettingsController(this._ref) : super(const Settings()) {
+  SettingsController(this._ref) : super(Settings()) {
     _loadSettings();
   }
 
@@ -37,7 +50,7 @@ class SettingsController extends StateNotifier<Settings> {
     );
   }
 
-  Future<void> updateThemeMode(String themeMode) async {
+  Future<void> updateThemeMode(ThemeMode themeMode) async {
     final newSettings = state.copyWith(themeMode: themeMode);
     await _saveSettings(newSettings);
   }
@@ -92,43 +105,8 @@ class SettingsController extends StateNotifier<Settings> {
     await _saveSettings(newSettings);
   }
 
-  Future<void> setMaxHintsPerGame(int value) async {
-    final newSettings = state.copyWith(maxHintsPerGame: value.clamp(0, 10));
-    await _saveSettings(newSettings);
-  }
-
-  Future<void> toggleAutoSave(bool enabled) async {
-    final newSettings = state.copyWith(autoSave: enabled);
-    await _saveSettings(newSettings);
-  }
-
-  Future<void> toggleShowMistakes(bool enabled) async {
-    final newSettings = state.copyWith(showMistakes: enabled);
-    await _saveSettings(newSettings);
-  }
-
-  Future<void> toggleHighlightRelated(bool enabled) async {
-    final newSettings = state.copyWith(highlightRelated: enabled);
-    await _saveSettings(newSettings);
-  }
-
-  Future<void> toggleAutoNotesEnabled(bool enabled) async {
-    final newSettings = state.copyWith(autoNotesEnabled: enabled);
-    await _saveSettings(newSettings);
-  }
-
-  Future<void> toggleHapticFeedbackEnabled(bool enabled) async {
-    final newSettings = state.copyWith(hapticFeedbackEnabled: enabled);
-    await _saveSettings(newSettings);
-  }
-
-  Future<void> toggleSoundEffectsEnabled(bool enabled) async {
-    final newSettings = state.copyWith(soundEffectsEnabled: enabled);
-    await _saveSettings(newSettings);
-  }
-
-  Future<void> toggleAutoSaveEnabled(bool enabled) async {
-    final newSettings = state.copyWith(autoSaveEnabled: enabled);
+  Future<void> setMaxHints(int value) async {
+    final newSettings = state.copyWith(maxHints: value.clamp(0, 10));
     await _saveSettings(newSettings);
   }
 
@@ -146,7 +124,7 @@ class SettingsController extends StateNotifier<Settings> {
     final result = await resetSettings();
     result.fold(
       (failure) => debugPrint('Failed to reset settings: $failure'),
-      (_) => state = const Settings(),
+      (_) => state = Settings(),
     );
   }
 }

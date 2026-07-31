@@ -17,6 +17,12 @@ class Settings extends Equatable {
     this.maxHints = 3,
     this.maxUndoHistory = 50,
     this.maxPuzzleHistory = 100,
+    this.autoSave = true,
+    this.showMistakes = true,
+    this.autoNotesEnabled = true,
+    this.hapticFeedbackEnabled = true,
+    this.soundEffectsEnabled = true,
+    this.autoSaveEnabled = true,
   });
 
   final ThemeMode themeMode;
@@ -33,6 +39,12 @@ class Settings extends Equatable {
   final int maxHints;
   final int maxUndoHistory;
   final int maxPuzzleHistory;
+  final bool autoSave;
+  final bool showMistakes;
+  final bool autoNotesEnabled;
+  final bool hapticFeedbackEnabled;
+  final bool soundEffectsEnabled;
+  final bool autoSaveEnabled;
 
   Settings copyWith({
     ThemeMode? themeMode,
@@ -49,6 +61,12 @@ class Settings extends Equatable {
     int? maxHints,
     int? maxUndoHistory,
     int? maxPuzzleHistory,
+    bool? autoSave,
+    bool? showMistakes,
+    bool? autoNotesEnabled,
+    bool? hapticFeedbackEnabled,
+    bool? soundEffectsEnabled,
+    bool? autoSaveEnabled,
   }) {
     return Settings(
       themeMode: themeMode ?? this.themeMode,
@@ -65,6 +83,13 @@ class Settings extends Equatable {
       maxHints: maxHints ?? this.maxHints,
       maxUndoHistory: maxUndoHistory ?? this.maxUndoHistory,
       maxPuzzleHistory: maxPuzzleHistory ?? this.maxPuzzleHistory,
+      autoSave: autoSave ?? this.autoSave,
+      showMistakes: showMistakes ?? this.showMistakes,
+      autoNotesEnabled: autoNotesEnabled ?? this.autoNotesEnabled,
+      hapticFeedbackEnabled:
+          hapticFeedbackEnabled ?? this.hapticFeedbackEnabled,
+      soundEffectsEnabled: soundEffectsEnabled ?? this.soundEffectsEnabled,
+      autoSaveEnabled: autoSaveEnabled ?? this.autoSaveEnabled,
     );
   }
 
@@ -84,6 +109,12 @@ class Settings extends Equatable {
       'maxHints': maxHints,
       'maxUndoHistory': maxUndoHistory,
       'maxPuzzleHistory': maxPuzzleHistory,
+      'autoSave': autoSave,
+      'showMistakes': showMistakes,
+      'autoNotesEnabled': autoNotesEnabled,
+      'hapticFeedbackEnabled': hapticFeedbackEnabled,
+      'soundEffectsEnabled': soundEffectsEnabled,
+      'autoSaveEnabled': autoSaveEnabled,
     };
   }
 
@@ -106,30 +137,36 @@ class Settings extends Equatable {
       maxHints: json['maxHints'] ?? 3,
       maxUndoHistory: json['maxUndoHistory'] ?? 50,
       maxPuzzleHistory: json['maxPuzzleHistory'] ?? 100,
+      autoSave: json['autoSave'] ?? true,
+      showMistakes: json['showMistakes'] ?? true,
+      autoNotesEnabled: json['autoNotesEnabled'] ?? true,
+      hapticFeedbackEnabled: json['hapticFeedbackEnabled'] ?? true,
+      soundEffectsEnabled: json['soundEffectsEnabled'] ?? true,
+      autoSaveEnabled: json['autoSaveEnabled'] ?? true,
     );
   }
 
   @override
   List<Object?> get props => [
-        themeMode,
-        soundEnabled,
-        hapticsEnabled,
-        autoNotes,
-        highlightErrors,
-        showTimer,
-        showHints,
-        autoClearNotes,
-        highlightRegions,
-        numberFirstInput,
-        selectedDifficulty,
-        maxHints,
-        maxUndoHistory,
-        maxPuzzleHistory,
-      ];
-}
-
-abstract class SettingsRepository {
-  Future<Either<Failure, Settings>> getSettings();
-  Future<Either<Failure, void>> saveSettings(Settings settings);
-  Future<Either<Failure, void>> resetSettings();
+    themeMode,
+    soundEnabled,
+    hapticsEnabled,
+    autoNotes,
+    highlightErrors,
+    showTimer,
+    showHints,
+    autoClearNotes,
+    highlightRegions,
+    numberFirstInput,
+    selectedDifficulty,
+    maxHints,
+    maxUndoHistory,
+    maxPuzzleHistory,
+    autoSave,
+    showMistakes,
+    autoNotesEnabled,
+    hapticFeedbackEnabled,
+    soundEffectsEnabled,
+    autoSaveEnabled,
+  ];
 }

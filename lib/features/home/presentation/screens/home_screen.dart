@@ -5,8 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/routing/app_router.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
-import 'package:m6_sudoku/features/sudoku/domain/entities/game_entities.dart';
-import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
+import 'package:m6_sudoku/features/sudoku/engine/models/game_status.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart'
+    hide GameStatus;
 import 'package:m6_sudoku/shared/widgets/buttons.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -40,12 +41,12 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: AppConstants.spacingSm),
 
               Text(
-                'Classic Sudoku Experience',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-              )
+                    'Classic Sudoku Experience',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  )
                   .animate()
                   .fadeIn(duration: 400.ms, delay: 100.ms)
                   .slideY(begin: 0.2, end: 0),
@@ -56,7 +57,8 @@ class HomeScreen extends ConsumerWidget {
               Consumer(
                 builder: (context, ref, child) {
                   final gameState = ref.watch(gameProvider);
-                  final hasSavedGame = gameState != null &&
+                  final hasSavedGame =
+                      gameState != null &&
                       gameState.status != GameStatus.completed &&
                       gameState.status != GameStatus.failed;
 
@@ -64,25 +66,26 @@ class HomeScreen extends ConsumerWidget {
                     children: [
                       if (hasSavedGame) ...[
                         AppButton(
-                          onPressed: () =>
-                              _continueGame(context, ref, gameState!),
-                          variant: AppButtonVariant.filled,
-                          size: AppButtonSize.large,
-                          child: const Text('Continue Game'),
-                        )
+                              onPressed:
+                                  () => _continueGame(context, ref, gameState!),
+                              variant: AppButtonVariant.filled,
+                              size: AppButtonSize.large,
+                              child: const Text('Continue Game'),
+                            )
                             .animate()
                             .fadeIn(duration: 300.ms, delay: 200.ms)
                             .slideX(begin: -0.2, end: 0),
                         const SizedBox(height: AppConstants.spacingMd),
                       ],
                       AppButton(
-                        onPressed: () =>
-                            context.push(AppRoutes.difficultySelection),
-                        variant: AppButtonVariant.filled,
-                        size: AppButtonSize.large,
-                        icon: const Icon(Icons.add_rounded),
-                        child: const Text('New Game'),
-                      )
+                            onPressed:
+                                () =>
+                                    context.push(AppRoutes.difficultySelection),
+                            variant: AppButtonVariant.filled,
+                            size: AppButtonSize.large,
+                            icon: const Icon(Icons.add_rounded),
+                            child: const Text('New Game'),
+                          )
                           .animate()
                           .fadeIn(duration: 300.ms, delay: 300.ms)
                           .slideX(begin: 0.2, end: 0),
@@ -106,37 +109,37 @@ class HomeScreen extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
-                    child: AppButton(
-                      onPressed: () => context.push(AppRoutes.statistics),
-                      variant: AppButtonVariant.outlined,
-                      child: const Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.bar_chart_rounded, size: 24),
-                          SizedBox(height: 4),
-                          Text('Statistics'),
-                        ],
-                      ),
-                    ),
-                  )
+                        child: AppButton(
+                          onPressed: () => context.push(AppRoutes.statistics),
+                          variant: AppButtonVariant.outlined,
+                          child: const Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.bar_chart_rounded, size: 24),
+                              SizedBox(height: 4),
+                              Text('Statistics'),
+                            ],
+                          ),
+                        ),
+                      )
                       .animate()
                       .fadeIn(duration: 300.ms, delay: 500.ms)
                       .slideY(begin: 0.2, end: 0),
                   const SizedBox(width: AppConstants.spacingMd),
                   Expanded(
-                    child: AppButton(
-                      onPressed: () => context.push(AppRoutes.settings),
-                      variant: AppButtonVariant.outlined,
-                      child: const Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.settings_rounded, size: 24),
-                          SizedBox(height: 4),
-                          Text('Settings'),
-                        ],
-                      ),
-                    ),
-                  )
+                        child: AppButton(
+                          onPressed: () => context.push(AppRoutes.settings),
+                          variant: AppButtonVariant.outlined,
+                          child: const Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.settings_rounded, size: 24),
+                              SizedBox(height: 4),
+                              Text('Settings'),
+                            ],
+                          ),
+                        ),
+                      )
                       .animate()
                       .fadeIn(duration: 300.ms, delay: 600.ms)
                       .slideY(begin: 0.2, end: 0),

@@ -16,143 +16,158 @@ class StatisticsScreen extends ConsumerWidget {
     final recentGames = ref.watch(recentGamesProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Statistics'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Statistics'), centerTitle: true),
       body: statisticsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 64, color: Colors.red),
-              const SizedBox(height: 16),
-              Text('Failed to load statistics',
-                  style: theme.textTheme.titleLarge),
-              const SizedBox(height: 8),
-              Text(error.toString(), style: theme.textTheme.bodyMedium),
-            ],
-          ),
-        ),
-        data: (stats) => CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(AppConstants.spacingLg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Overview Stats
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildStatCard(
-                            theme,
-                            extension,
-                            'Games Played',
-                            stats.gamesPlayed.toString(),
-                            Icons.games_rounded,
-                            extension.difficultyMediumColor,
-                          ),
-                        ),
-                        const SizedBox(width: AppConstants.spacingMd),
-                        Expanded(
-                          child: _buildStatCard(
-                            theme,
-                            extension,
-                            'Games Won',
-                            stats.gamesWon.toString(),
-                            Icons.emoji_events_rounded,
-                            extension.difficultyEasyColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppConstants.spacingMd),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildStatCard(
-                            theme,
-                            extension,
-                            'Win Rate',
-                            '${(stats.winRate * 100).toStringAsFixed(1)}%',
-                            Icons.trending_up_rounded,
-                            extension.difficultyMediumColor,
-                          ),
-                        ),
-                        const SizedBox(width: AppConstants.spacingMd),
-                        Expanded(
-                          child: _buildStatCard(
-                            theme,
-                            extension,
-                            'Best Streak',
-                            '${stats.bestStreak}',
-                            Icons.local_fire_department_rounded,
-                            extension.difficultyHardColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppConstants.spacingMd),
-                    _buildStatCard(
-                      theme,
-                      extension,
-                      'Total Time',
-                      stats.formattedTotalTime,
-                      Icons.timer_rounded,
-                      extension.difficultyExpertColor,
-                      fullWidth: true,
-                    ),
-
-                    const SizedBox(height: AppConstants.spacingXl),
-
-                    // Difficulty Stats
-                    Text(
-                      'Difficulty Performance',
-                      style: theme.textTheme.titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: AppConstants.spacingMd),
-
-                    ...Difficulty.values.map((difficulty) => Padding(
-                          padding: const EdgeInsets.only(
-                              bottom: AppConstants.spacingMd),
-                          child: _buildDifficultyCard(
-                              theme, extension, difficulty, stats),
-                        )),
-
-                    const SizedBox(height: AppConstants.spacingXl),
-
-                    // Recent Games
-                    if (recentGames.isNotEmpty) ...[
-                      Text(
-                        'Recent Games',
-                        style: theme.textTheme.titleLarge
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: AppConstants.spacingMd),
-                      ...recentGames.take(5).map((game) => Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: AppConstants.spacingSm),
-                            child: _buildGameRecordCard(theme, game),
-                          )),
-                      const SizedBox(height: AppConstants.spacingXl),
-                    ],
-
-                    // Reset Button
-                    AppButton(
-                      onPressed: () => _showResetDialog(context, ref),
-                      variant: AppButtonVariant.outlined,
-                      child: const Text('Reset Statistics'),
-                    ),
-                  ],
-                ),
+        error:
+            (error, stack) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Failed to load statistics',
+                    style: theme.textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(error.toString(), style: theme.textTheme.bodyMedium),
+                ],
               ),
             ),
-          ],
-        ),
+        data:
+            (stats) => CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppConstants.spacingLg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Overview Stats
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildStatCard(
+                                theme,
+                                extension,
+                                'Games Played',
+                                stats.gamesPlayed.toString(),
+                                Icons.games_rounded,
+                                extension.difficultyMediumColor,
+                              ),
+                            ),
+                            const SizedBox(width: AppConstants.spacingMd),
+                            Expanded(
+                              child: _buildStatCard(
+                                theme,
+                                extension,
+                                'Games Won',
+                                stats.gamesWon.toString(),
+                                Icons.emoji_events_rounded,
+                                extension.difficultyEasyColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppConstants.spacingMd),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildStatCard(
+                                theme,
+                                extension,
+                                'Win Rate',
+                                '${(stats.winRate * 100).toStringAsFixed(1)}%',
+                                Icons.trending_up_rounded,
+                                extension.difficultyMediumColor,
+                              ),
+                            ),
+                            const SizedBox(width: AppConstants.spacingMd),
+                            Expanded(
+                              child: _buildStatCard(
+                                theme,
+                                extension,
+                                'Best Streak',
+                                '${stats.bestStreak}',
+                                Icons.local_fire_department_rounded,
+                                extension.difficultyHardColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppConstants.spacingMd),
+                        _buildStatCard(
+                          theme,
+                          extension,
+                          'Total Time',
+                          stats.formattedTotalTime,
+                          Icons.timer_rounded,
+                          extension.difficultyExpertColor,
+                          fullWidth: true,
+                        ),
+
+                        const SizedBox(height: AppConstants.spacingXl),
+
+                        // Difficulty Stats
+                        Text(
+                          'Difficulty Performance',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: AppConstants.spacingMd),
+
+                        ...Difficulty.values.map(
+                          (difficulty) => Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: AppConstants.spacingMd,
+                            ),
+                            child: _buildDifficultyCard(
+                              theme,
+                              extension,
+                              difficulty,
+                              stats,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: AppConstants.spacingXl),
+
+                        // Recent Games
+                        if (recentGames.isNotEmpty) ...[
+                          Text(
+                            'Recent Games',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: AppConstants.spacingMd),
+                          ...recentGames
+                              .take(5)
+                              .map(
+                                (game) => Padding(
+                                  padding: const EdgeInsets.only(
+                                    bottom: AppConstants.spacingSm,
+                                  ),
+                                  child: _buildGameRecordCard(theme, game),
+                                ),
+                              ),
+                          const SizedBox(height: AppConstants.spacingXl),
+                        ],
+
+                        // Reset Button
+                        AppButton(
+                          onPressed: () => _showResetDialog(context, ref),
+                          variant: AppButtonVariant.outlined,
+                          child: const Text('Reset Statistics'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
       ),
     );
   }
@@ -253,13 +268,19 @@ class StatisticsScreen extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.games_rounded,
-                        size: 14, color: theme.colorScheme.onSurfaceVariant),
+                    Icon(
+                      Icons.games_rounded,
+                      size: 14,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                     const SizedBox(width: 4),
                     Text('$played played', style: theme.textTheme.bodySmall),
                     const SizedBox(width: 16),
-                    Icon(Icons.check_circle_rounded,
-                        size: 14, color: extension.difficultyEasyColor),
+                    Icon(
+                      Icons.check_circle_rounded,
+                      size: 14,
+                      color: extension.difficultyEasyColor,
+                    ),
                     const SizedBox(width: 4),
                     Text('$won won', style: theme.textTheme.bodySmall),
                   ],
@@ -268,18 +289,28 @@ class StatisticsScreen extends ConsumerWidget {
                 Row(
                   children: [
                     if (bestTime > 0) ...[
-                      Icon(Icons.timer_rounded,
-                          size: 14, color: theme.colorScheme.onSurfaceVariant),
+                      Icon(
+                        Icons.timer_rounded,
+                        size: 14,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                       const SizedBox(width: 4),
-                      Text('Best: ${_formatTime(bestTime)}',
-                          style: theme.textTheme.bodySmall),
+                      Text(
+                        'Best: ${_formatTime(bestTime)}',
+                        style: theme.textTheme.bodySmall,
+                      ),
                       const SizedBox(width: 16),
                     ],
-                    Icon(Icons.trending_up_rounded,
-                        size: 14, color: theme.colorScheme.onSurfaceVariant),
+                    Icon(
+                      Icons.trending_up_rounded,
+                      size: 14,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                     const SizedBox(width: 4),
-                    Text('${(winRate * 100).toStringAsFixed(0)}% win rate',
-                        style: theme.textTheme.bodySmall),
+                    Text(
+                      '${(winRate * 100).toStringAsFixed(0)}% win rate',
+                      style: theme.textTheme.bodySmall,
+                    ),
                   ],
                 ),
               ],
@@ -332,8 +363,11 @@ class StatisticsScreen extends ConsumerWidget {
                     if (game.completed)
                       Icon(Icons.check_circle_rounded, size: 16, color: color)
                     else
-                      Icon(Icons.cancel_rounded,
-                          size: 16, color: theme.colorScheme.error),
+                      Icon(
+                        Icons.cancel_rounded,
+                        size: 16,
+                        color: theme.colorScheme.error,
+                      ),
                     const SizedBox(width: 4),
                     Text(
                       game.completed ? 'Completed' : 'Incomplete',
@@ -355,19 +389,29 @@ class StatisticsScreen extends ConsumerWidget {
                 Row(
                   children: [
                     if (game.mistakes > 0) ...[
-                      Icon(Icons.close_rounded,
-                          size: 12, color: theme.colorScheme.error),
+                      Icon(
+                        Icons.close_rounded,
+                        size: 12,
+                        color: theme.colorScheme.error,
+                      ),
                       const SizedBox(width: 2),
-                      Text('${game.mistakes} mistakes',
-                          style: theme.textTheme.labelSmall),
+                      Text(
+                        '${game.mistakes} mistakes',
+                        style: theme.textTheme.labelSmall,
+                      ),
                       const SizedBox(width: 12),
                     ],
                     if (game.hintsUsed > 0) ...[
-                      Icon(Icons.lightbulb_rounded,
-                          size: 12, color: theme.colorScheme.tertiary),
+                      Icon(
+                        Icons.lightbulb_rounded,
+                        size: 12,
+                        color: theme.colorScheme.tertiary,
+                      ),
                       const SizedBox(width: 2),
-                      Text('${game.hintsUsed} hints',
-                          style: theme.textTheme.labelSmall),
+                      Text(
+                        '${game.hintsUsed} hints',
+                        style: theme.textTheme.labelSmall,
+                      ),
                     ],
                   ],
                 ),
@@ -386,7 +430,9 @@ class StatisticsScreen extends ConsumerWidget {
   }
 
   Color _getDifficultyColor(
-      AppThemeExtension extension, Difficulty difficulty) {
+    AppThemeExtension extension,
+    Difficulty difficulty,
+  ) {
     switch (difficulty) {
       case Difficulty.easy:
         return extension.difficultyEasyColor;
@@ -411,30 +457,32 @@ class StatisticsScreen extends ConsumerWidget {
   void _showResetDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reset Statistics'),
-        content: const Text(
-            'This will permanently delete all your statistics and game history. This action cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () {
-              ref.read(statisticsProvider.notifier).resetStatistics();
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Statistics reset')),
-              );
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Reset Statistics'),
+            content: const Text(
+              'This will permanently delete all your statistics and game history. This action cannot be undone.',
             ),
-            child: const Text('Reset'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  ref.read(statisticsProvider.notifier).resetStatistics();
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Statistics reset')),
+                  );
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+                child: const Text('Reset'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }

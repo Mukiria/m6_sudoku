@@ -42,8 +42,10 @@ class GameHeader extends ConsumerWidget {
           Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: _getDifficultyColor(extension).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -58,12 +60,15 @@ class GameHeader extends ConsumerWidget {
               ),
               const Spacer(),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: extension.timerBackground,
-                  borderRadius:
-                      BorderRadius.circular(AppConstants.largeBorderRadius),
+                  borderRadius: BorderRadius.circular(
+                    AppConstants.largeBorderRadius,
+                  ),
                 ),
                 child: Text(
                   _formatTime(timeElapsed),

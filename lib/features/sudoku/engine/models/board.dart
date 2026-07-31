@@ -5,7 +5,9 @@ class Board {
 
   static List<List<Cell>> _createEmptyGrid() {
     return List.generate(
-        9, (r) => List.generate(9, (c) => Cell(row: r, col: c)));
+      9,
+      (r) => List.generate(9, (c) => Cell(row: r, col: c)),
+    );
   }
 
   final List<List<Cell>> _cells;

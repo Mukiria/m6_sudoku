@@ -57,13 +57,15 @@ extension MapExtensions<K, V> on Map<K, V> {
   V? getOrElse(K key, V Function() defaultValue) => this[key] ?? defaultValue();
 
   Map<K2, V2> mapKeys<K2, V2>(
-      MapEntry<K2, V2> Function(MapEntry<K, V> entry) transform) {
+    MapEntry<K2, V2> Function(MapEntry<K, V> entry) transform,
+  ) {
     return Map.fromEntries(entries.map(transform));
   }
 
   Map<K, V2> mapValues<V2>(V2 Function(V value) transform) {
     return Map.fromEntries(
-        entries.map((e) => MapEntry(e.key, transform(e.value))));
+      entries.map((e) => MapEntry(e.key, transform(e.value))),
+    );
   }
 
   void addAllIf(Map<K, V>? other) {

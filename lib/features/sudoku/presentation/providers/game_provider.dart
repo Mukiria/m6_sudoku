@@ -70,20 +70,9 @@ class Move with _$Move {
   }) = _Move;
 }
 
-enum MoveType {
-  value,
-  note,
-  hint,
-  undo,
-  clear,
-}
+enum MoveType { value, note, hint, undo, clear }
 
-enum GameStatus {
-  playing,
-  paused,
-  completed,
-  failed,
-}
+enum GameStatus { playing, paused, completed, failed }
 
 enum Difficulty {
   easy,
@@ -138,10 +127,7 @@ class GameController extends _$GameController {
     final getGameState = ref.read(getGameStateUseCaseProvider);
     final result = await getGameState();
 
-    state = result.fold(
-      (failure) => null,
-      (gameState) => gameState,
-    );
+    state = result.fold((failure) => null, (gameState) => gameState);
   }
 
   void setValue(int row, int col, int value) {
@@ -268,28 +254,25 @@ class GameController extends _$GameController {
     final getHint = ref.read(getHintUseCaseProvider);
     final result = await getHint(state: currentState);
 
-    result.fold(
-      (failure) => null,
-      (hint) {
-        if (hint != null) {
-          setValue(hint.row, hint.col, hint.value!);
-          state = state!.copyWith(
-            hintsUsed: currentState.hintsUsed + 1,
-            moveHistory: [
-              ...currentState.moveHistory,
-              Move(
-                row: hint.row,
-                col: hint.col,
-                previousValue: null,
-                newValue: hint.value,
-                type: MoveType.hint,
-                timestamp: DateTime.now(),
-              ),
-            ],
-          );
-        }
-      },
-    );
+    result.fold((failure) => null, (hint) {
+      if (hint != null) {
+        setValue(hint.row, hint.col, hint.value!);
+        state = state!.copyWith(
+          hintsUsed: currentState.hintsUsed + 1,
+          moveHistory: [
+            ...currentState.moveHistory,
+            Move(
+              row: hint.row,
+              col: hint.col,
+              previousValue: null,
+              newValue: hint.value,
+              type: MoveType.hint,
+              timestamp: DateTime.now(),
+            ),
+          ],
+        );
+      }
+    });
   }
 
   void undo() {
@@ -297,8 +280,10 @@ class GameController extends _$GameController {
 
     final currentState = state!;
     final lastMove = currentState.moveHistory.last;
-    final previousMoves = currentState.moveHistory
-        .sublist(0, currentState.moveHistory.length - 1);
+    final previousMoves = currentState.moveHistory.sublist(
+      0,
+      currentState.moveHistory.length - 1,
+    );
 
     final newGrid = currentState.userGrid.map((row) => List.from(row)).toList();
     final newNotesGrid =
@@ -369,8 +354,10 @@ class GameController extends _$GameController {
 
   void resume() {
     if (state == null) return;
-    state =
-        state!.copyWith(status: GameStatus.playing, lastPlayed: DateTime.now());
+    state = state!.copyWith(
+      status: GameStatus.playing,
+      lastPlayed: DateTime.now(),
+    );
   }
 
   Puzzle? _getPuzzle(String puzzleId) {

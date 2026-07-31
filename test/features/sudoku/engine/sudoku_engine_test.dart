@@ -191,21 +191,29 @@ void main() {
       expect(board.isValid, true);
     });
 
-    test('generates puzzle with target clues', () {
-      final generator = PuzzleGenerator();
-      final board = generator.generatePuzzle(clues: 30, maxAttempts: 5);
-      expect(board.filledCount, lessThanOrEqualTo(35));
-      expect(board.isValid, true);
-      expect(UniqueSolutionValidator.hasUniqueSolution(board), true);
-    }, timeout: const Timeout(Duration(minutes: 2)));
-
-    test('generates puzzle with different difficulties', () {
-      final generator = PuzzleGenerator();
-      for (final diff in Difficulty.values) {
-        final board = generator.generatePuzzleWithDifficulty(diff);
+    test(
+      'generates puzzle with target clues',
+      () {
+        final generator = PuzzleGenerator();
+        final board = generator.generatePuzzle(clues: 30, maxAttempts: 5);
+        expect(board.filledCount, lessThanOrEqualTo(35));
         expect(board.isValid, true);
         expect(UniqueSolutionValidator.hasUniqueSolution(board), true);
-      }
-    }, timeout: const Timeout(Duration(minutes: 5)));
+      },
+      timeout: const Timeout(Duration(minutes: 2)),
+    );
+
+    test(
+      'generates puzzle with different difficulties',
+      () {
+        final generator = PuzzleGenerator();
+        for (final diff in Difficulty.values) {
+          final board = generator.generatePuzzleWithDifficulty(diff);
+          expect(board.isValid, true);
+          expect(UniqueSolutionValidator.hasUniqueSolution(board), true);
+        }
+      },
+      timeout: const Timeout(Duration(minutes: 5)),
+    );
   });
 }

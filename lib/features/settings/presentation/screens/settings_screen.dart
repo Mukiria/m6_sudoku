@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/constants/app_constants.dart';
-import '../../core/routing/app_router.dart';
-import '../../features/settings/presentation/providers/settings_provider.dart';
-import '../../shared/widgets/buttons.dart';
-import '../../shared/widgets/cards.dart';
+import 'package:m6_sudoku/core/constants/app_constants.dart';
+import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart';
+import 'package:m6_sudoku/shared/widgets/cards.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -26,194 +24,162 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(AppConstants.spacingMd),
         children: [
-          _buildSection(
-            context,
-            'Appearance',
-            [
-              _buildSettingTile(
-                context,
-                icon: Icons.palette_rounded,
-                title: 'Theme',
-                subtitle: settings.themeMode.capitalize(),
-                onTap: () => _showThemeDialog(context, ref),
-              ),
-            ],
-          ),
-          _buildSection(
-            context,
-            'Game',
-            [
-              _buildSettingTile(
-                context,
-                icon: Icons.difficulty_rounded,
-                title: 'Default Difficulty',
-                subtitle: settings.selectedDifficulty.capitalize(),
-                onTap: () => _showDifficultyDialog(context, ref),
-              ),
-              _buildSwitchTile(
-                context,
-                icon: Icons.auto_awesome_rounded,
-                title: 'Auto Notes',
-                subtitle: 'Automatically fill in notes for empty cells',
-                value: settings.autoNotes,
-                onChanged: (value) =>
-                    ref.read(settingsProvider.notifier).toggleAutoNotes(value),
-              ),
-              _buildSwitchTile(
-                context,
-                icon: Icons.error_outline_rounded,
-                title: 'Highlight Errors',
-                subtitle: 'Show incorrect numbers in red',
-                value: settings.highlightErrors,
-                onChanged: (value) => ref
-                    .read(settingsProvider.notifier)
-                    .toggleHighlightErrors(value),
-              ),
-              _buildSwitchTile(
-                context,
-                icon: Icons.visibility_rounded,
-                title: 'Highlight Related',
-                subtitle: 'Highlight cells in same row, column, and box',
-                value: settings.highlightRelated,
-                onChanged: (value) => ref
-                    .read(settingsProvider.notifier)
-                    .toggleHighlightRelated(value),
-              ),
-              _buildSwitchTile(
-                context,
-                icon: Icons.format_list_numbered_rounded,
-                title: 'Number First Input',
-                subtitle: 'Select number first, then tap cell',
-                value: settings.numberFirstInput,
-                onChanged: (value) => ref
-                    .read(settingsProvider.notifier)
-                    .toggleNumberFirstInput(value),
-              ),
-              _buildSwitchTile(
-                context,
-                icon: Icons.notes_rounded,
-                title: 'Auto Clear Notes',
-                subtitle: 'Remove notes when placing a number',
-                value: settings.autoClearNotes,
-                onChanged: (value) => ref
-                    .read(settingsProvider.notifier)
-                    .toggleAutoClearNotes(value),
-              ),
-            ],
-          ),
-          _buildSection(
-            context,
-            'Feedback',
-            [
-              _buildSwitchTile(
-                context,
-                icon: Icons.volume_up_rounded,
-                title: 'Sound Effects',
-                subtitle: 'Play sounds for actions and events',
-                value: settings.soundEnabled,
-                onChanged: (value) =>
-                    ref.read(settingsProvider.notifier).toggleSound(value),
-              ),
-              _buildSwitchTile(
-                context,
-                icon: Icons.vibration_rounded,
-                title: 'Haptic Feedback',
-                subtitle: 'Vibrate on interactions',
-                value: settings.hapticsEnabled,
-                onChanged: (value) =>
-                    ref.read(settingsProvider.notifier).toggleHaptics(value),
-              ),
-            ],
-          ),
-          _buildSection(
-            context,
-            'Display',
-            [
-              _buildSwitchTile(
-                context,
-                icon: Icons.timer_rounded,
-                title: 'Show Timer',
-                subtitle: 'Display timer during gameplay',
-                value: settings.showTimer,
-                onChanged: (value) =>
-                    ref.read(settingsProvider.notifier).toggleShowTimer(value),
-              ),
-              _buildSwitchTile(
-                context,
-                icon: Icons.lightbulb_rounded,
-                title: 'Show Hints',
-                subtitle: 'Allow using hints during gameplay',
-                value: settings.showHints,
-                onChanged: (value) =>
-                    ref.read(settingsProvider.notifier).toggleShowHints(value),
-              ),
-              _buildSwitchTile(
-                context,
-                icon: Icons.save_rounded,
-                title: 'Auto Save',
-                subtitle: 'Automatically save game progress',
-                value: settings.autoSave,
-                onChanged: (value) =>
-                    ref.read(settingsProvider.notifier).toggleAutoSave(value),
-              ),
-            ],
-          ),
-          _buildSection(
-            context,
-            'Data',
-            [
-              _buildSettingTile(
-                context,
-                icon: Icons.delete_forever_rounded,
-                title: 'Reset Statistics',
-                subtitle: 'Clear all game statistics and history',
-                onTap: () => _showResetDialog(context, ref),
-                isDestructive: true,
-              ),
-              _buildSettingTile(
-                context,
-                icon: Icons.restore_rounded,
-                title: 'Reset Settings',
-                subtitle: 'Restore all settings to defaults',
-                onTap: () => _showResetSettingsDialog(context, ref),
-                isDestructive: true,
-              ),
-            ],
-          ),
-          _buildSection(
-            context,
-            'About',
-            [
-              _buildSettingTile(
-                context,
-                icon: Icons.info_rounded,
-                title: 'Version',
-                subtitle: 'M6 Sudoku ${AppConstants.appVersion}',
-                onTap: () {},
-              ),
-              _buildSettingTile(
-                context,
-                icon: Icons.privacy_tip_rounded,
-                title: 'Privacy Policy',
-                subtitle: 'Read our privacy policy',
-                onTap: () {},
-              ),
-              _buildSettingTile(
-                context,
-                icon: Icons.description_rounded,
-                title: 'Terms of Service',
-                subtitle: 'Read our terms of service',
-                onTap: () {},
-              ),
-              _buildSettingTile(
-                context,
-                icon: Icons.star_rounded,
-                title: 'Rate App',
-                subtitle: 'Enjoying M6 Sudoku? Rate us!',
-                onTap: () {},
-              ),
-            ],
-          ),
+          _buildSection(context, 'Appearance', [
+            _buildSettingTile(
+              context,
+              icon: Icons.palette_rounded,
+              title: 'Theme',
+              subtitle: settings.themeMode.name.capitalize(),
+              onTap: () => _showThemeDialog(context, ref),
+            ),
+          ]),
+          _buildSection(context, 'Game', [
+            _buildSettingTile(
+              context,
+              icon: Icons.settings_outlined,
+              title: 'Default Difficulty',
+              subtitle: settings.selectedDifficulty.capitalize(),
+              onTap: () => _showDifficultyDialog(context, ref),
+            ),
+            _buildSwitchTile(
+              context,
+              icon: Icons.auto_awesome_rounded,
+              title: 'Auto Notes',
+              subtitle: 'Automatically fill in notes for empty cells',
+              value: settings.autoNotes,
+              onChanged:
+                  (value) => ref
+                      .read(settingsProvider.notifier)
+                      .toggleAutoNotes(value),
+            ),
+            _buildSwitchTile(
+              context,
+              icon: Icons.error_outline_rounded,
+              title: 'Highlight Errors',
+              subtitle: 'Show incorrect numbers in red',
+              value: settings.highlightErrors,
+              onChanged:
+                  (value) => ref
+                      .read(settingsProvider.notifier)
+                      .toggleHighlightErrors(value),
+            ),
+            _buildSwitchTile(
+              context,
+              icon: Icons.format_list_numbered_rounded,
+              title: 'Number First Input',
+              subtitle: 'Select number first, then tap cell',
+              value: settings.numberFirstInput,
+              onChanged:
+                  (value) => ref
+                      .read(settingsProvider.notifier)
+                      .toggleNumberFirstInput(value),
+            ),
+            _buildSwitchTile(
+              context,
+              icon: Icons.notes_rounded,
+              title: 'Auto Clear Notes',
+              subtitle: 'Remove notes when placing a number',
+              value: settings.autoClearNotes,
+              onChanged:
+                  (value) => ref
+                      .read(settingsProvider.notifier)
+                      .toggleAutoClearNotes(value),
+            ),
+          ]),
+          _buildSection(context, 'Feedback', [
+            _buildSwitchTile(
+              context,
+              icon: Icons.volume_up_rounded,
+              title: 'Sound Effects',
+              subtitle: 'Play sounds for actions and events',
+              value: settings.soundEnabled,
+              onChanged:
+                  (value) =>
+                      ref.read(settingsProvider.notifier).toggleSound(value),
+            ),
+            _buildSwitchTile(
+              context,
+              icon: Icons.vibration_rounded,
+              title: 'Haptic Feedback',
+              subtitle: 'Vibrate on interactions',
+              value: settings.hapticsEnabled,
+              onChanged:
+                  (value) =>
+                      ref.read(settingsProvider.notifier).toggleHaptics(value),
+            ),
+          ]),
+          _buildSection(context, 'Display', [
+            _buildSwitchTile(
+              context,
+              icon: Icons.timer_rounded,
+              title: 'Show Timer',
+              subtitle: 'Display timer during gameplay',
+              value: settings.showTimer,
+              onChanged:
+                  (value) => ref
+                      .read(settingsProvider.notifier)
+                      .toggleShowTimer(value),
+            ),
+            _buildSwitchTile(
+              context,
+              icon: Icons.lightbulb_rounded,
+              title: 'Show Hints',
+              subtitle: 'Allow using hints during gameplay',
+              value: settings.showHints,
+              onChanged:
+                  (value) => ref
+                      .read(settingsProvider.notifier)
+                      .toggleShowHints(value),
+            ),
+          ]),
+          _buildSection(context, 'Data', [
+            _buildSettingTile(
+              context,
+              icon: Icons.delete_forever_rounded,
+              title: 'Reset Statistics',
+              subtitle: 'Clear all game statistics and history',
+              onTap: () => _showResetDialog(context, ref),
+              isDestructive: true,
+            ),
+            _buildSettingTile(
+              context,
+              icon: Icons.restore_rounded,
+              title: 'Reset Settings',
+              subtitle: 'Restore all settings to defaults',
+              onTap: () => _showResetSettingsDialog(context, ref),
+              isDestructive: true,
+            ),
+          ]),
+          _buildSection(context, 'About', [
+            _buildSettingTile(
+              context,
+              icon: Icons.info_rounded,
+              title: 'Version',
+              subtitle: 'M6 Sudoku ${AppConstants.appVersion}',
+              onTap: () {},
+            ),
+            _buildSettingTile(
+              context,
+              icon: Icons.privacy_tip_rounded,
+              title: 'Privacy Policy',
+              subtitle: 'Read our privacy policy',
+              onTap: () {},
+            ),
+            _buildSettingTile(
+              context,
+              icon: Icons.description_rounded,
+              title: 'Terms of Service',
+              subtitle: 'Read our terms of service',
+              onTap: () {},
+            ),
+            _buildSettingTile(
+              context,
+              icon: Icons.star_rounded,
+              title: 'Rate App',
+              subtitle: 'Enjoying M6 Sudoku? Rate us!',
+              onTap: () {},
+            ),
+          ]),
           const SizedBox(height: AppConstants.spacingXl),
         ],
       ),
@@ -221,7 +187,10 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Widget _buildSection(
-      BuildContext context, String title, List<Widget> children) {
+    BuildContext context,
+    String title,
+    List<Widget> children,
+  ) {
     final theme = Theme.of(context);
 
     return Column(
@@ -241,10 +210,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
         ),
-        AppCard(
-          padding: EdgeInsets.zero,
-          child: Column(children: children),
-        ),
+        AppCard(padding: EdgeInsets.zero, child: Column(children: children)),
         const SizedBox(height: AppConstants.spacingLg),
       ],
     );
@@ -298,10 +264,7 @@ class SettingsScreen extends ConsumerWidget {
 
     return SwitchListTile(
       secondary: Icon(icon, color: theme.colorScheme.onSurfaceVariant),
-      title: Text(
-        title,
-        style: theme.textTheme.bodyLarge,
-      ),
+      title: Text(title, style: theme.textTheme.bodyLarge),
       subtitle: Text(
         subtitle,
         style: theme.textTheme.bodySmall?.copyWith(
@@ -310,8 +273,9 @@ class SettingsScreen extends ConsumerWidget {
       ),
       value: value,
       onChanged: onChanged,
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: AppConstants.spacingMd),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppConstants.spacingMd,
+      ),
     );
   }
 
@@ -321,41 +285,42 @@ class SettingsScreen extends ConsumerWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Choose Theme'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<String>(
-              title: const Text('Light'),
-              value: 'light',
-              groupValue: settings.themeMode,
-              onChanged: (value) {
-                ref.read(settingsProvider.notifier).updateThemeMode(value!);
-                Navigator.pop(context);
-              },
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Choose Theme'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RadioListTile<ThemeMode>(
+                  title: const Text('Light'),
+                  value: ThemeMode.light,
+                  groupValue: settings.themeMode,
+                  onChanged: (value) {
+                    ref.read(settingsProvider.notifier).updateThemeMode(value!);
+                    Navigator.pop(context);
+                  },
+                ),
+                RadioListTile<ThemeMode>(
+                  title: const Text('Dark'),
+                  value: ThemeMode.dark,
+                  groupValue: settings.themeMode,
+                  onChanged: (value) {
+                    ref.read(settingsProvider.notifier).updateThemeMode(value!);
+                    Navigator.pop(context);
+                  },
+                ),
+                RadioListTile<ThemeMode>(
+                  title: const Text('System'),
+                  value: ThemeMode.system,
+                  groupValue: settings.themeMode,
+                  onChanged: (value) {
+                    ref.read(settingsProvider.notifier).updateThemeMode(value!);
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
             ),
-            RadioListTile<String>(
-              title: const Text('Dark'),
-              value: 'dark',
-              groupValue: settings.themeMode,
-              onChanged: (value) {
-                ref.read(settingsProvider.notifier).updateThemeMode(value!);
-                Navigator.pop(context);
-              },
-            ),
-            RadioListTile<String>(
-              title: const Text('System'),
-              value: 'system',
-              groupValue: settings.themeMode,
-              onChanged: (value) {
-                ref.read(settingsProvider.notifier).updateThemeMode(value!);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -364,87 +329,88 @@ class SettingsScreen extends ConsumerWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Default Difficulty'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: AppConstants.difficulties.map((difficulty) {
-            return RadioListTile<String>(
-              title: Text(AppConstants.difficultyNames[difficulty]!),
-              value: difficulty,
-              groupValue: settings.selectedDifficulty,
-              onChanged: (value) {
-                ref.read(settingsProvider.notifier).updateDifficulty(value!);
-                Navigator.pop(context);
-              },
-            );
-          }).toList(),
-        ),
-      ),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Default Difficulty'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children:
+                  AppConstants.difficulties.map((difficulty) {
+                    return RadioListTile<String>(
+                      title: Text(AppConstants.difficultyNames[difficulty]!),
+                      value: difficulty,
+                      groupValue: settings.selectedDifficulty,
+                      onChanged: (value) {
+                        ref
+                            .read(settingsProvider.notifier)
+                            .updateDifficulty(value!);
+                        Navigator.pop(context);
+                      },
+                    );
+                  }).toList(),
+            ),
+          ),
     );
   }
 
   void _showResetDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reset Statistics'),
-        content: const Text(
-            'This will permanently delete all your game statistics and history. This action cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () {
-              // TODO: Reset statistics
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Statistics reset')),
-              );
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Reset Statistics'),
+            content: const Text(
+              'This will permanently delete all your game statistics and history. This action cannot be undone.',
             ),
-            child: const Text('Reset'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  // TODO: Reset statistics
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Statistics reset')),
+                  );
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+                child: const Text('Reset'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
   void _showResetSettingsDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reset Settings'),
-        content: const Text(
-            'This will restore all settings to their default values.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Reset Settings'),
+            content: const Text(
+              'This will restore all settings to their default values.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  ref.read(settingsProvider.notifier).resetToDefaults();
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Settings reset to defaults')),
+                  );
+                },
+                child: const Text('Reset'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () {
-              ref.read(settingsProvider.notifier).resetToDefaults();
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Settings reset to defaults')),
-              );
-            },
-            child: const Text('Reset'),
-          ),
-        ],
-      ),
     );
-  }
-}
-
-extension StringCapitalize on String {
-  String capitalize() {
-    if (isEmpty) return this;
-    return '${this[0].toUpperCase()}${substring(1).toLowerCase()}';
   }
 }

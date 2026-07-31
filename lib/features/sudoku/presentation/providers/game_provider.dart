@@ -23,28 +23,34 @@ class GameController extends _$GameController {
 
     state = result.fold(
       (failure) => throw Exception(failure.message),
-      (puzzle) => GameState(
-        puzzleId: puzzle.id,
-        puzzle: puzzle,
-        userGrid: puzzle.grid.map((row) => List<int>.from(row)).toList(),
-        notes: List.generate(9, (_) => List.generate(9, (_) => <int>{})),
-        timeElapsed: 0,
-        mistakes: 0,
-        hintsUsed: 0,
-        penaltyTime: 0,
-        moveHistory: [],
-        redoStack: [],
-        status: GameStatus.playing,
-        lastPlayed: DateTime.now(),
-        difficulty: difficulty,
-        selectedCell: null,
-        selectedNumber: null,
-        isNoteMode: false,
-        highlightedCells: {},
-        conflictCells: {},
-        hintState: null,
-        lastSaved: DateTime.now(),
-      ),
+      (puzzle) {
+        final initialNotes = _recomputeNotes(
+          puzzle.grid.map((row) => List<int>.from(row)).toList(),
+          puzzle,
+        );
+        return GameState(
+          puzzleId: puzzle.id,
+          puzzle: puzzle,
+          userGrid: puzzle.grid.map((row) => List<int>.from(row)).toList(),
+          notes: initialNotes,
+          timeElapsed: 0,
+          mistakes: 0,
+          hintsUsed: 0,
+          penaltyTime: 0,
+          moveHistory: [],
+          redoStack: [],
+          status: GameStatus.playing,
+          lastPlayed: DateTime.now(),
+          difficulty: difficulty,
+          selectedCell: null,
+          selectedNumber: null,
+          isNoteMode: false,
+          highlightedCells: {},
+          conflictCells: {},
+          hintState: null,
+          lastSaved: DateTime.now(),
+        );
+      },
     );
     _startAutoSave();
   }
@@ -104,6 +110,9 @@ class GameController extends _$GameController {
     final newMistakes =
         isCorrect ? currentState.mistakes : currentState.mistakes + 1;
 
+    // Auto-remove candidates from affected cells
+    final newNotesGrid = _autoRemoveCandidates(currentState.notes, row, col, value);
+
     final newMove = Move(
       row: row,
       col: col,
@@ -115,6 +124,7 @@ class GameController extends _$GameController {
 
     state = state!.copyWith(
       userGrid: newGrid,
+      notes: newNotesGrid,
       mistakes: newMistakes,
       conflictCells: _getConflicts(newGrid),
       moveHistory: [...currentState.moveHistory, newMove],
@@ -256,8 +266,6 @@ class GameController extends _$GameController {
     );
 
     final newGrid = currentState.userGrid.map((row) => List<int>.from(row)).toList();
-    final newNotesGrid =
-        currentState.notes.map((row) => List<Set<int>>.from(row)).toList();
     int newMistakes = currentState.mistakes;
     int newHintsUsed = currentState.hintsUsed;
 
@@ -267,9 +275,7 @@ class GameController extends _$GameController {
         newMistakes = _calculateMistakes(newGrid, currentState.puzzle.solution);
         break;
       case MoveType.note:
-        if (lastMove.newValue != null) {
-          newNotesGrid[lastMove.row][lastMove.col].remove(lastMove.newValue);
-        }
+        // Notes are handled by recomputing
         break;
       case MoveType.hint:
         newGrid[lastMove.row][lastMove.col] = lastMove.previousValue ?? 0;
@@ -285,6 +291,9 @@ class GameController extends _$GameController {
       default:
         break;
     }
+
+    // Recompute notes from scratch based on new grid
+    final newNotesGrid = _recomputeNotes(newGrid, currentState.puzzle);
 
     state = currentState.copyWith(
       userGrid: newGrid,
@@ -307,8 +316,6 @@ class GameController extends _$GameController {
     final remainingRedo = currentState.redoStack.sublist(1);
 
     final newGrid = currentState.userGrid.map((row) => List<int>.from(row)).toList();
-    final newNotesGrid =
-        currentState.notes.map((row) => List<Set<int>>.from(row)).toList();
     int newMistakes = currentState.mistakes;
     int newHintsUsed = currentState.hintsUsed;
 
@@ -318,9 +325,7 @@ class GameController extends _$GameController {
         newMistakes = _calculateMistakes(newGrid, currentState.puzzle.solution);
         break;
       case MoveType.note:
-        if (nextMove.newValue != null) {
-          newNotesGrid[nextMove.row][nextMove.col].add(nextMove.newValue!);
-        }
+        // Notes are handled by recomputing
         break;
       case MoveType.hint:
         newGrid[nextMove.row][nextMove.col] = nextMove.newValue ?? 0;
@@ -336,6 +341,9 @@ class GameController extends _$GameController {
       default:
         break;
     }
+
+    // Recompute notes from scratch based on new grid
+    final newNotesGrid = _recomputeNotes(newGrid, currentState.puzzle);
 
     state = currentState.copyWith(
       userGrid: newGrid,
@@ -506,6 +514,78 @@ class GameController extends _$GameController {
       }
     }
     return mistakes;
+  }
+
+  List<List<Set<int>>> _autoRemoveCandidates(
+    List<List<Set<int>>> notes,
+    int row,
+    int col,
+    int value,
+  ) {
+    final newNotes = notes.map((r) => List<Set<int>>.from(r)).toList();
+    
+    // Remove from row
+    for (int c = 0; c < 9; c++) {
+      newNotes[row][c].remove(value);
+    }
+    
+    // Remove from column
+    for (int r = 0; r < 9; r++) {
+      newNotes[r][col].remove(value);
+    }
+    
+    // Remove from box
+    final boxRow = (row ~/ 3) * 3;
+    final boxCol = (col ~/ 3) * 3;
+    for (int r = boxRow; r < boxRow + 3; r++) {
+      for (int c = boxCol; c < boxCol + 3; c++) {
+        newNotes[r][c].remove(value);
+      }
+    }
+    
+    // Clear the cell itself
+    newNotes[row][col].clear();
+    
+    return newNotes;
+  }
+
+  List<List<Set<int>>> _recomputeNotes(
+    List<List<int>> grid,
+    Puzzle puzzle,
+  ) {
+    final newNotes = List.generate(9, (_) => List.generate(9, (_) => <int>{}));
+
+    for (int r = 0; r < 9; r++) {
+      for (int c = 0; c < 9; c++) {
+        if (grid[r][c] == 0 && puzzle.grid[r][c] == 0) {
+          final candidates = <int>{};
+          for (int d = 1; d <= 9; d++) {
+            candidates.add(d);
+          }
+          // Remove from row
+          for (int cc = 0; cc < 9; cc++) {
+            final val = grid[r][cc] != 0 ? grid[r][cc] : puzzle.grid[r][cc];
+            if (val != 0) candidates.remove(val);
+          }
+          // Remove from column
+          for (int rr = 0; rr < 9; rr++) {
+            final val = grid[rr][c] != 0 ? grid[rr][c] : puzzle.grid[rr][c];
+            if (val != 0) candidates.remove(val);
+          }
+          // Remove from box
+          final boxRow = (r ~/ 3) * 3;
+          final boxCol = (c ~/ 3) * 3;
+          for (int rr = boxRow; rr < boxRow + 3; rr++) {
+            for (int cc = boxCol; cc < boxCol + 3; cc++) {
+              final val = grid[rr][cc] != 0 ? grid[rr][cc] : puzzle.grid[rr][cc];
+              if (val != 0) candidates.remove(val);
+            }
+          }
+          newNotes[r][c] = candidates;
+        }
+      }
+    }
+    return newNotes;
   }
 
   void clearHintState() {

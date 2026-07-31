@@ -9,6 +9,8 @@ import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
 import 'package:m6_sudoku/features/sudoku/domain/usecases/game_usecases.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/sudoku_providers.dart';
+import 'package:m6_sudoku/core/audio/audio_service.dart';
+import 'package:m6_sudoku/core/audio/audio_manager.dart';
 
 part 'game_provider.g.dart';
 
@@ -133,12 +135,20 @@ class GameController extends _$GameController {
       lastSaved: DateTime.now(),
     );
 
+    // Play sound
+    if (isCorrect) {
+      ref.read(audioServiceProvider).playClick();
+    } else {
+      ref.read(audioServiceProvider).playError();
+    }
+
     if (newMistakes >= 3) {
       state = state!.copyWith(status: GameStatus.failed);
     } else if (_checkCompletion(newGrid, puzzle.solution)) {
       state = state!.copyWith(status: GameStatus.completed);
       _saveGame();
       _checkAndUnlockAchievements(currentState);
+      ref.read(audioServiceProvider).playWin();
     }
   }
 
@@ -175,6 +185,7 @@ class GameController extends _$GameController {
       lastPlayed: DateTime.now(),
       lastSaved: DateTime.now(),
     );
+    ref.read(audioServiceProvider).playClick();
   }
 
   void clearCell(int row, int col) {
@@ -211,6 +222,7 @@ class GameController extends _$GameController {
       lastPlayed: DateTime.now(),
       lastSaved: DateTime.now(),
     );
+    ref.read(audioServiceProvider).playClick();
   }
 
   Future<void> useHint() async {
@@ -252,6 +264,7 @@ class GameController extends _$GameController {
           lastPlayed: DateTime.now(),
           lastSaved: DateTime.now(),
         );
+        ref.read(audioServiceProvider).playHint();
       }
     });
   }
@@ -307,6 +320,7 @@ class GameController extends _$GameController {
       lastPlayed: DateTime.now(),
       lastSaved: DateTime.now(),
     );
+    ref.read(audioServiceProvider).playClick();
   }
 
   void redo() {
@@ -357,6 +371,7 @@ class GameController extends _$GameController {
       lastPlayed: DateTime.now(),
       lastSaved: DateTime.now(),
     );
+    ref.read(audioServiceProvider).playClick();
   }
 
   void toggleNoteMode() {
@@ -383,6 +398,7 @@ class GameController extends _$GameController {
     if (state == null) return;
     state = state!.copyWith(status: GameStatus.paused);
     _saveGame();
+    ref.read(audioServiceProvider).playPause();
   }
 
   void resume() {
@@ -391,6 +407,7 @@ class GameController extends _$GameController {
       status: GameStatus.playing,
       lastPlayed: DateTime.now(),
     );
+    ref.read(audioServiceProvider).playResume();
   }
 
   void _saveGame() {

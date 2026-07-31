@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  audioplayers: ^6.0.0
   collection: ^1.18.0
   dartz: ^0.10.1
   equatable: ^2.0.5
@@ -48,6 +49,7 @@ flutter:
   assets:
     - assets/images/
     - assets/puzzles/
+    - assets/audio/
 
 flutter_intl:
   enabled: true

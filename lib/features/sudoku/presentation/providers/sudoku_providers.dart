@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:m6_sudoku/core/audio/audio_manager.dart';
+import 'package:m6_sudoku/core/audio/audio_service.dart';
 import 'package:m6_sudoku/core/services/storage_service.dart';
 import 'package:m6_sudoku/features/sudoku/data/datasources/puzzle_local_datasource.dart';
 import 'package:m6_sudoku/features/sudoku/data/datasources/daily_challenge_local_datasource.dart';
@@ -153,4 +155,18 @@ final unlockedAchievementsProvider = FutureProvider<List<Achievement>>((ref) asy
   final useCase = ref.read(getUnlockedAchievementsUseCaseProvider);
   final result = await useCase();
   return result.fold((failure) => throw Exception(failure.message), (achievements) => achievements);
+});
+
+final audioManagerProvider = Provider<AudioManager>((ref) {
+  return AudioManager.instance;
+});
+
+final audioServiceProvider = Provider<AudioService>((ref) {
+  final audioManager = ref.read(audioManagerProvider);
+  final settings = ref.read(settingsProvider);
+  
+  // Sync mute state with settings
+  audioManager.setMuted(!settings.soundEnabled);
+  
+  return AudioService(audioManager);
 });

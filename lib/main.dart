@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:m6_sudoku/core/audio/audio_service.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/routing/app_router.dart';
 import 'package:m6_sudoku/core/theme/app_theme.dart';
@@ -20,6 +21,9 @@ class M6SudokuApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
     final themeMode = ref.watch(themeModeProvider);
+    
+    // Initialize audio service on first build
+    ref.listen(audioServiceProvider, (_, __) {});
 
     return MaterialApp.router(
       title: AppConstants.appName,

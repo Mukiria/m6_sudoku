@@ -5,12 +5,12 @@ import 'package:go_router/go_router.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_theme_extension.dart';
 import '../../shared/widgets/buttons.dart';
-import '../../shared/widgets/sudoku_widgets.dart';
 import '../../features/sudoku/presentation/providers/game_provider.dart';
 import '../../features/sudoku/domain/entities/puzzle.dart';
 import '../../features/sudoku/presentation/widgets/number_pad.dart';
 import '../../features/sudoku/presentation/widgets/game_header.dart';
 import '../../features/sudoku/presentation/widgets/pause_menu.dart';
+import '../../features/sudoku/presentation/widgets/sudoku_board.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key, required this.difficulty});
@@ -121,7 +121,22 @@ class _GameScreenState extends ConsumerState<GameScreen>
                             width: 2.5,
                           ),
                         ),
-                        child: _buildGrid(gameState, extension),
+                        child: SudokuBoard(
+                          puzzle: gameState.puzzle,
+                          userGrid: gameState.userGrid,
+                          notes: gameState.notes,
+                          selectedCell: gameState.selectedCell,
+                          highlightedCells: gameState.highlightedCells,
+                          conflictCells: gameState.conflictCells,
+                          isNoteMode: gameState.isNoteMode,
+                          onCellTap:
+                              (row, col) => ref
+                                  .read(gameProvider.notifier)
+                                  .selectCell(row, col),
+                          onCellLongPress:
+                              (row, col) =>
+                                  _showCellOptions(row, col, gameState),
+                        ),
                       ),
                     );
                   },
@@ -183,87 +198,6 @@ class _GameScreenState extends ConsumerState<GameScreen>
         ),
       ),
     );
-  }
-
-  Widget _buildGrid(GameState gameState, AppThemeExtension extension) {
-    return Column(
-      children: List.generate(9, (row) {
-        return Expanded(
-          child: Row(
-            children: List.generate(9, (col) {
-              final cell = gameState.cells[row][col];
-              final isSubGridBorder = col % 3 == 0 || row % 3 == 0;
-
-              return Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color:
-                            col % 3 == 2
-                                ? extension.subGridLineColor
-                                : extension.gridLineColor,
-                        width: col % 3 == 2 ? 2 : 1,
-                      ),
-                      bottom: BorderSide(
-                        color:
-                            row % 3 == 2
-                                ? extension.subGridLineColor
-                                : extension.gridLineColor,
-                        width: row % 3 == 2 ? 2 : 1,
-                      ),
-                    ),
-                  ),
-                  child: SudokuCell(
-                    value: cell.value,
-                    notes: cell.notes,
-                    isSelected: cell.isSelected,
-                    isFixed: cell.isFixed,
-                    hasError: cell.hasError,
-                    isHighlighted: cell.isHighlighted,
-                    isRelated: cell.isRelated,
-                    onTap:
-                        () => ref
-                            .read(gameProvider.notifier)
-                            .selectCell(row, col),
-                    onLongPress: () => _showCellOptions(row, col, gameState),
-                  ),
-                ),
-              );
-            }),
-          ),
-        );
-      }),
-    );
-  }
-
-  Map<int, int> _getNumberCounts(GameState gameState) {
-    final counts = <int, int>{};
-    for (int i = 1; i <= 9; i++) {
-      counts[i] = 0;
-    }
-
-    for (int r = 0; r < 9; r++) {
-      for (int c = 0; c < 9; c++) {
-        final value = gameState.cells[r][c].value;
-        if (value != null) {
-          counts[value] = (counts[value] ?? 0) + 1;
-        }
-      }
-    }
-    return counts;
-  }
-
-  Set<int> _getDisabledNumbers(GameState gameState) {
-    final disabled = <int>{};
-    final counts = _getNumberCounts(gameState);
-
-    for (int i = 1; i <= 9; i++) {
-      if (counts[i] != null && counts[i]! >= 9) {
-        disabled.add(i);
-      }
-    }
-    return disabled;
   }
 
   void _showCellOptions(int row, int col, GameState gameState) {

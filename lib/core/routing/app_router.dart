@@ -6,6 +6,7 @@ import 'package:m6_sudoku/features/sudoku/presentation/screens/game_screen.dart'
 import 'package:m6_sudoku/features/sudoku/presentation/screens/difficulty_selection_screen.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/screens/completion_screen.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/screens/puzzle_loading_screen.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/screens/daily_challenge_screen.dart';
 import 'package:m6_sudoku/features/statistics/presentation/screens/statistics_screen.dart';
 import 'package:m6_sudoku/features/settings/presentation/screens/settings_screen.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/pause_menu.dart';
@@ -75,6 +76,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
+      GoRoute(
+        path: AppRoutes.dailyChallenge,
+        name: 'dailyChallenge',
+        builder: (context, state) => const DailyChallengeScreen(),
+      ),
     ],
     errorBuilder:
         (context, state) => Scaffold(
@@ -115,6 +121,7 @@ class AppRoutes {
   static const String pause = '/pause';
   static const String completion = '/completion';
   static const String puzzleLoading = '/loading';
+  static const String dailyChallenge = '/daily';
 
   static String get homeRoute => home;
   static String get difficultyRoute => difficultySelection;
@@ -124,4 +131,5 @@ class AppRoutes {
   static String get pauseRoute => pause;
   static String get completionRoute => completion;
   static String get puzzleLoadingRoute => puzzleLoading;
+  static String get dailyChallengeRoute => dailyChallenge;
 }

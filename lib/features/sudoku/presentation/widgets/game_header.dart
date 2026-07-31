@@ -14,6 +14,7 @@ class GameHeader extends ConsumerWidget {
     required this.hintsUsed,
     required this.onPause,
     required this.onHint,
+    required this.onUndo,
   });
 
   final String difficulty;
@@ -22,6 +23,7 @@ class GameHeader extends ConsumerWidget {
   final int hintsUsed;
   final VoidCallback onPause;
   final VoidCallback onHint;
+  final VoidCallback onUndo;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -80,6 +82,12 @@ class GameHeader extends ConsumerWidget {
                 ),
               ),
               const Spacer(),
+              IconButton(
+                onPressed: onUndo,
+                icon: const Icon(Icons.undo_rounded),
+                tooltip: 'Undo',
+              ),
+              const SizedBox(width: 8),
               IconButton(
                 onPressed: onPause,
                 icon: const Icon(Icons.pause_rounded),

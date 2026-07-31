@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:dartz/dartz.dart';
-import '../../domain/entities/game_entities.dart';
-import '../../domain/repositories/puzzle_repository.dart';
-import '../../core/errors/failures.dart';
-import '../../core/services/storage_service.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
+import 'package:m6_sudoku/features/sudoku/domain/repositories/puzzle_repository.dart';
+import 'package:m6_sudoku/core/errors/failures.dart';
+import 'package:m6_sudoku/core/services/storage_service.dart';
 
 class PuzzleLocalDataSource {
   PuzzleLocalDataSource(this._storage);
@@ -182,8 +183,8 @@ class PuzzleLocalDataSource {
   }
 
   List<List<int>> _removeNumbers(List<List<int>> solution, int cluesCount) {
-    final grid = List.generate(9, (r) => List.from(solution[r]));
-    final cells = List.generate(81, (i) => i).shuffle(Random());
+    final grid = List.generate(9, (r) => List<int>.from(solution[r]));
+    final cells = List<int>.generate(81, (i) => i)..shuffle(Random());
 
     int removed = 0;
     final toRemove = 81 - cluesCount;

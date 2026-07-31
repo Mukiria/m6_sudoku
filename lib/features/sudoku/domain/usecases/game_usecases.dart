@@ -1,7 +1,22 @@
 import 'package:dartz/dartz.dart';
-import '../entities/game_entities.dart';
-import '../../core/errors/failures.dart';
-import '../repositories/puzzle_repository.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
+import 'package:m6_sudoku/core/errors/failures.dart';
+import 'package:m6_sudoku/features/sudoku/domain/repositories/puzzle_repository.dart';
+
+class HintCell {
+  const HintCell({
+    required this.row,
+    required this.col,
+    required this.value,
+    required this.isFixed,
+  });
+
+  final int row;
+  final int col;
+  final int value;
+  final bool isFixed;
+}
 
 class GeneratePuzzleUseCase {
   GeneratePuzzleUseCase(this._repository);
@@ -84,16 +99,41 @@ class GetHintUseCase {
 
   final PuzzleRepository _repository;
 
-  Future<Either<Failure, Cell?>> call({required GameState state}) async {
+  Future<Either<Failure, HintCell?>> call({required GameState state}) async {
+    final puzzle = state.puzzle;
     for (int r = 0; r < 9; r++) {
       for (int c = 0; c < 9; c++) {
-        final cell = state.cells[r][c];
-        if (cell.value == null && !cell.isFixed) {
-          final solutionValue = state.puzzle.solution[r][c];
-          return Right(cell.copyWith(value: solutionValue, isFixed: false));
+        if (state.userGrid[r][c] == 0 && puzzle.grid[r][c] == 0) {
+          final solutionValue = puzzle.solution[r][c];
+          return Right(HintCell(
+            row: r,
+            col: c,
+            value: solutionValue,
+            isFixed: false,
+          ));
         }
       }
     }
     return const Right(null);
+  }
+}
+
+class GetGameStateUseCase {
+  GetGameStateUseCase(this._repository);
+
+  final PuzzleRepository _repository;
+
+  Future<Either<Failure, GameState?>> call() {
+    return _repository.getGameState();
+  }
+}
+
+class SaveGameStateUseCase {
+  SaveGameStateUseCase(this._repository);
+
+  final PuzzleRepository _repository;
+
+  Future<Either<Failure, void>> call(GameState state) {
+    return _repository.saveGameState(state);
   }
 }

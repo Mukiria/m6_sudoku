@@ -1,24 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/constants/app_constants.dart';
-import '../../core/theme/app_theme_extension.dart';
-import '../../shared/widgets/sudoku_widgets.dart';
-import '../../features/sudoku/presentation/providers/game_provider.dart';
+import 'package:m6_sudoku/core/constants/app_constants.dart';
+import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
+import 'package:m6_sudoku/shared/widgets/sudoku_widgets.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
 
 class NumberPad extends ConsumerWidget {
-  const NumberPad({super.key});
+  const NumberPad({
+    super.key,
+    required this.selectedNumber,
+    required this.onNumberSelected,
+    required this.onNoteModeToggle,
+    required this.isNoteMode,
+    required this.counts,
+    required this.disabledNumbers,
+  });
+
+  final int? selectedNumber;
+  final void Function(int) onNumberSelected;
+  final void Function() onNoteModeToggle;
+  final bool isNoteMode;
+  final Map<int, int> counts;
+  final Set<int> disabledNumbers;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameState = ref.watch(gameProvider);
+    final gameState = ref.watch(gameControllerProvider);
     final theme = Theme.of(context);
     final extension = theme.extension<AppThemeExtension>()!;
     final colorScheme = theme.colorScheme;
 
     if (gameState == null) return const SizedBox.shrink();
-
-    final selectedNumber = gameState.selectedNumber;
-    final isNoteMode = gameState.isNoteMode;
 
     return Container(
       padding: const EdgeInsets.all(AppConstants.spacingMd),
@@ -37,22 +49,20 @@ class NumberPad extends ConsumerWidget {
             children: [
               Expanded(
                 child: _buildModeButton(
+                  context: context,
                   icon: Icons.format_size_rounded,
                   label: 'Numbers',
                   isSelected: !isNoteMode,
-                  onTap:
-                      () =>
-                          ref.read(gameProvider.notifier).toggleNoteMode(false),
+                  onTap: () => onNoteModeToggle(),
                 ),
               ),
               Expanded(
                 child: _buildModeButton(
+                  context: context,
                   icon: Icons.notes_rounded,
                   label: 'Notes',
                   isSelected: isNoteMode,
-                  onTap:
-                      () =>
-                          ref.read(gameProvider.notifier).toggleNoteMode(true),
+                  onTap: () => onNoteModeToggle(),
                 ),
               ),
             ],
@@ -76,23 +86,29 @@ class NumberPad extends ConsumerWidget {
                 return _buildActionButton(
                   icon: Icons.backspace_rounded,
                   label: 'Erase',
-                  onTap:
-                      () => ref.read(gameProvider.notifier).clearSelectedCell(),
-                  color: extension.eraseButtonBackground,
-                  textColor: extension.eraseButtonText,
+                  onTap: () {
+                    if (gameState.selectedCell != null) {
+                      ref.read(gameControllerProvider.notifier).clearCell(
+                        gameState.selectedCell!.row,
+                        gameState.selectedCell!.col,
+                      );
+                    }
+                  },
+                  color: extension.eraseButtonBackground!,
+                  textColor: extension.eraseButtonText!,
                 );
               }
 
               final number = index + 1;
               final isSelected = selectedNumber == number;
-              final count = _getRemainingCount(gameState, number);
+              final count = counts[number] ?? 9;
+              final isDisabled = disabledNumbers.contains(number);
 
               return NumberButton(
                 number: number,
                 isSelected: isSelected,
-                isEnabled: true,
-                onTap:
-                    () => ref.read(gameProvider.notifier).selectNumber(number),
+                isEnabled: !isDisabled,
+                onTap: () => onNumberSelected(number),
                 count: count,
                 showCount: true,
               );
@@ -108,10 +124,10 @@ class NumberPad extends ConsumerWidget {
                 child: _buildActionButton(
                   icon: Icons.lightbulb_rounded,
                   label: 'Hint',
-                  onTap: () => ref.read(gameProvider.notifier).useHint(),
-                  color: extension.hintButtonBackground,
-                  textColor: extension.hintButtonText,
-                  isEnabled: hintsUsed < 3,
+                  onTap: () => ref.read(gameControllerProvider.notifier).useHint(),
+                  color: extension.hintButtonBackground!,
+                  textColor: extension.hintButtonText!,
+                  isEnabled: gameState.hintsUsed < 3,
                 ),
               ),
               const SizedBox(width: AppConstants.spacingMd),
@@ -119,10 +135,10 @@ class NumberPad extends ConsumerWidget {
                 child: _buildActionButton(
                   icon: Icons.undo_rounded,
                   label: 'Undo',
-                  onTap: () => ref.read(gameProvider.notifier).undo(),
-                  color: extension.undoButtonBackground,
-                  textColor: extension.undoButtonText,
-                  isEnabled: gameState.undoStack.isNotEmpty,
+                  onTap: () => ref.read(gameControllerProvider.notifier).undo(),
+                  color: extension.undoButtonBackground!,
+                  textColor: extension.undoButtonText!,
+                  isEnabled: gameState.moveHistory.isNotEmpty,
                 ),
               ),
             ],
@@ -133,6 +149,7 @@ class NumberPad extends ConsumerWidget {
   }
 
   Widget _buildModeButton({
+    required BuildContext context,
     required IconData icon,
     required String label,
     required bool isSelected,
@@ -235,10 +252,5 @@ class NumberPad extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  int _getRemainingCount(GameState state, int number) {
-    // This would be calculated from the puzzle solution
-    return 9; // Simplified
   }
 }

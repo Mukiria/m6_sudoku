@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/constants/app_constants.dart';
-import '../../core/theme/app_theme_extension.dart';
-import '../../shared/widgets/cards.dart';
-import '../../shared/widgets/buttons.dart';
-import '../../features/sudoku/presentation/providers/game_provider.dart';
-import '../../features/sudoku/domain/entities/puzzle.dart';
+import 'package:m6_sudoku/core/constants/app_constants.dart';
+import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
+import 'package:m6_sudoku/shared/widgets/cards.dart';
+import 'package:m6_sudoku/shared/widgets/buttons.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/providers/sudoku_providers.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
+import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart';
+import 'package:m6_sudoku/core/routing/app_router.dart';
+import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 
 class DifficultySelectionScreen extends ConsumerWidget {
   const DifficultySelectionScreen({super.key});
@@ -99,6 +103,9 @@ class DifficultyCard extends StatelessWidget {
         break;
       case Difficulty.expert:
         difficultyColor = extension.difficultyExpertColor;
+        break;
+      case Difficulty.evil:
+        difficultyColor = extension.difficultyHardColor; // Use hard color for evil
         break;
     }
 
@@ -230,6 +237,8 @@ class DifficultyCard extends StatelessWidget {
         return 'Requires advanced techniques. Fewer clues.';
       case Difficulty.expert:
         return 'Expert level. Minimal clues, complex logic needed.';
+      case Difficulty.evil:
+        return 'Evil level. Minimal clues, extremely difficult.';
     }
   }
 
@@ -242,6 +251,8 @@ class DifficultyCard extends StatelessWidget {
       case Difficulty.hard:
         return '20-40 min';
       case Difficulty.expert:
+        return '40+ min';
+      case Difficulty.evil:
         return '40+ min';
     }
   }

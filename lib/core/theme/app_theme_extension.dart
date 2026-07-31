@@ -13,6 +13,8 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
     required this.cellNoteBackground,
     required this.cellHighlightBackground,
     required this.cellRelatedBackground,
+    required this.gridBackgroundColor,
+    required this.subGridLineColor,
     required this.numberButtonBackground,
     required this.numberButtonSelectedBackground,
     required this.numberButtonDisabledBackground,
@@ -54,6 +56,8 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
   final Color cellNoteBackground;
   final Color cellHighlightBackground;
   final Color cellRelatedBackground;
+  final Color gridBackgroundColor;
+  final Color subGridLineColor;
   final Color numberButtonBackground;
   final Color numberButtonSelectedBackground;
   final Color numberButtonDisabledBackground;
@@ -95,6 +99,8 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
     cellNoteBackground: Color(0xFFF5F5F5),
     cellHighlightBackground: Color(0xFFE3F2FD),
     cellRelatedBackground: Color(0xFFBBDEFB),
+    gridBackgroundColor: Color(0xFFFFFFFF),
+    subGridLineColor: Color(0xFF9E9E9E),
     numberButtonBackground: Color(0xFFE3F2FD),
     numberButtonSelectedBackground: Color(0xFF1976D2),
     numberButtonDisabledBackground: Color(0xFFE0E0E0),
@@ -137,6 +143,8 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
     cellNoteBackground: Color(0xFF1E1E1E),
     cellHighlightBackground: Color(0xFF1565C0),
     cellRelatedBackground: Color(0xFF0D47A1),
+    gridBackgroundColor: Color(0xFF2C2C2C),
+    subGridLineColor: Color(0xFF616161),
     numberButtonBackground: Color(0xFF1565C0),
     numberButtonSelectedBackground: Color(0xFF90CAF9),
     numberButtonDisabledBackground: Color(0xFF444444),
@@ -179,94 +187,98 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
     Color? cellFixedBorder,
     Color? cellNoteBackground,
     Color? cellHighlightBackground,
-    Color? cellRelatedBackground,
-    Color? numberButtonBackground,
-    Color? numberButtonSelectedBackground,
-    Color? numberButtonDisabledBackground,
-    Color? numberButtonText,
-    Color? numberButtonSelectedText,
-    Color? numberButtonDisabledText,
-    Color? noteButtonBackground,
-    Color? noteButtonSelectedBackground,
-    Color? noteButtonText,
-    Color? noteButtonSelectedText,
-    Color? hintButtonBackground,
-    Color? hintButtonText,
-    Color? undoButtonBackground,
-    Color? undoButtonText,
-    Color? eraseButtonBackground,
-    Color? eraseButtonText,
-    Color? timerBackground,
-    Color? timerText,
-    Color? mistakeIndicatorColor,
-    Color? hintIndicatorColor,
-    Color? completionBackground,
-    Color? completionText,
-    Color? progressBackground,
-    Color? progressForeground,
-    Color? difficultyEasyColor,
-    Color? difficultyMediumColor,
-    Color? difficultyHardColor,
-    Color? difficultyExpertColor,
-  }) {
-    return AppThemeExtension(
-      cellBackground: cellBackground ?? this.cellBackground,
-      cellBorder: cellBorder ?? this.cellBorder,
-      cellSelectedBackground:
-          cellSelectedBackground ?? this.cellSelectedBackground,
-      cellSelectedBorder: cellSelectedBorder ?? this.cellSelectedBorder,
-      cellErrorBackground: cellErrorBackground ?? this.cellErrorBackground,
-      cellErrorBorder: cellErrorBorder ?? this.cellErrorBorder,
-      cellFixedBackground: cellFixedBackground ?? this.cellFixedBackground,
-      cellFixedBorder: cellFixedBorder ?? this.cellFixedBorder,
-      cellNoteBackground: cellNoteBackground ?? this.cellNoteBackground,
-      cellHighlightBackground:
-          cellHighlightBackground ?? this.cellHighlightBackground,
-      cellRelatedBackground:
-          cellRelatedBackground ?? this.cellRelatedBackground,
-      numberButtonBackground:
-          numberButtonBackground ?? this.numberButtonBackground,
-      numberButtonSelectedBackground:
-          numberButtonSelectedBackground ?? this.numberButtonSelectedBackground,
-      numberButtonDisabledBackground:
-          numberButtonDisabledBackground ?? this.numberButtonDisabledBackground,
-      numberButtonText: numberButtonText ?? this.numberButtonText,
-      numberButtonSelectedText:
-          numberButtonSelectedText ?? this.numberButtonSelectedText,
-      numberButtonDisabledText:
-          numberButtonDisabledText ?? this.numberButtonDisabledText,
-      noteButtonBackground: noteButtonBackground ?? this.noteButtonBackground,
-      noteButtonSelectedBackground:
-          noteButtonSelectedBackground ?? this.noteButtonSelectedBackground,
-      noteButtonText: noteButtonText ?? this.noteButtonText,
-      noteButtonSelectedText:
-          noteButtonSelectedText ?? this.noteButtonSelectedText,
-      hintButtonBackground: hintButtonBackground ?? this.hintButtonBackground,
-      hintButtonText: hintButtonText ?? this.hintButtonText,
-      undoButtonBackground: undoButtonBackground ?? this.undoButtonBackground,
-      undoButtonText: undoButtonText ?? this.undoButtonText,
-      eraseButtonBackground:
-          eraseButtonBackground ?? this.eraseButtonBackground,
-      eraseButtonText: eraseButtonText ?? this.eraseButtonText,
-      timerBackground: timerBackground ?? this.timerBackground,
-      timerText: timerText ?? this.timerText,
-      mistakeIndicatorColor:
-          mistakeIndicatorColor ?? this.mistakeIndicatorColor,
-      hintIndicatorColor: hintIndicatorColor ?? this.hintIndicatorColor,
-      completionBackground: completionBackground ?? this.completionBackground,
-      completionText: completionText ?? this.completionText,
-      progressBackground: progressBackground ?? this.progressBackground,
-      progressForeground: progressForeground ?? this.progressForeground,
-      difficultyEasyColor: difficultyEasyColor ?? this.difficultyEasyColor,
-      difficultyMediumColor:
-          difficultyMediumColor ?? this.difficultyMediumColor,
-      difficultyHardColor: difficultyHardColor ?? this.difficultyHardColor,
-      difficultyExpertColor:
-          difficultyExpertColor ?? this.difficultyExpertColor,
-    );
-  }
+Color? cellRelatedBackground,
+  Color? gridBackgroundColor,
+  Color? subGridLineColor,
+  Color? numberButtonBackground,
+  Color? numberButtonSelectedBackground,
+  Color? numberButtonDisabledBackground,
+  Color? numberButtonText,
+  Color? numberButtonSelectedText,
+  Color? numberButtonDisabledText,
+  Color? noteButtonBackground,
+  Color? noteButtonSelectedBackground,
+  Color? noteButtonText,
+  Color? noteButtonSelectedText,
+  Color? hintButtonBackground,
+  Color? hintButtonText,
+  Color? undoButtonBackground,
+  Color? undoButtonText,
+  Color? eraseButtonBackground,
+  Color? eraseButtonText,
+  Color? timerBackground,
+  Color? timerText,
+  Color? mistakeIndicatorColor,
+  Color? hintIndicatorColor,
+  Color? completionBackground,
+  Color? completionText,
+  Color? progressBackground,
+  Color? progressForeground,
+  Color? difficultyEasyColor,
+  Color? difficultyMediumColor,
+  Color? difficultyHardColor,
+  Color? difficultyExpertColor,
+}) {
+  return AppThemeExtension(
+    cellBackground: cellBackground ?? this.cellBackground,
+    cellBorder: cellBorder ?? this.cellBorder,
+    cellSelectedBackground:
+        cellSelectedBackground ?? this.cellSelectedBackground,
+    cellSelectedBorder: cellSelectedBorder ?? this.cellSelectedBorder,
+    cellErrorBackground: cellErrorBackground ?? this.cellErrorBackground,
+    cellErrorBorder: cellErrorBorder ?? this.cellErrorBorder,
+    cellFixedBackground: cellFixedBackground ?? this.cellFixedBackground,
+    cellFixedBorder: cellFixedBorder ?? this.cellFixedBorder,
+    cellNoteBackground: cellNoteBackground ?? this.cellNoteBackground,
+    cellHighlightBackground:
+        cellHighlightBackground ?? this.cellHighlightBackground,
+    cellRelatedBackground:
+        cellRelatedBackground ?? this.cellRelatedBackground,
+    gridBackgroundColor: gridBackgroundColor ?? this.gridBackgroundColor,
+    subGridLineColor: subGridLineColor ?? this.subGridLineColor,
+    numberButtonBackground:
+        numberButtonBackground ?? this.numberButtonBackground,
+    numberButtonSelectedBackground:
+        numberButtonSelectedBackground ?? this.numberButtonSelectedBackground,
+    numberButtonDisabledBackground:
+        numberButtonDisabledBackground ?? this.numberButtonDisabledBackground,
+    numberButtonText: numberButtonText ?? this.numberButtonText,
+    numberButtonSelectedText:
+        numberButtonSelectedText ?? this.numberButtonSelectedText,
+    numberButtonDisabledText:
+        numberButtonDisabledText ?? this.numberButtonDisabledText,
+    noteButtonBackground: noteButtonBackground ?? this.noteButtonBackground,
+    noteButtonSelectedBackground:
+        noteButtonSelectedBackground ?? this.noteButtonSelectedBackground,
+    noteButtonText: noteButtonText ?? this.noteButtonText,
+    noteButtonSelectedText:
+        noteButtonSelectedText ?? this.noteButtonSelectedText,
+    hintButtonBackground: hintButtonBackground ?? this.hintButtonBackground,
+    hintButtonText: hintButtonText ?? this.hintButtonText,
+    undoButtonBackground: undoButtonBackground ?? this.undoButtonBackground,
+    undoButtonText: undoButtonText ?? this.undoButtonText,
+    eraseButtonBackground:
+        eraseButtonBackground ?? this.eraseButtonBackground,
+    eraseButtonText: eraseButtonText ?? this.eraseButtonText,
+    timerBackground: timerBackground ?? this.timerBackground,
+    timerText: timerText ?? this.timerText,
+    mistakeIndicatorColor:
+        mistakeIndicatorColor ?? this.mistakeIndicatorColor,
+    hintIndicatorColor: hintIndicatorColor ?? this.hintIndicatorColor,
+    completionBackground: completionBackground ?? this.completionBackground,
+    completionText: completionText ?? this.completionText,
+    progressBackground: progressBackground ?? this.progressBackground,
+    progressForeground: progressForeground ?? this.progressForeground,
+    difficultyEasyColor: difficultyEasyColor ?? this.difficultyEasyColor,
+    difficultyMediumColor:
+        difficultyMediumColor ?? this.difficultyMediumColor,
+    difficultyHardColor: difficultyHardColor ?? this.difficultyHardColor,
+    difficultyExpertColor:
+        difficultyExpertColor ?? this.difficultyExpertColor,
+  );
+}
 
-  @override
+@override
   AppThemeExtension lerp(ThemeExtension<AppThemeExtension>? other, double t) {
     if (other is! AppThemeExtension) return this;
     return AppThemeExtension(
@@ -292,6 +304,10 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
           )!,
       cellRelatedBackground:
           Color.lerp(cellRelatedBackground, other.cellRelatedBackground, t)!,
+      gridBackgroundColor:
+          Color.lerp(gridBackgroundColor, other.gridBackgroundColor, t)!,
+      subGridLineColor:
+          Color.lerp(subGridLineColor, other.subGridLineColor, t)!,
       numberButtonBackground:
           Color.lerp(numberButtonBackground, other.numberButtonBackground, t)!,
       numberButtonSelectedBackground:
@@ -330,7 +346,11 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
           )!,
       noteButtonText: Color.lerp(noteButtonText, other.noteButtonText, t)!,
       noteButtonSelectedText:
-          Color.lerp(noteButtonSelectedText, other.noteButtonSelectedText, t)!,
+          Color.lerp(
+            noteButtonSelectedText,
+            other.noteButtonSelectedText,
+            t,
+          )!,
       hintButtonBackground:
           Color.lerp(hintButtonBackground, other.hintButtonBackground, t)!,
       hintButtonText: Color.lerp(hintButtonText, other.hintButtonText, t)!,

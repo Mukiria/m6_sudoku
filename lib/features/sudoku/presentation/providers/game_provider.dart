@@ -1,101 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:m6_sudoku/features/sudoku/engine/generator/puzzle_generator.dart';
-import '../../domain/usecases/game_usecases.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
+import 'package:m6_sudoku/features/sudoku/domain/usecases/game_usecases.dart';
+import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/providers/sudoku_providers.dart';
 
 part 'game_provider.g.dart';
-
-class GameState {
-  GameState({
-    required this.puzzleId,
-    required this.userGrid,
-    required this.notes,
-    required this.timeElapsed,
-    required this.mistakes,
-    required this.hintsUsed,
-    required this.moveHistory,
-    required this.status,
-    required this.lastPlayed,
-    required this.difficulty,
-  });
-
-  final String puzzleId;
-  final List<List<int>> userGrid;
-  final List<List<Set<int>>> notes;
-  final int timeElapsed;
-  final int mistakes;
-  final int hintsUsed;
-  final List<Move> moveHistory;
-  final GameStatus status;
-  final DateTime lastPlayed;
-  final Difficulty difficulty;
-
-  GameState copyWith({
-    String? puzzleId,
-    List<List<int>>? userGrid,
-    List<List<Set<int>>>? notes,
-    int? timeElapsed,
-    int? mistakes,
-    int? hintsUsed,
-    List<Move>? moveHistory,
-    GameStatus? status,
-    DateTime? lastPlayed,
-    Difficulty? difficulty,
-  }) {
-    return GameState(
-      puzzleId: puzzleId ?? this.puzzleId,
-      userGrid: userGrid ?? this.userGrid,
-      notes: notes ?? this.notes,
-      timeElapsed: timeElapsed ?? this.timeElapsed,
-      mistakes: mistakes ?? this.mistakes,
-      hintsUsed: hintsUsed ?? this.hintsUsed,
-      moveHistory: moveHistory ?? this.moveHistory,
-      status: status ?? this.status,
-      lastPlayed: lastPlayed ?? this.lastPlayed,
-      difficulty: difficulty ?? this.difficulty,
-    );
-  }
-}
-
-@freezed
-class Move with _$Move {
-  const factory Move({
-    required int row,
-    required int col,
-    required int? previousValue,
-    required int? newValue,
-    required MoveType type,
-    required DateTime timestamp,
-  }) = _Move;
-}
-
-enum MoveType { value, note, hint, undo, clear }
-
-enum GameStatus { playing, paused, completed, failed }
-
-enum Difficulty {
-  easy,
-  medium,
-  hard,
-  expert,
-  evil;
-
-  String get name {
-    switch (this) {
-      case Difficulty.easy:
-        return 'easy';
-      case Difficulty.medium:
-        return 'medium';
-      case Difficulty.hard:
-        return 'hard';
-      case Difficulty.expert:
-        return 'expert';
-      case Difficulty.evil:
-        return 'evil';
-    }
-  }
-}
 
 @riverpod
 class GameController extends _$GameController {
@@ -110,17 +25,26 @@ class GameController extends _$GameController {
       (failure) => throw Exception(failure.message),
       (puzzle) => GameState(
         puzzleId: puzzle.id,
-        userGrid: puzzle.grid.map((row) => List.from(row)).toList(),
+        puzzle: puzzle,
+        userGrid: puzzle.grid.map((row) => List<int>.from(row)).toList(),
         notes: List.generate(9, (_) => List.generate(9, (_) => <int>{})),
         timeElapsed: 0,
         mistakes: 0,
         hintsUsed: 0,
         moveHistory: [],
+        redoStack: [],
         status: GameStatus.playing,
         lastPlayed: DateTime.now(),
         difficulty: difficulty,
+        selectedCell: null,
+        selectedNumber: null,
+        isNoteMode: false,
+        highlightedCells: {},
+        conflictCells: {},
+        lastSaved: DateTime.now(),
       ),
     );
+    _startAutoSave();
   }
 
   Future<void> loadGame() async {
@@ -128,48 +52,80 @@ class GameController extends _$GameController {
     final result = await getGameState();
 
     state = result.fold((failure) => null, (gameState) => gameState);
+    if (state != null && state!.status == GameStatus.playing) {
+      _startAutoSave();
+    }
+  }
+
+  void selectCell(int row, int col) {
+    if (state == null) return;
+
+    final puzzle = state!.puzzle;
+
+    state = state!.copyWith(
+      selectedCell: CellPosition(row: row, col: col),
+      highlightedCells: _getHighlightedCells(row, col),
+      conflictCells: _getConflicts(state!.userGrid),
+      lastPlayed: DateTime.now(),
+    );
+  }
+
+  void selectNumber(int number) {
+    if (state == null) return;
+    if (state!.selectedCell == null) return;
+
+    final isFixed = state!.puzzle.grid[state!.selectedCell!.row][state!.selectedCell!.col] != 0;
+    if (isFixed) return;
+
+    if (state!.isNoteMode) {
+      toggleNote(state!.selectedCell!.row, state!.selectedCell!.col, number);
+    } else {
+      setValue(state!.selectedCell!.row, state!.selectedCell!.col, number);
+    }
   }
 
   void setValue(int row, int col, int value) {
     if (state == null) return;
 
     final currentState = state!;
-    final puzzle = _getPuzzle(currentState.puzzleId);
-    if (puzzle == null) return;
+    final puzzle = currentState.puzzle;
 
     if (puzzle.grid[row][col] != 0) return; // Fixed cell
 
     final previousValue = currentState.userGrid[row][col];
     if (previousValue == value) return;
 
-    final newGrid = currentState.userGrid.map((row) => List.from(row)).toList();
+    final newGrid = currentState.userGrid.map((row) => List<int>.from(row)).toList();
     newGrid[row][col] = value;
 
     final isCorrect = puzzle.solution[row][col] == value;
     final newMistakes =
         isCorrect ? currentState.mistakes : currentState.mistakes + 1;
 
-    state = currentState.copyWith(
+    final newMove = Move(
+      row: row,
+      col: col,
+      previousValue: previousValue,
+      newValue: value,
+      type: MoveType.value,
+      timestamp: DateTime.now(),
+    );
+
+    state = state!.copyWith(
       userGrid: newGrid,
       mistakes: newMistakes,
-      moveHistory: [
-        ...currentState.moveHistory,
-        Move(
-          row: row,
-          col: col,
-          previousValue: previousValue,
-          newValue: value,
-          type: MoveType.value,
-          timestamp: DateTime.now(),
-        ),
-      ],
+      conflictCells: _getConflicts(newGrid),
+      moveHistory: [...currentState.moveHistory, newMove],
+      redoStack: [],
       lastPlayed: DateTime.now(),
+      lastSaved: DateTime.now(),
     );
 
     if (newMistakes >= 3) {
       state = state!.copyWith(status: GameStatus.failed);
     } else if (_checkCompletion(newGrid, puzzle.solution)) {
       state = state!.copyWith(status: GameStatus.completed);
+      _saveGame();
     }
   }
 
@@ -187,7 +143,7 @@ class GameController extends _$GameController {
     }
 
     final newNotesGrid =
-        currentState.notes.map((row) => List.from(row)).toList();
+        currentState.notes.map((row) => List<Set<int>>.from(row)).toList();
     newNotesGrid[row][col] = newNotes;
 
     state = currentState.copyWith(
@@ -204,6 +160,7 @@ class GameController extends _$GameController {
         ),
       ],
       lastPlayed: DateTime.now(),
+      lastSaved: DateTime.now(),
     );
   }
 
@@ -211,19 +168,17 @@ class GameController extends _$GameController {
     if (state == null) return;
 
     final currentState = state!;
-    final puzzle = _getPuzzle(currentState.puzzleId);
-    if (puzzle == null) return;
 
-    if (puzzle.grid[row][col] != 0) return; // Fixed cell
+    if (currentState.puzzle.grid[row][col] != 0) return; // Fixed cell
 
     final previousValue = currentState.userGrid[row][col];
     if (previousValue == 0 && currentState.notes[row][col].isEmpty) return;
 
-    final newGrid = currentState.userGrid.map((row) => List.from(row)).toList();
+    final newGrid = currentState.userGrid.map((row) => List<int>.from(row)).toList();
     newGrid[row][col] = 0;
 
     final newNotesGrid =
-        currentState.notes.map((row) => List.from(row)).toList();
+        currentState.notes.map((row) => List<Set<int>>.from(row)).toList();
     newNotesGrid[row][col] = <int>{};
 
     state = currentState.copyWith(
@@ -241,6 +196,7 @@ class GameController extends _$GameController {
         ),
       ],
       lastPlayed: DateTime.now(),
+      lastSaved: DateTime.now(),
     );
   }
 
@@ -248,8 +204,6 @@ class GameController extends _$GameController {
     if (state == null) return;
 
     final currentState = state!;
-    final puzzle = _getPuzzle(currentState.puzzleId);
-    if (puzzle == null) return;
 
     final getHint = ref.read(getHintUseCaseProvider);
     final result = await getHint(state: currentState);
@@ -270,6 +224,8 @@ class GameController extends _$GameController {
               timestamp: DateTime.now(),
             ),
           ],
+          lastPlayed: DateTime.now(),
+          lastSaved: DateTime.now(),
         );
       }
     });
@@ -285,20 +241,16 @@ class GameController extends _$GameController {
       currentState.moveHistory.length - 1,
     );
 
-    final newGrid = currentState.userGrid.map((row) => List.from(row)).toList();
+    final newGrid = currentState.userGrid.map((row) => List<int>.from(row)).toList();
     final newNotesGrid =
-        currentState.notes.map((row) => List.from(row)).toList();
+        currentState.notes.map((row) => List<Set<int>>.from(row)).toList();
     int newMistakes = currentState.mistakes;
     int newHintsUsed = currentState.hintsUsed;
 
     switch (lastMove.type) {
       case MoveType.value:
         newGrid[lastMove.row][lastMove.col] = lastMove.previousValue ?? 0;
-        // Recalculate mistakes
-        final puzzle = _getPuzzle(currentState.puzzleId);
-        if (puzzle != null) {
-          newMistakes = _calculateMistakes(newGrid, puzzle.solution);
-        }
+        newMistakes = _calculateMistakes(newGrid, currentState.puzzle.solution);
         break;
       case MoveType.note:
         if (lastMove.newValue != null) {
@@ -308,19 +260,13 @@ class GameController extends _$GameController {
       case MoveType.hint:
         newGrid[lastMove.row][lastMove.col] = lastMove.previousValue ?? 0;
         newHintsUsed = (currentState.hintsUsed - 1).clamp(0, 999);
-        final puzzle = _getPuzzle(currentState.puzzleId);
-        if (puzzle != null) {
-          newMistakes = _calculateMistakes(newGrid, puzzle.solution);
-        }
+        newMistakes = _calculateMistakes(newGrid, currentState.puzzle.solution);
         break;
       case MoveType.clear:
         if (lastMove.previousValue != null) {
           newGrid[lastMove.row][lastMove.col] = lastMove.previousValue!;
         }
-        final puzzle = _getPuzzle(currentState.puzzleId);
-        if (puzzle != null) {
-          newMistakes = _calculateMistakes(newGrid, puzzle.solution);
-        }
+        newMistakes = _calculateMistakes(newGrid, currentState.puzzle.solution);
         break;
       default:
         break;
@@ -332,9 +278,72 @@ class GameController extends _$GameController {
       mistakes: newMistakes,
       hintsUsed: newHintsUsed,
       moveHistory: previousMoves,
+      redoStack: [lastMove, ...currentState.redoStack],
       status: GameStatus.playing,
       lastPlayed: DateTime.now(),
+      lastSaved: DateTime.now(),
     );
+  }
+
+  void redo() {
+    if (state == null || state!.redoStack.isEmpty) return;
+
+    final currentState = state!;
+    final nextMove = currentState.redoStack.first;
+    final remainingRedo = currentState.redoStack.sublist(1);
+
+    final newGrid = currentState.userGrid.map((row) => List<int>.from(row)).toList();
+    final newNotesGrid =
+        currentState.notes.map((row) => List<Set<int>>.from(row)).toList();
+    int newMistakes = currentState.mistakes;
+    int newHintsUsed = currentState.hintsUsed;
+
+    switch (nextMove.type) {
+      case MoveType.value:
+        newGrid[nextMove.row][nextMove.col] = nextMove.newValue ?? 0;
+        newMistakes = _calculateMistakes(newGrid, currentState.puzzle.solution);
+        break;
+      case MoveType.note:
+        if (nextMove.newValue != null) {
+          newNotesGrid[nextMove.row][nextMove.col].add(nextMove.newValue!);
+        }
+        break;
+      case MoveType.hint:
+        newGrid[nextMove.row][nextMove.col] = nextMove.newValue ?? 0;
+        newHintsUsed = (currentState.hintsUsed - 1).clamp(0, 999);
+        newMistakes = _calculateMistakes(newGrid, currentState.puzzle.solution);
+        break;
+      case MoveType.clear:
+        if (nextMove.previousValue != null) {
+          newGrid[nextMove.row][nextMove.col] = nextMove.previousValue!;
+        }
+        newMistakes = _calculateMistakes(newGrid, currentState.puzzle.solution);
+        break;
+      default:
+        break;
+    }
+
+    state = currentState.copyWith(
+      userGrid: newGrid,
+      notes: newNotesGrid,
+      mistakes: newMistakes,
+      hintsUsed: newHintsUsed,
+      moveHistory: [...currentState.moveHistory, nextMove],
+      redoStack: remainingRedo,
+      status: GameStatus.playing,
+      lastPlayed: DateTime.now(),
+      lastSaved: DateTime.now(),
+    );
+  }
+
+  void toggleNoteMode() {
+    if (state == null) return;
+    state = state!.copyWith(isNoteMode: !state!.isNoteMode);
+  }
+
+  void setSelectedNumber(int? number) {
+    if (state == null) return;
+    state = state!.copyWith(selectedNumber: number);
   }
 
   void incrementTimer() {
@@ -350,6 +359,7 @@ class GameController extends _$GameController {
   void pause() {
     if (state == null) return;
     state = state!.copyWith(status: GameStatus.paused);
+    _saveGame();
   }
 
   void resume() {
@@ -360,9 +370,107 @@ class GameController extends _$GameController {
     );
   }
 
-  Puzzle? _getPuzzle(String puzzleId) {
-    // In a real app, this would come from repository
-    return null;
+  void _saveGame() {
+    if (state == null) return;
+    final saveGame = ref.read(saveGameStateUseCaseProvider);
+    saveGame(state!.copyWith(lastSaved: DateTime.now()));
+  }
+
+  void _startAutoSave() {
+    // Auto-save every 30 seconds
+    Future.delayed(const Duration(seconds: 30), () {
+      if (state != null && state!.status == GameStatus.playing) {
+        _saveGame();
+        _startAutoSave();
+      }
+    });
+  }
+
+  Set<CellPosition> _getHighlightedCells(int row, int col) {
+    final highlighted = <CellPosition>{};
+
+    // Highlight row
+    for (int c = 0; c < 9; c++) {
+      if (c != col) highlighted.add(CellPosition(row: row, col: c));
+    }
+
+    // Highlight column
+    for (int r = 0; r < 9; r++) {
+      if (r != row) highlighted.add(CellPosition(row: r, col: col));
+    }
+
+    // Highlight 3x3 box
+    final boxRow = (row ~/ 3) * 3;
+    final boxCol = (col ~/ 3) * 3;
+    for (int r = boxRow; r < boxRow + 3; r++) {
+      for (int c = boxCol; c < boxCol + 3; c++) {
+        if (r != row || c != col) {
+          highlighted.add(CellPosition(row: r, col: c));
+        }
+      }
+    }
+
+    return highlighted;
+  }
+
+  Set<CellPosition> _getConflicts(List<List<int>> grid) {
+    final conflicts = <CellPosition>{};
+
+    // Check rows
+    for (int r = 0; r < 9; r++) {
+      final seen = <int, int>{};
+      for (int c = 0; c < 9; c++) {
+        final val = grid[r][c];
+        if (val != 0) {
+          if (seen.containsKey(val)) {
+            conflicts.add(CellPosition(row: r, col: seen[val]!));
+            conflicts.add(CellPosition(row: r, col: c));
+          } else {
+            seen[val] = c;
+          }
+        }
+      }
+    }
+
+    // Check columns
+    for (int c = 0; c < 9; c++) {
+      final seen = <int, int>{};
+      for (int r = 0; r < 9; r++) {
+        final val = grid[r][c];
+        if (val != 0) {
+          if (seen.containsKey(val)) {
+            conflicts.add(CellPosition(row: seen[val]!, col: c));
+            conflicts.add(CellPosition(row: r, col: c));
+          } else {
+            seen[val] = r;
+          }
+        }
+      }
+    }
+
+    // Check 3x3 boxes
+    for (int boxRow = 0; boxRow < 3; boxRow++) {
+      for (int boxCol = 0; boxCol < 3; boxCol++) {
+        final seen = <int, CellPosition>{};
+        for (int r = 0; r < 3; r++) {
+          for (int c = 0; c < 3; c++) {
+            final rIdx = boxRow * 3 + r;
+            final cIdx = boxCol * 3 + c;
+            final val = grid[rIdx][cIdx];
+            if (val != 0) {
+              if (seen.containsKey(val)) {
+                conflicts.add(seen[val]!);
+                conflicts.add(CellPosition(row: rIdx, col: cIdx));
+              } else {
+                seen[val] = CellPosition(row: rIdx, col: cIdx);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return conflicts;
   }
 
   bool _checkCompletion(List<List<int>> grid, List<List<int>> solution) {
@@ -387,14 +495,45 @@ class GameController extends _$GameController {
   }
 }
 
-@riverpod
-class TimerController extends _$TimerController {
+class TimerController extends StateNotifier<int> {
+  TimerController(this.ref) : super(0);
+
+  final Ref ref;
+  Timer? _timer;
+
+  void start() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      final gameState = ref.read(gameControllerProvider);
+      if (gameState != null && gameState.status == GameStatus.playing) {
+        state = state + 1;
+        ref.read(gameControllerProvider.notifier).incrementTimer();
+      }
+    });
+  }
+
+  void pause() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  void resume() {
+    start();
+  }
+
+  void reset() {
+    _timer?.cancel();
+    _timer = null;
+    state = 0;
+  }
+
   @override
-  Stream<int> build() {
-    return Stream.periodic(const Duration(seconds: 1), (count) => count + 1);
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 }
 
-final gameProvider = StateNotifierProvider<GameController, GameState?>((ref) {
-  return GameController(ref);
+final timerControllerProvider = StateNotifierProvider<TimerController, int>((ref) {
+  return TimerController(ref);
 });

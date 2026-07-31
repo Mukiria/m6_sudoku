@@ -1,8 +1,9 @@
 import 'package:dartz/dartz.dart';
-import '../../domain/entities/game_entities.dart';
-import '../../domain/repositories/puzzle_repository.dart';
-import '../datasources/puzzle_local_datasource.dart';
-import '../../core/errors/failures.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
+import 'package:m6_sudoku/features/sudoku/domain/repositories/puzzle_repository.dart';
+import 'package:m6_sudoku/features/sudoku/data/datasources/puzzle_local_datasource.dart';
+import 'package:m6_sudoku/core/errors/failures.dart';
 
 class PuzzleRepositoryImpl implements PuzzleRepository {
   PuzzleRepositoryImpl(this._dataSource);

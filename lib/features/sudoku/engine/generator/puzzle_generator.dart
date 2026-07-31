@@ -1,3 +1,4 @@
+import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 import '../models/board.dart';
 import '../models/cell.dart';
 import '../validator/unique_solution_validator.dart';
@@ -78,18 +79,5 @@ class PuzzleGenerator {
         break;
     }
     return generatePuzzle(clues: clues);
-  }
-}
-
-enum Difficulty { easy, medium, hard, expert, evil }
-
-extension ListShuffle<T> on List<T> {
-  void shuffle() {
-    for (var i = length - 1; i > 0; i--) {
-      final j = DateTime.now().microsecondsSinceEpoch % (i + 1);
-      final temp = this[i];
-      this[i] = this[j];
-      this[j] = temp;
-    }
   }
 }

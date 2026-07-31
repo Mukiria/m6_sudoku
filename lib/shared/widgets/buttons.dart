@@ -98,27 +98,15 @@ class AppButton extends StatelessWidget {
               ),
               textStyle: textStyle,
               minimumSize: Size(width ?? 0, buttonHeight),
-              side: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.disabled)) {
-                  return BorderSide(
-                    color: colorScheme.outline.withValues(alpha: 0.5),
-                  );
-                }
-                return BorderSide(color: colorScheme.primary, width: 1.5);
-              }),
-              foregroundColor: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.disabled)) {
-                  return colorScheme.onSurface.withValues(alpha: 0.38);
-                }
-                return colorScheme.primary;
-              }),
-            ).copyWith(
-              foregroundColor: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.disabled)) {
-                  return colorScheme.onSurface.withValues(alpha: 0.38);
-                }
-                return colorScheme.primary;
-              }),
+              side: BorderSide(
+                color: effectiveOnPressed != null
+                    ? colorScheme.primary
+                    : colorScheme.outline.withValues(alpha: 0.5),
+                width: 1.5,
+              ),
+              foregroundColor: effectiveOnPressed != null
+                  ? colorScheme.primary
+                  : colorScheme.onSurface.withValues(alpha: 0.38),
             ),
             child: buttonChild,
           ),

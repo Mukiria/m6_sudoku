@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/routing/app_router.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
-import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
+import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
 import 'package:m6_sudoku/shared/widgets/buttons.dart';
 
@@ -16,7 +16,7 @@ class PauseMenu extends ConsumerWidget {
     final theme = Theme.of(context);
     final extension = theme.extension<AppThemeExtension>()!;
     final colorScheme = theme.colorScheme;
-    final gameState = ref.watch(gameProvider);
+    final gameState = ref.watch(gameControllerProvider);
 
     return Container(
       padding: const EdgeInsets.all(AppConstants.spacingLg),
@@ -54,7 +54,7 @@ class PauseMenu extends ConsumerWidget {
           const SizedBox(height: AppConstants.spacingLg),
           AppButton(
             onPressed: () {
-              ref.read(gameProvider.notifier).resume();
+              ref.read(gameControllerProvider.notifier).resume();
               context.pop();
             },
             variant: AppButtonVariant.filled,
@@ -77,7 +77,7 @@ class PauseMenu extends ConsumerWidget {
             onPressed: () {
               if (gameState != null) {
                 ref
-                    .read(gameProvider.notifier)
+                    .read(gameControllerProvider.notifier)
                     .newGame(
                       Difficulty.values.firstWhere(
                         (d) => d.name == gameState!.difficulty.name,

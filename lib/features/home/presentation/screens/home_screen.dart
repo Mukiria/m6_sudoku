@@ -5,9 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/routing/app_router.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
-import 'package:m6_sudoku/features/sudoku/engine/models/game_status.dart';
-import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart'
-    hide GameStatus;
+import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
 import 'package:m6_sudoku/shared/widgets/buttons.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -56,7 +55,7 @@ class HomeScreen extends ConsumerWidget {
               // Continue Game or New Game
               Consumer(
                 builder: (context, ref, child) {
-                  final gameState = ref.watch(gameProvider);
+                  final gameState = ref.watch(gameControllerProvider);
                   final hasSavedGame =
                       gameState != null &&
                       gameState.status != GameStatus.completed &&

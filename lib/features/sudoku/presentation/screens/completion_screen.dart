@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../core/constants/app_constants.dart';
-import '../../core/theme/app_theme_extension.dart';
-import '../../shared/widgets/buttons.dart';
-import '../../features/sudoku/presentation/providers/game_provider.dart';
-import '../../features/statistics/presentation/providers/statistics_provider.dart';
+import 'package:m6_sudoku/core/constants/app_constants.dart';
+import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
+import 'package:m6_sudoku/shared/widgets/buttons.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
+import 'package:m6_sudoku/features/statistics/presentation/providers/statistics_provider.dart';
+import 'package:m6_sudoku/core/routing/app_router.dart';
+import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 
 class CompletionScreen extends ConsumerWidget {
   const CompletionScreen({
@@ -121,7 +123,7 @@ class CompletionScreen extends ConsumerWidget {
                 const SizedBox(height: AppConstants.spacingSm),
 
                 Text(
-                      '${difficulty.capitalize()} difficulty solved',
+                      '${_capitalize(difficulty)} difficulty solved',
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -141,7 +143,7 @@ class CompletionScreen extends ConsumerWidget {
                       icon: Icons.timer_rounded,
                       label: 'Time',
                       value: _formatTime(time),
-                      color: extension.timerTextColor,
+                      color: extension.timerText,
                       delay: 500,
                     ),
                     _buildCompletionStat(
@@ -171,7 +173,7 @@ class CompletionScreen extends ConsumerWidget {
                     AppButton(
                           onPressed: () {
                             ref
-                                .read(gameProvider.notifier)
+                                .read(gameControllerProvider.notifier)
                                 .newGame(
                                   Difficulty.values.firstWhere(
                                     (d) => d.name == difficulty,
@@ -268,5 +270,10 @@ class CompletionScreen extends ConsumerWidget {
       return '${minutes}m ${secs}s';
     }
     return '${secs}s';
+  }
+
+  String _capitalize(String str) {
+    if (str.isEmpty) return str;
+    return '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}';
   }
 }

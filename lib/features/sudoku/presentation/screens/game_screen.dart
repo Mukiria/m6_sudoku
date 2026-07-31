@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/constants/app_constants.dart';
-import '../../core/theme/app_theme_extension.dart';
-import '../../shared/widgets/buttons.dart';
-import '../../features/sudoku/presentation/providers/game_provider.dart';
-import '../../features/sudoku/domain/entities/puzzle.dart';
-import '../../features/sudoku/presentation/widgets/number_pad.dart';
-import '../../features/sudoku/presentation/widgets/game_header.dart';
-import '../../features/sudoku/presentation/widgets/pause_menu.dart';
-import '../../features/sudoku/presentation/widgets/sudoku_board.dart';
+import 'package:m6_sudoku/core/constants/app_constants.dart';
+import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
+import 'package:m6_sudoku/shared/widgets/buttons.dart';
+import 'package:m6_sudoku/shared/widgets/sudoku_widgets.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/widgets/number_pad.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/widgets/game_header.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/widgets/pause_menu.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/widgets/sudoku_board.dart';
+import 'package:m6_sudoku/core/routing/app_router.dart';
+import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key, required this.difficulty});
@@ -25,6 +29,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   bool _showPauseMenu = false;
+  bool _hasNavigated = false;
 
   @override
   void initState() {
@@ -37,7 +42,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
         (d) => d.name == widget.difficulty,
         orElse: () => Difficulty.easy,
       );
-      ref.read(gameProvider.notifier).newGame(difficulty);
+      ref.read(gameControllerProvider.notifier).newGame(difficulty);
       ref.read(timerControllerProvider.notifier).start();
     });
   }
@@ -70,9 +75,69 @@ class _GameScreenState extends ConsumerState<GameScreen>
     });
   }
 
+  void _checkGameStatus(GameState gameState) {
+    if (_hasNavigated) return;
+
+    if (gameState.status == GameStatus.completed) {
+      _hasNavigated = true;
+      ref.read(timerControllerProvider.notifier).pause();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.go(
+            AppRoutes.completion,
+            extra: {
+              'time': gameState.timeElapsed,
+              'mistakes': gameState.mistakes,
+              'hintsUsed': gameState.hintsUsed,
+              'difficulty': gameState.difficulty.name,
+            },
+          );
+        }
+      });
+    } else if (gameState.status == GameStatus.failed) {
+      _hasNavigated = true;
+      ref.read(timerControllerProvider.notifier).pause();
+      _showGameOverDialog();
+    }
+  }
+
+  void _showGameOverDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Game Over'),
+        content: const Text('You made 3 mistakes. Better luck next time!'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              context.pop();
+              context.go(AppRoutes.home);
+            },
+            child: const Text('Main Menu'),
+          ),
+          TextButton(
+            onPressed: () {
+              context.pop();
+              final difficulty = Difficulty.values.firstWhere(
+                (d) => d.name == widget.difficulty,
+                orElse: () => Difficulty.easy,
+              );
+              ref.read(gameControllerProvider.notifier).newGame(difficulty);
+              ref.read(timerControllerProvider.notifier).reset();
+              ref.read(timerControllerProvider.notifier).start();
+              _hasNavigated = false;
+            },
+            child: const Text('Try Again'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final gameState = ref.watch(gameProvider);
+    final gameState = ref.watch(gameControllerProvider);
     final timer = ref.watch(timerControllerProvider);
     final theme = Theme.of(context);
     final extension = theme.extension<AppThemeExtension>()!;
@@ -81,6 +146,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
     if (gameState == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+
+    // Check game status after build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkGameStatus(gameState);
+    });
 
     return PopScope(
       canPop: false,
@@ -99,8 +169,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 mistakes: gameState.mistakes,
                 hintsUsed: gameState.hintsUsed,
                 onPause: _showPauseOverlay,
-                onHint: () => ref.read(gameProvider.notifier).useHint(),
-                onUndo: () => ref.read(gameProvider.notifier).undo(),
+                onHint: () => ref.read(gameControllerProvider.notifier).useHint(),
+                onUndo: () => ref.read(gameControllerProvider.notifier).undo(),
               ),
               Expanded(
                 child: LayoutBuilder(
@@ -108,8 +178,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
                     final gridSize = constraints.maxWidth - 32;
                     return Center(
                       child: Container(
-                        width: gridSize.clamp(0, AppConstants.gridSize),
-                        height: gridSize.clamp(0, AppConstants.gridSize),
+                        width: gridSize.clamp(0, AppConstants.gridSizePx),
+                        height: gridSize.clamp(0, AppConstants.gridSizePx),
                         padding: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
                           color: extension.gridBackgroundColor,
@@ -131,7 +201,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                           isNoteMode: gameState.isNoteMode,
                           onCellTap:
                               (row, col) => ref
-                                  .read(gameProvider.notifier)
+                                  .read(gameControllerProvider.notifier)
                                   .selectCell(row, col),
                           onCellLongPress:
                               (row, col) =>
@@ -147,9 +217,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 selectedNumber: gameState.selectedNumber,
                 onNumberSelected:
                     (number) =>
-                        ref.read(gameProvider.notifier).selectNumber(number),
+                        ref.read(gameControllerProvider.notifier).selectNumber(number),
                 onNoteModeToggle:
-                    () => ref.read(gameProvider.notifier).toggleNoteMode(),
+                    () => ref.read(gameControllerProvider.notifier).toggleNoteMode(),
                 isNoteMode: gameState.isNoteMode,
                 counts: _getNumberCounts(gameState),
                 disabledNumbers: _getDisabledNumbers(gameState),
@@ -161,7 +231,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   ActionButton(
                     icon: const Icon(Icons.undo_rounded),
                     label: 'Undo',
-                    onPressed: () => ref.read(gameProvider.notifier).undo(),
+                    onPressed: () => ref.read(gameControllerProvider.notifier).undo(),
                     variant: ActionButtonVariant.secondary,
                     isEnabled: gameState.moveHistory.isNotEmpty,
                   ),
@@ -169,7 +239,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   ActionButton(
                     icon: const Icon(Icons.lightbulb_rounded),
                     label: 'Hint',
-                    onPressed: () => ref.read(gameProvider.notifier).useHint(),
+                    onPressed: () => ref.read(gameControllerProvider.notifier).useHint(),
                     variant: ActionButtonVariant.primary,
                     isEnabled: gameState.hintsUsed < 3,
                   ),
@@ -180,7 +250,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                     onPressed: () {
                       if (gameState.selectedCell != null) {
                         ref
-                            .read(gameProvider.notifier)
+                            .read(gameControllerProvider.notifier)
                             .clearCell(
                               gameState.selectedCell!.row,
                               gameState.selectedCell!.col,
@@ -201,8 +271,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
   }
 
   void _showCellOptions(int row, int col, GameState gameState) {
-    final cell = gameState.cells[row][col];
-    if (cell.isFixed) return;
+    final isFixed = gameState.puzzle.grid[row][col] != 0;
+    if (isFixed) return;
 
     showModalBottomSheet(
       context: context,
@@ -222,7 +292,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   children: [
                     AppButton(
                       onPressed: () {
-                        ref.read(gameProvider.notifier).clearCell(row, col);
+                        ref.read(gameControllerProvider.notifier).clearCell(row, col);
                         Navigator.pop(context);
                       },
                       variant: AppButtonVariant.outlined,
@@ -235,7 +305,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
                       },
                       variant: AppButtonVariant.filled,
                       child: Text(
-                        cell.notes.isNotEmpty ? 'Clear Notes' : 'Add Notes',
+                        gameState.notes[row][col].isNotEmpty
+                            ? 'Clear Notes'
+                            : 'Add Notes',
                       ),
                     ),
                   ],
@@ -244,5 +316,34 @@ class _GameScreenState extends ConsumerState<GameScreen>
             ),
           ),
     );
+  }
+
+  Map<int, int> _getNumberCounts(GameState state) {
+    final counts = <int, int>{};
+    for (int r = 0; r < 9; r++) {
+      for (int c = 0; c < 9; c++) {
+        final val = state.userGrid[r][c];
+        if (val != 0) {
+          counts[val] = (counts[val] ?? 0) + 1;
+        }
+      }
+    }
+    // Return remaining counts (9 - used)
+    final remaining = <int, int>{};
+    for (int i = 1; i <= 9; i++) {
+      remaining[i] = 9 - (counts[i] ?? 0);
+    }
+    return remaining;
+  }
+
+  Set<int> _getDisabledNumbers(GameState state) {
+    final disabled = <int>{};
+    final counts = _getNumberCounts(state);
+    for (int i = 1; i <= 9; i++) {
+      if ((counts[i] ?? 9) <= 0) {
+        disabled.add(i);
+      }
+    }
+    return disabled;
   }
 }

@@ -1,6 +1,6 @@
 # Dart/Flutter
 .dart_tool/
-build/
+/build/
 *.dart_tool/
 *.packages
 pubspec.lock

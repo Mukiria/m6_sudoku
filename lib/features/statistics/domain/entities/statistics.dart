@@ -59,6 +59,18 @@ class Statistics extends Equatable {
 
   double get winRate => gamesPlayed > 0 ? gamesWon / gamesPlayed : 0.0;
 
+  int get averageTimeSeconds => gamesWon > 0 ? totalTimeSeconds ~/ gamesWon : 0;
+
+  String get formattedAverageTime {
+    final seconds = averageTimeSeconds;
+    final minutes = seconds ~/ 60;
+    final secs = seconds % 60;
+    if (minutes > 0) {
+      return '${minutes}m ${secs}s';
+    }
+    return '${secs}s';
+  }
+
   String get formattedTotalTime {
     final hours = totalTimeSeconds ~/ 3600;
     final minutes = (totalTimeSeconds % 3600) ~/ 60;

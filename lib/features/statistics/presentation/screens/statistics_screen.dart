@@ -99,6 +99,32 @@ class StatisticsScreen extends ConsumerWidget {
                           ],
                         ),
                         const SizedBox(height: AppConstants.spacingMd),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildStatCard(
+                                theme,
+                                extension,
+                                'Avg Time',
+                                stats.formattedAverageTime,
+                                Icons.timer_outlined,
+                                extension.difficultyExpertColor,
+                              ),
+                            ),
+                            const SizedBox(width: AppConstants.spacingMd),
+                            Expanded(
+                              child: _buildStatCard(
+                                theme,
+                                extension,
+                                'Current Streak',
+                                '${stats.currentStreak}',
+                                Icons.local_fire_department_outlined,
+                                extension.difficultyHardColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppConstants.spacingMd),
                         _buildStatCard(
                           theme,
                           extension,
@@ -444,6 +470,8 @@ class StatisticsScreen extends ConsumerWidget {
         return extension.difficultyHardColor;
       case Difficulty.expert:
         return extension.difficultyExpertColor;
+      case Difficulty.evil:
+        return extension.difficultyHardColor;
     }
   }
 

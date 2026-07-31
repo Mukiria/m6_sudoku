@@ -131,6 +131,17 @@ class SettingsScreen extends ConsumerWidget {
                       .read(settingsProvider.notifier)
                       .toggleShowHints(value),
             ),
+            _buildSwitchTile(
+              context,
+              icon: Icons.animation_rounded,
+              title: 'Animations',
+              subtitle: 'Enable UI animations and transitions',
+              value: settings.animationsEnabled,
+              onChanged:
+                  (value) => ref
+                      .read(settingsProvider.notifier)
+                      .toggleAnimations(value),
+            ),
           ]),
           _buildSection(context, 'Data', [
             _buildSettingTile(

@@ -23,6 +23,7 @@ class Settings extends Equatable {
     this.hapticFeedbackEnabled = true,
     this.soundEffectsEnabled = true,
     this.autoSaveEnabled = true,
+    this.animationsEnabled = true,
   });
 
   final ThemeMode themeMode;
@@ -45,6 +46,7 @@ class Settings extends Equatable {
   final bool hapticFeedbackEnabled;
   final bool soundEffectsEnabled;
   final bool autoSaveEnabled;
+  final bool animationsEnabled;
 
   Settings copyWith({
     ThemeMode? themeMode,
@@ -67,6 +69,7 @@ class Settings extends Equatable {
     bool? hapticFeedbackEnabled,
     bool? soundEffectsEnabled,
     bool? autoSaveEnabled,
+    bool? animationsEnabled,
   }) {
     return Settings(
       themeMode: themeMode ?? this.themeMode,
@@ -90,6 +93,7 @@ class Settings extends Equatable {
           hapticFeedbackEnabled ?? this.hapticFeedbackEnabled,
       soundEffectsEnabled: soundEffectsEnabled ?? this.soundEffectsEnabled,
       autoSaveEnabled: autoSaveEnabled ?? this.autoSaveEnabled,
+      animationsEnabled: animationsEnabled ?? this.animationsEnabled,
     );
   }
 
@@ -115,6 +119,7 @@ class Settings extends Equatable {
       'hapticFeedbackEnabled': hapticFeedbackEnabled,
       'soundEffectsEnabled': soundEffectsEnabled,
       'autoSaveEnabled': autoSaveEnabled,
+      'animationsEnabled': animationsEnabled,
     };
   }
 
@@ -143,6 +148,7 @@ class Settings extends Equatable {
       hapticFeedbackEnabled: json['hapticFeedbackEnabled'] ?? true,
       soundEffectsEnabled: json['soundEffectsEnabled'] ?? true,
       autoSaveEnabled: json['autoSaveEnabled'] ?? true,
+      animationsEnabled: json['animationsEnabled'] ?? true,
     );
   }
 

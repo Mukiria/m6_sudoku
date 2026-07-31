@@ -90,6 +90,11 @@ class SettingsController extends StateNotifier<Settings> {
     await _saveSettings(newSettings);
   }
 
+  Future<void> toggleAnimations(bool enabled) async {
+    final newSettings = state.copyWith(soundEffectsEnabled: enabled);
+    await _saveSettings(newSettings);
+  }
+
   Future<void> toggleAutoClearNotes(bool enabled) async {
     final newSettings = state.copyWith(autoClearNotes: enabled);
     await _saveSettings(newSettings);

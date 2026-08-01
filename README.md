@@ -11,16 +11,27 @@ A production-ready Flutter Sudoku application built with Clean Architecture, Fea
 - **Material 3**: Latest Material Design with dynamic theming
 - **Light & Dark Themes**: Full theme support with system preference
 - **Shared Preferences**: Local data persistence
-- **Responsive Layout**: Works on phones and tablets
+- **Responsive Layout**: Works on phones, tablets, and web
 - **Animations**: Smooth animations with flutter_animate
 - **Null Safety**: Full null safety compliance
 - **No Deprecated APIs**: Uses latest Flutter 3.24+ APIs
+- **Daily Challenges**: New puzzle every day
+- **Achievements**: Unlock achievements as you play
+- **Statistics**: Track your progress and performance
+- **Hints System**: Multiple hint types with explanations
+- **Undo/Redo**: Full move history support
+- **Auto-save**: Never lose your progress
 
 ## Screenshots
 
 | Light Theme | Dark Theme |
 |-------------|------------|
 | ![Light](docs/screenshots/light.png) | ![Dark](docs/screenshots/dark.png) |
+
+## Download
+
+- **Android**: [Google Play Store](https://play.google.com/store/apps/details?id=com.m6.sudoku)
+- **Web**: [Play Online](https://m6-sudoku.web.app)
 
 ## Architecture
 
@@ -60,7 +71,7 @@ lib/
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/m6_sudoku.git
+git clone https://github.com/Mukiria/m6_sudoku.git
 
 # Navigate to project
 cd m6_sudoku
@@ -93,8 +104,17 @@ flutter build apk --release
 # Build release iOS
 flutter build ios --release
 
+# Build release web
+flutter build web --release
+
 # Generate code (after changes)
 dart run build_runner build --delete-conflicting-outputs
+
+# Generate app icons
+dart run flutter_launcher_icons
+
+# Generate splash screen
+dart run flutter_native_splash:create
 ```
 
 ## Project Structure
@@ -141,6 +161,8 @@ Reusable widgets, components, and utilities.
 - `freezed` - Freezed code generation
 - `json_serializable` - JSON serialization generation
 - `mockito` - Mocking for tests
+- `flutter_launcher_icons` - App icon generation
+- `flutter_native_splash` - Splash screen generation
 
 ## Testing
 
@@ -165,4 +187,12 @@ genhtml coverage/lcov.info -o coverage/html
 
 ## License
 
-MIT License - see LICENSE file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Changelog
+
+See [CHANGELOG](CHANGELOG.md) for version history.
+
+## Release Notes
+
+See [RELEASE_NOTES](RELEASE_NOTES.md) for the latest release details.

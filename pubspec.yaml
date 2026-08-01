@@ -43,7 +43,8 @@ dev_dependencies:
   mockito: ^5.4.4
   riverpod_generator: ^2.4.0
   riverpod_lint: ^2.3.0
-
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.0
 
 flutter:
   uses-material-design: true
@@ -54,3 +55,22 @@ flutter:
 
 flutter_intl:
   enabled: true
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  image_path: "assets/images/m6-logo.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/images/m6-logo.png"
+    background_color: "#1E1E1E"
+    theme_color: "#1E1E1E"
+  remove_alpha_ios: true
+
+flutter_native_splash:
+  color: "#1E1E1E"
+  image: assets/images/m6-logo.png
+  android: true
+  web: true
+  fullscreen: true
+  android_gravity: center

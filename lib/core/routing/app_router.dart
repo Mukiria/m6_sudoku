@@ -17,7 +17,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: AppRoutes.home,
     debugLogDiagnostics: true,
-    transitionBuilder: (context, state, child) {
+    transitionsBuilder: (context, state, child) {
       final routeName = state.matchedLocation;
 
       if (routeName == AppRoutes.game || routeName == AppRoutes.completion) {

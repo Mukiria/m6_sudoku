@@ -2,11 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:m6_sudoku/features/sudoku/engine/generator/puzzle_generator.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
-import 'package:m6_sudoku/features/sudoku/domain/usecases/game_usecases.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/sudoku_providers.dart';
 
@@ -22,6 +19,9 @@ class GameController extends _$GameController {
   // Cache for conflict cells computation
   final Map<String, Set<CellPosition>> _conflictCache = {};
 
+  // Bitmask constants for notes (bits 0-8 represent digits 1-9)
+  static const int _allCandidates = 0x1FF; // bits 0-8 set (1-9)
+
   Future<void> newGame(Difficulty difficulty) async {
     final generatePuzzle = ref.read(generatePuzzleUseCaseProvider);
     final result = await generatePuzzle(difficulty.name);
@@ -29,7 +29,7 @@ class GameController extends _$GameController {
     state = result.fold(
       (failure) => throw Exception(failure.message),
       (puzzle) {
-        final initialNotes = _recomputeNotes(
+        final initialNotes = _recomputeNotesBitmask(
           puzzle.grid.map((row) => List<int>.from(row)).toList(),
           puzzle,
         );
@@ -71,15 +71,12 @@ class GameController extends _$GameController {
   }
 
   Future<void> continueGame(GameState savedState) async {
-    // Load the saved game state directly
     state = savedState;
     _startAutoSave();
   }
 
   void selectCell(int row, int col) {
     if (state == null) return;
-
-    final puzzle = state!.puzzle;
 
     state = state!.copyWith(
       selectedCell: CellPosition(row: row, col: col),
@@ -121,8 +118,8 @@ class GameController extends _$GameController {
     final newMistakes =
         isCorrect ? currentState.mistakes : currentState.mistakes + 1;
 
-    // Auto-remove candidates from affected cells
-    final newNotesGrid = _autoRemoveCandidates(currentState.notes, row, col, value);
+    // Auto-remove candidates from affected cells using bitmasks
+    final newNotesGrid = _autoRemoveCandidatesBitmask(currentState.notes, row, col, value);
 
     final newMove = Move(
       row: row,
@@ -317,8 +314,8 @@ class GameController extends _$GameController {
         break;
     }
 
-    // Recompute notes from scratch based on new grid
-    final newNotesGrid = _recomputeNotes(newGrid, currentState.puzzle);
+    // Recompute notes from scratch based on new grid using bitmasks
+    final newNotesGrid = _recomputeNotesBitmask(newGrid, currentState.puzzle);
 
     state = currentState.copyWith(
       userGrid: newGrid,
@@ -369,8 +366,8 @@ class GameController extends _$GameController {
         break;
     }
 
-    // Recompute notes from scratch based on new grid
-    final newNotesGrid = _recomputeNotes(newGrid, currentState.puzzle);
+    // Recompute notes from scratch based on new grid using bitmasks
+    final newNotesGrid = _recomputeNotesBitmask(newGrid, currentState.puzzle);
 
     state = currentState.copyWith(
       userGrid: newGrid,
@@ -568,7 +565,55 @@ class GameController extends _$GameController {
     return mistakes;
   }
 
-  List<List<Set<int>>> _autoRemoveCandidates(
+  // Bitmask-based notes computation - much faster than Set-based
+  List<List<Set<int>>> _recomputeNotesBitmask(List<List<int>> grid, Puzzle puzzle) {
+    final newNotesBitmask = List.generate(9, (_) => List.generate(9, (_) => 0));
+
+    // Precompute row, col, box masks for the current grid + puzzle givens
+    final rowMasks = List.filled(9, 0);
+    final colMasks = List.filled(9, 0);
+    final boxMasks = List.filled(9, 0);
+
+    // Fill masks with fixed values (user entries + puzzle givens)
+    for (int r = 0; r < 9; r++) {
+      for (int c = 0; c < 9; c++) {
+        final val = grid[r][c] != 0 ? grid[r][c] : puzzle.grid[r][c];
+        if (val != 0) {
+          final bit = 1 << (val - 1);
+          rowMasks[r] |= bit;
+          colMasks[c] |= bit;
+          boxMasks[(r ~/ 3) * 3 + (c ~/ 3)] |= bit;
+        }
+      }
+    }
+
+    // Compute candidates for each empty cell
+    for (int r = 0; r < 9; r++) {
+      for (int c = 0; c < 9; c++) {
+        if (grid[r][c] == 0 && puzzle.grid[r][c] == 0) {
+          final boxIndex = (r ~/ 3) * 3 + (c ~/ 3);
+          final usedMask = rowMasks[r] | colMasks[c] | boxMasks[boxIndex];
+          newNotesBitmask[r][c] = _allCandidates & ~usedMask;
+        }
+      }
+    }
+
+    // Convert bitmasks to Sets for the GameState
+    return List.generate(9, (r) => List.generate(9, (c) {
+      final mask = newNotesBitmask[r][c];
+      if (mask == 0) return <int>{};
+      final set = <int>{};
+      var m = mask;
+      while (m != 0) {
+        final bit = m & -m;
+        set.add(_bitToDigit(bit));
+        m &= m - 1;
+      }
+      return set;
+    }));
+  }
+
+  List<List<Set<int>>> _autoRemoveCandidatesBitmask(
     List<List<Set<int>>> notes,
     int row,
     int col,
@@ -601,43 +646,19 @@ class GameController extends _$GameController {
     return newNotes;
   }
 
-  List<List<Set<int>>> _recomputeNotes(
-    List<List<int>> grid,
-    Puzzle puzzle,
-  ) {
-    final newNotes = List.generate(9, (_) => List.generate(9, (_) => <int>{}));
-
-    for (int r = 0; r < 9; r++) {
-      for (int c = 0; c < 9; c++) {
-        if (grid[r][c] == 0 && puzzle.grid[r][c] == 0) {
-          final candidates = <int>{};
-          for (int d = 1; d <= 9; d++) {
-            candidates.add(d);
-          }
-          // Remove from row
-          for (int cc = 0; cc < 9; cc++) {
-            final val = grid[r][cc] != 0 ? grid[r][cc] : puzzle.grid[r][cc];
-            if (val != 0) candidates.remove(val);
-          }
-          // Remove from column
-          for (int rr = 0; rr < 9; rr++) {
-            final val = grid[rr][c] != 0 ? grid[rr][c] : puzzle.grid[rr][c];
-            if (val != 0) candidates.remove(val);
-          }
-          // Remove from box
-          final boxRow = (r ~/ 3) * 3;
-          final boxCol = (c ~/ 3) * 3;
-          for (int rr = boxRow; rr < boxRow + 3; rr++) {
-            for (int cc = boxCol; cc < boxCol + 3; cc++) {
-              final val = grid[rr][cc] != 0 ? grid[rr][cc] : puzzle.grid[rr][cc];
-              if (val != 0) candidates.remove(val);
-            }
-          }
-          newNotes[r][c] = candidates;
-        }
-      }
+  static int _bitToDigit(int bit) {
+    switch (bit) {
+      case 0x001: return 1;
+      case 0x002: return 2;
+      case 0x004: return 3;
+      case 0x008: return 4;
+      case 0x010: return 5;
+      case 0x020: return 6;
+      case 0x040: return 7;
+      case 0x080: return 8;
+      case 0x100: return 9;
+      default: return 0;
     }
-    return newNotes;
   }
 
   List<List<int>> _copyGrid(List<List<int>> grid) {

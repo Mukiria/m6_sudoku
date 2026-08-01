@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
@@ -103,22 +102,35 @@ class _BoardGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final selectedRow = selectedCell?.row;
+    final selectedCol = selectedCell?.col;
+
     return Column(
       children: List.generate(9, (row) {
+        final isSelectedRow = row == selectedRow;
         return Expanded(
           child: Row(
             children: List.generate(9, (col) {
+              final isSelected = isSelectedRow && col == selectedCol;
+              final position = CellPosition(row: row, col: col);
+              final isHighlighted = highlightedCells.contains(position);
+              final isConflicted = conflictCells.contains(position);
+              final isFixed = puzzle.grid[row][col] != 0;
+              final userValue = userGrid[row][col];
+              final value = userValue != 0 ? userValue : (isFixed ? puzzle.grid[row][col] : null);
+              final cellNotes = notes[row][col];
+
               return _SudokuCell(
                 key: ValueKey('cell_${row}_${col}'),
                 row: row,
                 col: col,
                 cellSize: cellSize,
-                puzzle: puzzle,
-                userGrid: userGrid,
-                notes: notes,
-                selectedCell: selectedCell,
-                highlightedCells: highlightedCells,
-                conflictCells: conflictCells,
+                value: value,
+                cellNotes: cellNotes,
+                isFixed: isFixed,
+                isSelected: isSelected,
+                isHighlighted: isHighlighted,
+                isConflicted: isConflicted,
                 isNoteMode: isNoteMode,
                 onCellTap: onCellTap,
                 onCellLongPress: onCellLongPress,
@@ -139,12 +151,12 @@ class _SudokuCell extends StatelessWidget {
     required this.row,
     required this.col,
     required this.cellSize,
-    required this.puzzle,
-    required this.userGrid,
-    required this.notes,
-    required this.selectedCell,
-    required this.highlightedCells,
-    required this.conflictCells,
+    required this.value,
+    required this.cellNotes,
+    required this.isFixed,
+    required this.isSelected,
+    required this.isHighlighted,
+    required this.isConflicted,
     required this.isNoteMode,
     required this.onCellTap,
     required this.onCellLongPress,
@@ -155,12 +167,12 @@ class _SudokuCell extends StatelessWidget {
   final int row;
   final int col;
   final double cellSize;
-  final Puzzle puzzle;
-  final List<List<int>> userGrid;
-  final List<List<Set<int>>> notes;
-  final CellPosition? selectedCell;
-  final Set<CellPosition> highlightedCells;
-  final Set<CellPosition> conflictCells;
+  final int? value;
+  final Set<int> cellNotes;
+  final bool isFixed;
+  final bool isSelected;
+  final bool isHighlighted;
+  final bool isConflicted;
   final bool isNoteMode;
   final void Function(int row, int col) onCellTap;
   final void Function(int row, int col) onCellLongPress;
@@ -169,15 +181,6 @@ class _SudokuCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final position = CellPosition(row: row, col: col);
-    final isSelected = selectedCell?.row == row && selectedCell?.col == col;
-    final isHighlighted = highlightedCells.contains(position);
-    final isConflicted = conflictCells.contains(position);
-    final isFixed = puzzle.grid[row][col] != 0;
-    final userValue = userGrid[row][col];
-    final value = userValue != 0 ? userValue : (isFixed ? puzzle.grid[row][col] : null);
-    final cellNotes = notes[row][col];
-
     final (backgroundColor, borderColor, borderWidth) = _getCellDecoration(
       isConflicted: isConflicted,
       isSelected: isSelected,

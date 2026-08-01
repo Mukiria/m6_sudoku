@@ -3,6 +3,14 @@ import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 
+final testHint = HintState(
+  type: HintType.directReveal,
+  cell: CellPosition(row: 0, col: 0),
+  value: 1,
+  explanation: 'test hint',
+  shownAt: DateTime(2024, 1, 1),
+);
+
 void main() {
   group('GameState', () {
     late Puzzle testPuzzle;
@@ -43,7 +51,7 @@ void main() {
         isNoteMode: false,
         highlightedCells: {},
         conflictCells: {},
-        hintState: null,
+        hintState: testHint,
         lastSaved: DateTime(2024, 1, 1),
       );
 
@@ -94,7 +102,7 @@ void main() {
         isNoteMode: true,
         highlightedCells: {CellPosition(row: 0, col: 1)},
         conflictCells: {CellPosition(row: 1, col: 1)},
-        hintState: null,
+        hintState: testHint,
         lastSaved: DateTime.now(),
       );
 
@@ -141,7 +149,7 @@ void main() {
         isNoteMode: false,
         highlightedCells: {CellPosition(row: 0, col: 0)},
         conflictCells: {CellPosition(row: 1, col: 1)},
-        hintState: null,
+        hintState: testHint,
         lastSaved: DateTime(2024, 6, 15),
       );
 
@@ -190,7 +198,7 @@ void main() {
         isNoteMode: false,
         highlightedCells: {},
         conflictCells: {},
-        hintState: null,
+        hintState: testHint,
         lastSaved: DateTime.now(),
       );
 
@@ -220,7 +228,7 @@ void main() {
         isNoteMode: false,
         highlightedCells: {},
         conflictCells: {},
-        hintState: null,
+        hintState: testHint,
         lastSaved: DateTime.now(),
       );
 

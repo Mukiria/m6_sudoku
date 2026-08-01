@@ -13,7 +13,8 @@ import 'package:m6_sudoku/main.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    // The main app class is M6SudokuApp (not MyApp)
+    await tester.pumpWidget(const M6SudokuApp());
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

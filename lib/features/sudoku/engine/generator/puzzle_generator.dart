@@ -1,7 +1,6 @@
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 import '../models/board.dart';
 import '../solver/sudoku_solver.dart';
-import 'dart:math';
 
 class PuzzleGenerator {
   PuzzleGenerator({this.seed});

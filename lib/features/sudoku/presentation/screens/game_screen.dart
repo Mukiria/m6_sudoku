@@ -9,7 +9,7 @@ import 'package:m6_sudoku/shared/widgets/sudoku_widgets.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
-import 'package:m6_sudoku/features/sudoku/presentation/widgets/number_pad.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/widgets/number_pad.dart'
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/game_header.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/pause_menu.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/sudoku_board.dart';
@@ -41,7 +41,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final gameState = ref.read(gameControllerProvider);
-      
+
       // If there's no saved game state, create a new game
       if (gameState == null || gameState.status != GameStatus.playing) {
         final difficulty = Difficulty.values.firstWhere(
@@ -142,25 +142,6 @@ class _GameScreenState extends ConsumerState<GameScreen>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final gameState = ref.watch(gameControllerProvider);
-    final timer = ref.watch(timerControllerProvider);
-    final theme = Theme.of(context);
-    final extension = theme.extension<AppThemeExtension>()!;
-    final colorScheme = theme.colorScheme;
-
-    if (gameState == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
-    // Check game status after build
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkGameStatus(gameState);
-      _checkHintState(gameState);
-    });
-  }
-
   void _checkHintState(GameState gameState) {
     if (gameState.hintState != null && !_showHintOverlay) {
       _showHintOverlay = true;
@@ -188,9 +169,24 @@ class _GameScreenState extends ConsumerState<GameScreen>
 
   @override
   Widget build(BuildContext context) {
+    final gameState = ref.watch(gameControllerProvider);
+    final theme = Theme.of(context);
+    final extension = theme.extension<AppThemeExtension>()!;
+    final colorScheme = theme.colorScheme;
+
+    if (gameState == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    // Check game status after build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkGameStatus(gameState);
+      _checkHintState(gameState);
+    });
+
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         if (!didPop) {
           _showPauseOverlay();
         }
@@ -314,43 +310,43 @@ class _GameScreenState extends ConsumerState<GameScreen>
       context: context,
       builder:
           (context) => Container(
-            padding: const EdgeInsets.all(AppConstants.spacingLg),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+        padding: const EdgeInsets.all(AppConstants.spacingLg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Cell Options',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: AppConstants.spacingLg),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text(
-                  'Cell Options',
-                  style: Theme.of(context).textTheme.titleLarge,
+                AppButton(
+                  onPressed: () {
+                    ref.read(gameControllerProvider.notifier).clearCell(row, col);
+                    Navigator.pop(context);
+                  },
+                  variant: AppButtonVariant.outlined,
+                  child: const Text('Clear'),
                 ),
-                const SizedBox(height: AppConstants.spacingLg),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    AppButton(
-                      onPressed: () {
-                        ref.read(gameControllerProvider.notifier).clearCell(row, col);
-                        Navigator.pop(context);
-                      },
-                      variant: AppButtonVariant.outlined,
-                      child: const Text('Clear'),
-                    ),
-                    AppButton(
-                      onPressed: () {
-                        // Toggle note mode for this cell
-                        Navigator.pop(context);
-                      },
-                      variant: AppButtonVariant.filled,
-                      child: Text(
-                        gameState.notes[row][col].isNotEmpty
-                            ? 'Clear Notes'
-                            : 'Add Notes',
-                      ),
-                    ),
-                  ],
+                AppButton(
+                  onPressed: () {
+                    // Toggle note mode for this cell
+                    Navigator.pop(context);
+                  },
+                  variant: AppButtonVariant.filled,
+                  child: Text(
+                    gameState.notes[row][col].isNotEmpty
+                        ? 'Clear Notes'
+                        : 'Add Notes',
+                  ),
                 ),
               ],
             ),
-          ),
+          ],
+        ),
+      ),
     );
   }
 

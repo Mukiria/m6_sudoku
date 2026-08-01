@@ -5,6 +5,7 @@ import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 import 'package:m6_sudoku/shared/widgets/cards.dart';
 import 'package:m6_sudoku/shared/widgets/buttons.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
+import 'package:m6_sudoku/features/statistics/domain/entities/statistics.dart';
 import '../providers/statistics_provider.dart';
 
 class StatisticsScreen extends ConsumerWidget {

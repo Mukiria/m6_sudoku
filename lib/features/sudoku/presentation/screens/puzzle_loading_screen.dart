@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
+import 'package:m6_sudoku/shared/widgets/buttons.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
 import 'package:m6_sudoku/core/routing/app_router.dart';
@@ -59,16 +60,16 @@ class _PuzzleLoadingScreenState extends ConsumerState<PuzzleLoadingScreen> {
     Color difficultyColor;
     switch (widget.difficulty) {
       case 'easy':
-        difficultyColor = extension.difficultyEasyColor;
+        difficultyColor = extension.difficultyEasyColor!;
         break;
       case 'medium':
-        difficultyColor = extension.difficultyMediumColor;
+        difficultyColor = extension.difficultyMediumColor!;
         break;
       case 'hard':
-        difficultyColor = extension.difficultyHardColor;
+        difficultyColor = extension.difficultyHardColor!;
         break;
       case 'expert':
-        difficultyColor = extension.difficultyExpertColor;
+        difficultyColor = extension.difficultyExpertColor!;
         break;
       default:
         difficultyColor = colorScheme.primary;
@@ -164,7 +165,7 @@ class _PuzzleLoadingScreenState extends ConsumerState<PuzzleLoadingScreen> {
                   Icon(
                     Icons.error_outline_rounded,
                     size: 60,
-                    color: extension.cellErrorBorder,
+                    color: extension.cellErrorBorder!,
                   )
                   .animate()
                   .fadeIn(duration: 400.ms)
@@ -173,7 +174,7 @@ class _PuzzleLoadingScreenState extends ConsumerState<PuzzleLoadingScreen> {
                   Text(
                     _error!,
                     style: theme.textTheme.bodyLarge?.copyWith(
-                      color: extension.cellErrorBorder,
+                      color: extension.cellErrorBorder!,
                     ),
                     textAlign: TextAlign.center,
                   ),

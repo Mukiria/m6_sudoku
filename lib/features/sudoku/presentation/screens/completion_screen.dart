@@ -43,7 +43,6 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
     _confettiController2 = ConfettiController(
       duration: const Duration(seconds: 3),
     );
-    // Start confetti after a short delay
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
         _confettiController.play();
@@ -60,38 +59,35 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final extension = theme.extension<AppThemeExtension>()!;
 
     Color difficultyColor;
-    switch (difficulty) {
+    switch (widget.difficulty) {
       case 'easy':
-        difficultyColor = extension.difficultyEasyColor;
+        difficultyColor = extension.difficultyEasyColor!;
         break;
       case 'medium':
-        difficultyColor = extension.difficultyMediumColor;
+        difficultyColor = extension.difficultyMediumColor!;
         break;
       case 'hard':
-        difficultyColor = extension.difficultyHardColor;
+        difficultyColor = extension.difficultyHardColor!;
         break;
       case 'expert':
-        difficultyColor = extension.difficultyExpertColor;
+        difficultyColor = extension.difficultyExpertColor!;
         break;
       default:
         difficultyColor = colorScheme.primary;
     }
 
-    // Record the game
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(statisticsProvider.notifier)
-          .recordGame(
-            difficulty: difficulty,
-            timeSeconds: time,
-            mistakes: mistakes,
-            hintsUsed: hintsUsed,
+      ref.read(statisticsProvider.notifier).recordGame(
+            difficulty: widget.difficulty,
+            timeSeconds: widget.time,
+            mistakes: widget.mistakes,
+            hintsUsed: widget.hintsUsed,
             completed: true,
           );
     });
@@ -118,12 +114,11 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
                   children: [
                     const Spacer(),
 
-                    // Confetti from top
                     Align(
                       alignment: Alignment.topCenter,
                       child: ConfettiWidget(
                         confettiController: _confettiController,
-                        blastDirection: 1.57, // radians (down)
+                        blastDirection: 1.57,
                         emissionFrequency: 0.05,
                         numberOfParticles: 20,
                         maxBlastForce: 10,
@@ -138,7 +133,6 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
                       ),
                     ),
 
-                    // Completion Animation
                     Container(
                           width: 120,
                           height: 120,
@@ -180,7 +174,7 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
                     const SizedBox(height: AppConstants.spacingSm),
 
                     Text(
-                          '${_capitalize(difficulty)} difficulty solved',
+                          '${_capitalize(widget.difficulty)} difficulty solved',
                           style: theme.textTheme.bodyLarge?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -191,7 +185,6 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
 
                     const SizedBox(height: AppConstants.spacingXl),
 
-                    // Stats
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -199,24 +192,24 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
                           theme,
                           icon: Icons.timer_rounded,
                           label: 'Time',
-                          value: _formatTime(time),
-                          color: extension.timerText,
+                          value: _formatTime(widget.time),
+                          color: extension.timerText!,
                           delay: 500,
                         ),
                         _buildCompletionStat(
                           theme,
                           icon: Icons.close_rounded,
                           label: 'Mistakes',
-                          value: '$mistakes/3',
-                          color: extension.mistakeIndicatorColor,
+                          value: '${widget.mistakes}/3',
+                          color: extension.mistakeIndicatorColor!,
                           delay: 600,
                         ),
                         _buildCompletionStat(
                           theme,
                           icon: Icons.lightbulb_rounded,
                           label: 'Hints',
-                          value: '$hintsUsed/3',
-                          color: extension.hintIndicatorColor,
+                          value: '${widget.hintsUsed}/3',
+                          color: extension.hintIndicatorColor!,
                           delay: 700,
                         ),
                       ],
@@ -224,12 +217,11 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
 
                     const Spacer(),
 
-                    // Confetti from bottom
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: ConfettiWidget(
                         confettiController: _confettiController2,
-                        blastDirection: -1.57, // radians (up)
+                        blastDirection: -1.57,
                         emissionFrequency: 0.05,
                         numberOfParticles: 20,
                         maxBlastForce: 10,
@@ -244,7 +236,6 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
                       ),
                     ),
 
-                    // Buttons
                     Column(
                       children: [
                         AppButton(
@@ -253,7 +244,7 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
                                     .read(gameControllerProvider.notifier)
                                     .newGame(
                                       Difficulty.values.firstWhere(
-                                        (d) => d.name == difficulty,
+                                        (d) => d.name == widget.difficulty,
                                         orElse: () => Difficulty.easy,
                                       ),
                                     );
@@ -298,12 +289,11 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
               ),
             ),
           ),
-          // Side confetti
           Align(
             alignment: Alignment.centerLeft,
             child: ConfettiWidget(
               confettiController: _confettiController,
-              blastDirection: 0, // right
+              blastDirection: 0,
               emissionFrequency: 0.02,
               numberOfParticles: 10,
               maxBlastForce: 5,
@@ -319,7 +309,7 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
             alignment: Alignment.centerRight,
             child: ConfettiWidget(
               confettiController: _confettiController2,
-              blastDirection: 3.14, // left
+              blastDirection: 3.14,
               emissionFrequency: 0.02,
               numberOfParticles: 10,
               maxBlastForce: 5,

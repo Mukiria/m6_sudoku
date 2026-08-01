@@ -10,11 +10,16 @@ import 'package:m6_sudoku/features/sudoku/presentation/providers/sudoku_provider
 import 'package:m6_sudoku/features/sudoku/domain/entities/daily_challenge.dart';
 import 'package:m6_sudoku/core/routing/app_router.dart';
 
-class DailyChallengeScreen extends ConsumerWidget {
+class DailyChallengeScreen extends ConsumerStatefulWidget {
   const DailyChallengeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DailyChallengeScreen> createState() => _DailyChallengeScreenState();
+}
+
+class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final extension = theme.extension<AppThemeExtension>()!;
     final colorScheme = theme.colorScheme;
@@ -82,20 +87,20 @@ class DailyChallengeScreen extends ConsumerWidget {
           const SizedBox(height: AppConstants.spacingXl),
 
           // Stats row
-          if (stats != null) _buildStatsRow(theme, extension, stats),
+          if (stats != null) _buildStatsRow(theme, extension, colorScheme, stats),
           const SizedBox(height: AppConstants.spacingXl),
 
           // Puzzle preview or completion info
           if (isCompleted) ...[
             _buildCompletionCard(theme, extension, colorScheme, challenge),
           ] else ...[
-            _buildPlayButton(theme, extension, colorScheme, context, challenge, ref),
+            _buildPlayButton(theme, extension, colorScheme, context, challenge),
           ],
 
           const SizedBox(height: AppConstants.spacingXl),
 
           // Rules
-          _buildRules(theme, extension),
+          _buildRules(theme, extension, colorScheme),
         ],
       ),
     );
@@ -111,14 +116,14 @@ class DailyChallengeScreen extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: isCompleted 
-                ? extension.difficultyEasyColor.withValues(alpha: 0.1)
-                : extension.difficultyMediumColor.withValues(alpha: 0.1),
+            color: isCompleted
+                ? extension.difficultyEasyColor!.withValues(alpha: 0.1)
+                : extension.difficultyMediumColor!.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isCompleted 
-                  ? extension.difficultyEasyColor
-                  : extension.difficultyMediumColor,
+              color: isCompleted
+                  ? extension.difficultyEasyColor!
+                  : extension.difficultyMediumColor!,
               width: 1.5,
             ),
           ),
@@ -128,18 +133,18 @@ class DailyChallengeScreen extends ConsumerWidget {
               Icon(
                 isCompleted ? Icons.check_circle_rounded : Icons.calendar_today_rounded,
                 size: 16,
-                color: isCompleted 
-                    ? extension.difficultyEasyColor
-                    : extension.difficultyMediumColor,
+                color: isCompleted
+                    ? extension.difficultyEasyColor!
+                    : extension.difficultyMediumColor!,
               ),
               const SizedBox(width: 8),
               Text(
                 formattedDate,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: isCompleted 
-                      ? extension.difficultyEasyColor
-                      : extension.difficultyMediumColor,
+                  color: isCompleted
+                      ? extension.difficultyEasyColor!
+                      : extension.difficultyMediumColor!,
                 ),
               ),
             ],
@@ -154,7 +159,7 @@ class DailyChallengeScreen extends ConsumerWidget {
         ).animate().fadeIn(delay: 200.ms).slideY(),
         const SizedBox(height: AppConstants.spacingXs),
         Text(
-          isCompleted 
+          isCompleted
               ? 'Come back tomorrow for a new puzzle'
               : 'Medium difficulty • Same puzzle for everyone',
           style: theme.textTheme.bodyLarge?.copyWith(
@@ -165,17 +170,18 @@ class DailyChallengeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatsRow(ThemeData theme, AppThemeExtension extension, DailyChallengeStats stats) {
+  Widget _buildStatsRow(ThemeData theme, AppThemeExtension extension, ColorScheme colorScheme, DailyChallengeStats stats) {
     return Row(
       children: [
         Expanded(
           child: _buildStatItem(
             theme,
             extension,
+            colorScheme,
             'Played',
             stats.totalPlayed.toString(),
             Icons.games_rounded,
-            extension.difficultyMediumColor,
+            extension.difficultyMediumColor!,
           ),
         ),
         const SizedBox(width: AppConstants.spacingMd),
@@ -183,10 +189,11 @@ class DailyChallengeScreen extends ConsumerWidget {
           child: _buildStatItem(
             theme,
             extension,
+            colorScheme,
             'Completed',
             stats.totalCompleted.toString(),
             Icons.check_circle_rounded,
-            extension.difficultyEasyColor,
+            extension.difficultyEasyColor!,
           ),
         ),
         const SizedBox(width: AppConstants.spacingMd),
@@ -194,10 +201,11 @@ class DailyChallengeScreen extends ConsumerWidget {
           child: _buildStatItem(
             theme,
             extension,
+            colorScheme,
             'Streak',
             '${stats.currentStreak}',
             Icons.local_fire_department_rounded,
-            extension.difficultyHardColor,
+            extension.difficultyHardColor!,
           ),
         ),
         const SizedBox(width: AppConstants.spacingMd),
@@ -205,17 +213,26 @@ class DailyChallengeScreen extends ConsumerWidget {
           child: _buildStatItem(
             theme,
             extension,
-            'Best Streak',
-            '${stats.bestStreak}',
-            Icons.emoji_events_rounded,
-            extension.difficultyExpertColor,
+            colorScheme,
+            'Best Time',
+            stats.bestStreak > 0 ? _formatTime(stats.bestStreak) : '--',
+            Icons.timer_rounded,
+            extension.difficultyExpertColor!,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildStatItem(ThemeData theme, AppThemeExtension extension, String label, String value, IconData icon, Color color) {
+  Widget _buildStatItem(
+    ThemeData theme,
+    AppThemeExtension extension,
+    ColorScheme colorScheme,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppConstants.spacingMd),
       decoration: BoxDecoration(
@@ -229,7 +246,7 @@ class DailyChallengeScreen extends ConsumerWidget {
           const SizedBox(height: AppConstants.spacingXs),
           Text(
             value,
-            style: theme.textTheme.headlineSmall?.copyWith(
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
               color: color,
             ),
@@ -247,64 +264,133 @@ class DailyChallengeScreen extends ConsumerWidget {
 
   Widget _buildCompletionCard(ThemeData theme, AppThemeExtension extension, ColorScheme colorScheme, DailyChallenge challenge) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(AppConstants.spacingLg),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            extension.difficultyEasyColor.withValues(alpha: 0.1),
-            extension.difficultyMediumColor.withValues(alpha: 0.05),
+            extension.difficultyEasyColor!.withValues(alpha: 0.2),
+            extension.difficultyEasyColor!.withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(AppConstants.largeBorderRadius),
-        border: Border.all(color: extension.difficultyEasyColor.withValues(alpha: 0.3)),
+        border: Border.all(color: extension.difficultyEasyColor!.withValues(alpha: 0.3)),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: extension.difficultyEasyColor,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.check_rounded, color: Colors.white, size: 40),
-          ).animate().scale(duration: 600.ms, curve: Curves.elasticOut).shimmer(),
-          const SizedBox(height: AppConstants.spacingMd),
-          Text(
-            'Completed!',
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: extension.difficultyEasyColor,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: extension.difficultyEasyColor!,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.check_circle_rounded, color: Colors.white, size: 28),
+              ),
+              const SizedBox(width: AppConstants.spacingMd),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Challenge Completed!',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: extension.difficultyEasyColor!,
+                      ),
+                    ),
+                    Text(
+                      'Puzzle solved on ${_formatDate(challenge.date)}',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: AppConstants.spacingSm),
-          if (challenge.timeElapsed != null)
-            Text(
-              'Time: ${_formatTime(challenge.timeElapsed!)}',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+          const SizedBox(height: AppConstants.spacingLg),
+          Row(
+            children: [
+              Expanded(
+                child: _buildCompletionStat(
+                  theme,
+                  colorScheme: colorScheme,
+                  label: 'Time',
+                  value: _formatTime(challenge.timeElapsed ?? 0),
+                  icon: Icons.timer_rounded,
+                  color: extension.timerText!,
+                ),
               ),
-            ),
-          if (challenge.mistakes != null && challenge.mistakes! > 0)
-            Text(
-              'Mistakes: ${challenge.mistakes}',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: colorScheme.error,
+              const SizedBox(width: AppConstants.spacingMd),
+              Expanded(
+                child: _buildCompletionStat(
+                  theme,
+                  colorScheme: colorScheme,
+                  label: 'Mistakes',
+                  value: '${challenge.mistakes}/3',
+                  icon: Icons.close_rounded,
+                  color: extension.mistakeIndicatorColor!,
+                ),
               ),
-            ),
-          if (challenge.hintsUsed != null && challenge.hintsUsed! > 0)
-            Text(
-              'Hints: ${challenge.hintsUsed}',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: extension.hintButtonText,
+              const SizedBox(width: AppConstants.spacingMd),
+              Expanded(
+                child: _buildCompletionStat(
+                  theme,
+                  colorScheme: colorScheme,
+                  label: 'Hints',
+                  value: '${challenge.hintsUsed}/3',
+                  icon: Icons.lightbulb_rounded,
+                  color: extension.hintIndicatorColor!,
+                ),
               ),
-            ),
+            ],
+          ),
         ],
       ),
     ).animate().fadeIn().slideY();
   }
 
-  Widget _buildPlayButton(ThemeData theme, AppThemeExtension extension, ColorScheme colorScheme, BuildContext context, DailyChallenge challenge, WidgetRef ref) {
+  Widget _buildCompletionStat(
+    ThemeData theme, {
+    required ColorScheme colorScheme,
+    required String label,
+    required String value,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(AppConstants.spacingMd),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlayButton(ThemeData theme, AppThemeExtension extension, ColorScheme colorScheme, BuildContext context, DailyChallenge challenge) {
     return Column(
       children: [
         Container(
@@ -313,12 +399,12 @@ class DailyChallengeScreen extends ConsumerWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                extension.difficultyMediumColor.withValues(alpha: 0.2),
-                extension.difficultyMediumColor.withValues(alpha: 0.05),
+                extension.difficultyMediumColor!.withValues(alpha: 0.2),
+                extension.difficultyMediumColor!.withValues(alpha: 0.05),
               ],
             ),
             borderRadius: BorderRadius.circular(AppConstants.largeBorderRadius),
-            border: Border.all(color: extension.difficultyMediumColor.withValues(alpha: 0.3)),
+            border: Border.all(color: extension.difficultyMediumColor!.withValues(alpha: 0.3)),
           ),
           child: Stack(
             children: [
@@ -328,7 +414,7 @@ class DailyChallengeScreen extends ConsumerWidget {
                 child: Icon(
                   Icons.grid_3x3_rounded,
                   size: 120,
-                  color: extension.difficultyMediumColor.withValues(alpha: 0.1),
+                  color: extension.difficultyMediumColor!.withValues(alpha: 0.1),
                 ),
               ),
               Center(
@@ -339,7 +425,7 @@ class DailyChallengeScreen extends ConsumerWidget {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        color: extension.difficultyMediumColor,
+                        color: extension.difficultyMediumColor!,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 30),
@@ -349,7 +435,7 @@ class DailyChallengeScreen extends ConsumerWidget {
                       'Play Daily Challenge',
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: extension.difficultyMediumColor,
+                        color: extension.difficultyMediumColor!,
                       ),
                     ),
                     const SizedBox(height: AppConstants.spacingXs),
@@ -382,7 +468,7 @@ class DailyChallengeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildRules(ThemeData theme, AppThemeExtension extension) {
+  Widget _buildRules(ThemeData theme, AppThemeExtension extension, ColorScheme colorScheme) {
     return Container(
       padding: const EdgeInsets.all(AppConstants.spacingLg),
       decoration: BoxDecoration(
@@ -399,29 +485,59 @@ class DailyChallengeScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppConstants.spacingMd),
-          _buildRuleItem(theme, '🌍', 'Same puzzle for everyone worldwide'),
-          _buildRuleItem(theme, '📅', 'New puzzle every day at midnight UTC'),
-          _buildRuleItem(theme, '🎯', 'Medium difficulty, same rules as regular game'),
-          _buildRuleItem(theme, '🏆', 'Track your streak and compete with friends'),
-          _buildRuleItem(theme, '🚫', 'Once completed, cannot be replayed until tomorrow'),
+          _buildRuleItem(
+            theme,
+            extension,
+            colorScheme,
+            'Same puzzle for everyone, everywhere',
+            Icons.public_rounded,
+          ),
+          _buildRuleItem(
+            theme,
+            extension,
+            colorScheme,
+            'New puzzle every day at midnight UTC',
+            Icons.schedule_rounded,
+          ),
+          _buildRuleItem(
+            theme,
+            extension,
+            colorScheme,
+            'Compete for best time and streak',
+            Icons.emoji_events_rounded,
+          ),
+          _buildRuleItem(
+            theme,
+            extension,
+            colorScheme,
+            'Hints and mistakes tracked separately',
+            Icons.help_outline_rounded,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildRuleItem(ThemeData theme, String emoji, String text) {
+  Widget _buildRuleItem(ThemeData theme, AppThemeExtension extension, ColorScheme colorScheme, String text, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppConstants.spacingSm),
+      padding: const EdgeInsets.only(bottom: AppConstants.spacingMd),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 18)),
-          const SizedBox(width: AppConstants.spacingSm),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: extension.difficultyMediumColor!.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 20, color: extension.difficultyMediumColor!),
+          ),
+          const SizedBox(width: AppConstants.spacingMd),
           Expanded(
             child: Text(
               text,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -436,6 +552,11 @@ class DailyChallengeScreen extends ConsumerWidget {
       'July', 'August', 'September', 'October', 'November', 'December'
     ];
     return months[month - 1];
+  }
+
+  String _formatDate(String dateStr) {
+    final date = DateTime.parse(dateStr);
+    return '${_getMonthName(date.month)} ${date.day}, ${date.year}';
   }
 
   String _formatTime(int seconds) {

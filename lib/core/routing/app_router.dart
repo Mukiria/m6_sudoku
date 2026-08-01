@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/features/home/presentation/screens/home_screen.dart';
@@ -11,53 +12,43 @@ import 'package:m6_sudoku/features/sudoku/presentation/screens/achievement_scree
 import 'package:m6_sudoku/features/statistics/presentation/screens/statistics_screen.dart';
 import 'package:m6_sudoku/features/settings/presentation/screens/settings_screen.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/pause_menu.dart';
-import 'package:riverpod/riverpod.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: AppRoutes.home,
     debugLogDiagnostics: true,
-    // Custom page transitions
-    pageBuilder: (context, state, child) {
-      return CustomTransitionPage(
-        key: state.pageKey,
-        child: child,
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          // Different transitions for different routes
-          final routeName = state.matchedLocation;
-          
-          if (routeName == AppRoutes.game || routeName == AppRoutes.completion) {
-            // Slide up for game screens
-            return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 1),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeOutCubic,
-              )),
-              child: child,
-            );
-          } else if (routeName == AppRoutes.achievements || routeName == AppRoutes.dailyChallenge) {
-            // Fade + scale for modal-like screens
-            return FadeTransition(
-              opacity: animation,
-              child: ScaleTransition(
-                scale: Tween<double>(begin: 0.95, end: 1.0).animate(
-                  CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
-                ),
-                child: child,
-              ),
-            );
-          } else {
-            // Default fade for other screens
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          }
-        },
-      );
+    transitionBuilder: (context, state, child) {
+      final routeName = state.matchedLocation;
+
+      if (routeName == AppRoutes.game || routeName == AppRoutes.completion) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 1),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: state.animation!,
+            curve: Curves.easeOutCubic,
+          )),
+          child: child,
+        );
+      } else if (routeName == AppRoutes.achievements ||
+          routeName == AppRoutes.dailyChallenge) {
+        return FadeTransition(
+          opacity: state.animation!,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.95, end: 1.0).animate(
+              CurvedAnimation(
+                  parent: state.animation!, curve: Curves.easeOutCubic),
+            ),
+            child: child,
+          ),
+        );
+      } else {
+        return FadeTransition(
+          opacity: state.animation!,
+          child: child,
+        );
+      }
     },
     routes: [
       GoRoute(
@@ -132,31 +123,31 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     ],
     errorBuilder:
         (context, state) => Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                const SizedBox(height: 16),
-                Text(
-                  'Page Not Found',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  state.error.toString(),
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => context.go(AppRoutes.home),
-                  child: const Text('Go Home'),
-                ),
-              ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const SizedBox(height: 16),
+            Text(
+              'Page Not Found',
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
-          ),
+            const SizedBox(height: 8),
+            Text(
+              state.error.toString(),
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => context.go(AppRoutes.home),
+              child: const Text('Go Home'),
+            ),
+          ],
         ),
+      ),
+    ),
   );
 });
 

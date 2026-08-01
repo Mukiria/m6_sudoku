@@ -1,15 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/sudoku_board.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/number_pad.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/game_header.dart';
-import 'package:m6_sudoku/features/sudoku/presentation/widgets/hint_overlay.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
-import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
-import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 
 void main() {

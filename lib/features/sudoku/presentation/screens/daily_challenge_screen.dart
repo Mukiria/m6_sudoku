@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 import 'package:m6_sudoku/shared/widgets/buttons.dart';
-import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/sudoku_providers.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/daily_challenge.dart';
 import 'package:m6_sudoku/core/routing/app_router.dart';

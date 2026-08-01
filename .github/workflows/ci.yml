@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build and Test
+    name: Build, Test and Release
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -19,8 +19,7 @@ jobs:
       - name: Cache Pub packages
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.pub-cache
+          path: ~/.pub-cache
           key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
           restore-keys: |
             ${{ runner.os }}-pub-
@@ -32,14 +31,26 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Display Flutter version
+        run: flutter --version
+
       - name: Get dependencies
         run: flutter pub get
 
       - name: Generate code
         run: dart run build_runner build --delete-conflicting-outputs
 
+      - name: Apply automatic Dart fixes
+        run: dart fix --apply
+
+      - name: Format code
+        run: dart format .
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
       - name: Analyze code
-        run: flutter analyze --no-fatal-warnings --no-fatal-infos
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
       - name: Run tests
         run: flutter test --coverage

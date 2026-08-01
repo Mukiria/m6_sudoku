@@ -43,6 +43,7 @@ void main() {
         isNoteMode: false,
         highlightedCells: {},
         conflictCells: {},
+        hintState: null,
         lastSaved: DateTime(2024, 1, 1),
       );
 
@@ -93,6 +94,7 @@ void main() {
         isNoteMode: true,
         highlightedCells: {CellPosition(row: 0, col: 1)},
         conflictCells: {CellPosition(row: 1, col: 1)},
+        hintState: null,
         lastSaved: DateTime.now(),
       );
 
@@ -139,6 +141,7 @@ void main() {
         isNoteMode: false,
         highlightedCells: {CellPosition(row: 0, col: 0)},
         conflictCells: {CellPosition(row: 1, col: 1)},
+        hintState: null,
         lastSaved: DateTime(2024, 6, 15),
       );
 
@@ -187,6 +190,7 @@ void main() {
         isNoteMode: false,
         highlightedCells: {},
         conflictCells: {},
+        hintState: null,
         lastSaved: DateTime.now(),
       );
 
@@ -216,6 +220,7 @@ void main() {
         isNoteMode: false,
         highlightedCells: {},
         conflictCells: {},
+        hintState: null,
         lastSaved: DateTime.now(),
       );
 

@@ -85,7 +85,7 @@ class Board {
     if (_cells[row][col].value != 0) return 0;
     final boxIndex = (row ~/ 3) * 3 + (col ~/ 3);
     final usedMask = _rowMasks[row] | _colMasks[col] | _boxMasks[boxIndex];
-    return ALL_CANDIDATES & ~usedMask;
+    return allCandidates & ~usedMask;
   }
 
   List<int> getCandidates(int row, int col) {
@@ -210,5 +210,3 @@ class Board {
     return buffer.toString();
   }
 }
-
-const int ALL_CANDIDATES = 0x1FF; // bits 0-8 set (1-9)

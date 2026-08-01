@@ -162,24 +162,27 @@ void main() {
   group('Cell - Extended Tests', () {
     test('candidates are empty by default', () {
       const cell = Cell(row: 0, col: 0);
-      expect(cell.candidates, isEmpty);
+      expect(cell.getCandidatesList(), isEmpty);
     });
 
     test('candidates can be set', () {
-      final cell = Cell(row: 0, col: 0, candidates: [1, 2, 3]);
-      expect(cell.candidates, [1, 2, 3]);
+      // bitmask for [1,2,3] is 0x001 | 0x002 | 0x004 = 0x007
+      final cell = Cell(row: 0, col: 0, candidates: 0x007);
+      expect(cell.getCandidatesList(), [1, 2, 3]);
     });
 
     test('copyWith preserves candidates when not specified', () {
-      const cell = Cell(row: 0, col: 0, candidates: [1, 2]);
+      // bitmask for [1,2] is 0x001 | 0x002 = 0x003
+      const cell = Cell(row: 0, col: 0, candidates: 0x003);
       final newCell = cell.copyWith(value: 5);
-      expect(newCell.candidates, [1, 2]);
+      expect(newCell.getCandidatesList(), [1, 2]);
     });
 
     test('copyWith updates candidates when specified', () {
-      const cell = Cell(row: 0, col: 0, candidates: [1, 2]);
-      final newCell = cell.copyWith(candidates: [3, 4]);
-      expect(newCell.candidates, [3, 4]);
+      // bitmask for [3,4] is 0x004 | 0x008 = 0x00C
+      const cell = Cell(row: 0, col: 0, candidates: 0x003);
+      final newCell = cell.copyWith(candidates: 0x00C);
+      expect(newCell.getCandidatesList(), [3, 4]);
     });
 
     test('isGiven is false by default', () {

@@ -51,7 +51,7 @@ class AudioManager {
       await _player.play(AssetSource(assetPath));
     } catch (e) {
       // Silently fail if sound file not found
-      debugPrint('Failed to play sound: $e');
+      print('Failed to play sound: $e');
     }
   }
 

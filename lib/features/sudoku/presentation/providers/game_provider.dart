@@ -9,8 +9,6 @@ import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
 import 'package:m6_sudoku/features/sudoku/domain/usecases/game_usecases.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/sudoku_providers.dart';
-import 'package:m6_sudoku/core/audio/audio_service.dart';
-import 'package:m6_sudoku/core/audio/audio_manager.dart';
 
 part 'game_provider.g.dart';
 

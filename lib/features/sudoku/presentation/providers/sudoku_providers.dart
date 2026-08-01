@@ -16,6 +16,9 @@ import 'package:m6_sudoku/features/sudoku/domain/usecases/daily_challenge_usecas
 import 'package:m6_sudoku/features/sudoku/domain/usecases/achievement_usecases.dart';
 import 'package:m6_sudoku/features/sudoku/engine/generator/puzzle_generator.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/daily_challenge.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/achievement.dart';
+import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart';
 
 final storageServiceProvider = Provider<StorageService>((ref) {
   throw UnimplementedError('Initialize storage service in main.dart');

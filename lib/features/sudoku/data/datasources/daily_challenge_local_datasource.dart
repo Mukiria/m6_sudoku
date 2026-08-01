@@ -3,6 +3,9 @@ import 'dart:math';
 import 'package:dartz/dartz.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/daily_challenge.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
+import 'package:m6_sudoku/features/sudoku/engine/models/board.dart';
+import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
+import 'package:m6_sudoku/features/sudoku/engine/generator/puzzle_generator.dart';
 import 'package:m6_sudoku/core/errors/failures.dart';
 import 'package:m6_sudoku/core/services/storage_service.dart';
 
@@ -138,7 +141,6 @@ class DailyChallengeLocalDataSource {
   Puzzle _generateDailyPuzzle(String date) {
     // Generate deterministic seed from date
     final seed = _dateToSeed(date);
-    final random = Random(seed);
     
     // Use the puzzle generator with seed
     final generator = PuzzleGenerator(seed: seed);
@@ -153,7 +155,7 @@ class DailyChallengeLocalDataSource {
       grid: grid,
       solution: solution,
       difficulty: 'medium',
-      cluesCount: board.getFilledCount(),
+      cluesCount: board.getFilledCount,
       createdAt: DateTime.now(),
     );
   }

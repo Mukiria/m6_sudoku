@@ -16,8 +16,7 @@ class DailyChallenge with _$DailyChallenge {
     DateTime? completedAt,
   }) = _DailyChallenge;
 
-  factory DailyChallenge.fromJson(Map<String, dynamic> json) =>
-      _$DailyChallengeFromJson(json);
+  factory DailyChallenge.fromJson(Map<String, dynamic> json) => _$DailyChallengeFromJson(json);
 }
 
 @freezed

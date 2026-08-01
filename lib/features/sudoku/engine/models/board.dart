@@ -118,6 +118,8 @@ class Board {
   int get filledCount =>
       _cells.expand((row) => row).where((c) => c.value != 0).length;
 
+  int get getFilledCount => filledCount;
+
   int get givenCount =>
       _cells.expand((row) => row).where((c) => c.isGiven).length;
 

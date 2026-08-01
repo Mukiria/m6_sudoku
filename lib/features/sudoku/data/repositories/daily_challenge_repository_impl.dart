@@ -35,7 +35,12 @@ class DailyChallengeRepositoryImpl implements DailyChallengeRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> isDailyChallengeCompleted(String date) {
-    return _dataSource.isDailyChallengeCompleted(date);
+  Future<Either<Failure, bool>> isDailyChallengeCompleted(String date) async {
+    try {
+      final result = await _dataSource.isDailyChallengeCompleted(date);
+      return Right(result);
+    } catch (e) {
+      return Left(CacheFailure('Failed to check daily challenge completion: $e'));
+    }
   }
 }

@@ -9,7 +9,7 @@ import 'package:m6_sudoku/shared/widgets/sudoku_widgets.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
-import 'package:m6_sudoku/features/sudoku/presentation/widgets/number_pad.dart'
+import 'package:m6_sudoku/features/sudoku/presentation/widgets/number_pad.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/game_header.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/pause_menu.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/sudoku_board.dart';

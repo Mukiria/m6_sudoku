@@ -17,6 +17,11 @@ class GameController extends _$GameController {
   @override
   GameState? build() => null;
 
+  // Cache for highlighted cells computation
+  final Map<int, Set<CellPosition>> _highlightedCache = {};
+  // Cache for conflict cells computation
+  final Map<String, Set<CellPosition>> _conflictCache = {};
+
   Future<void> newGame(Difficulty difficulty) async {
     final generatePuzzle = ref.read(generatePuzzleUseCaseProvider);
     final result = await generatePuzzle(difficulty.name);
@@ -109,7 +114,7 @@ class GameController extends _$GameController {
     final previousValue = currentState.userGrid[row][col];
     if (previousValue == value) return;
 
-    final newGrid = currentState.userGrid.map((row) => List<int>.from(row)).toList();
+    final newGrid = _copyGrid(currentState.userGrid);
     newGrid[row][col] = value;
 
     final isCorrect = puzzle.solution[row][col] == value;
@@ -172,8 +177,7 @@ class GameController extends _$GameController {
       newNotes.add(note);
     }
 
-    final newNotesGrid =
-        currentState.notes.map((row) => List<Set<int>>.from(row)).toList();
+    final newNotesGrid = _copyNotesGrid(currentState.notes);
     newNotesGrid[row][col] = newNotes;
 
     state = currentState.copyWith(
@@ -206,14 +210,13 @@ class GameController extends _$GameController {
     final previousValue = currentState.userGrid[row][col];
     if (previousValue == 0 && currentState.notes[row][col].isEmpty) return;
 
-    final newGrid = currentState.userGrid.map((row) => List<int>.from(row)).toList();
+    final newGrid = _copyGrid(currentState.userGrid);
     newGrid[row][col] = 0;
 
-    final newNotesGrid =
-        currentState.notes.map((row) => List<Set<int>>.from(row)).toList();
+    final newNotesGrid = _copyNotesGrid(currentState.notes);
     newNotesGrid[row][col] = <int>{};
 
-state = currentState.copyWith(
+    state = currentState.copyWith(
       userGrid: newGrid,
       notes: newNotesGrid,
       moveHistory: [
@@ -245,7 +248,7 @@ state = currentState.copyWith(
       if (hint != null) {
         // Add penalty time (15 seconds for logical hints, 30 for direct reveal)
         final penalty = hint.hintType == HintType.directReveal ? 30 : 15;
-        
+
         setValue(hint.row, hint.col, hint.value!);
         state = state!.copyWith(
           hintsUsed: currentState.hintsUsed + 1,
@@ -287,7 +290,7 @@ state = currentState.copyWith(
       currentState.moveHistory.length - 1,
     );
 
-    final newGrid = currentState.userGrid.map((row) => List<int>.from(row)).toList();
+    final newGrid = _copyGrid(currentState.userGrid);
     int newMistakes = currentState.mistakes;
     int newHintsUsed = currentState.hintsUsed;
 
@@ -339,7 +342,7 @@ state = currentState.copyWith(
     final nextMove = currentState.redoStack.first;
     final remainingRedo = currentState.redoStack.sublist(1);
 
-    final newGrid = currentState.userGrid.map((row) => List<int>.from(row)).toList();
+    final newGrid = _copyGrid(currentState.userGrid);
     int newMistakes = currentState.mistakes;
     int newHintsUsed = currentState.hintsUsed;
 
@@ -369,7 +372,7 @@ state = currentState.copyWith(
     // Recompute notes from scratch based on new grid
     final newNotesGrid = _recomputeNotes(newGrid, currentState.puzzle);
 
-state = currentState.copyWith(
+    state = currentState.copyWith(
       userGrid: newGrid,
       notes: newNotesGrid,
       mistakes: newMistakes,
@@ -441,90 +444,107 @@ state = currentState.copyWith(
   }
 
   Set<CellPosition> _getHighlightedCells(int row, int col) {
-    final highlighted = <CellPosition>{};
+    final key = row * 9 + col;
+    return _highlightedCache.putIfAbsent(key, () {
+      final highlighted = <CellPosition>{};
 
-    // Highlight row
-    for (int c = 0; c < 9; c++) {
-      if (c != col) highlighted.add(CellPosition(row: row, col: c));
-    }
+      // Highlight row
+      for (int c = 0; c < 9; c++) {
+        if (c != col) highlighted.add(CellPosition(row: row, col: c));
+      }
 
-    // Highlight column
-    for (int r = 0; r < 9; r++) {
-      if (r != row) highlighted.add(CellPosition(row: r, col: col));
-    }
+      // Highlight column
+      for (int r = 0; r < 9; r++) {
+        if (r != row) highlighted.add(CellPosition(row: r, col: col));
+      }
 
-    // Highlight 3x3 box
-    final boxRow = (row ~/ 3) * 3;
-    final boxCol = (col ~/ 3) * 3;
-    for (int r = boxRow; r < boxRow + 3; r++) {
-      for (int c = boxCol; c < boxCol + 3; c++) {
-        if (r != row || c != col) {
-          highlighted.add(CellPosition(row: r, col: c));
+      // Highlight 3x3 box
+      final boxRow = (row ~/ 3) * 3;
+      final boxCol = (col ~/ 3) * 3;
+      for (int r = boxRow; r < boxRow + 3; r++) {
+        for (int c = boxCol; c < boxCol + 3; c++) {
+          if (r != row || c != col) {
+            highlighted.add(CellPosition(row: r, col: c));
+          }
         }
       }
-    }
 
-    return highlighted;
+      return highlighted;
+    });
   }
 
   Set<CellPosition> _getConflicts(List<List<int>> grid) {
-    final conflicts = <CellPosition>{};
+    // Create a hash of the grid for caching
+    final hash = _gridHash(grid);
+    return _conflictCache.putIfAbsent(hash, () {
+      final conflicts = <CellPosition>{};
 
-    // Check rows
-    for (int r = 0; r < 9; r++) {
-      final seen = <int, int>{};
-      for (int c = 0; c < 9; c++) {
-        final val = grid[r][c];
-        if (val != 0) {
-          if (seen.containsKey(val)) {
-            conflicts.add(CellPosition(row: r, col: seen[val]!));
-            conflicts.add(CellPosition(row: r, col: c));
-          } else {
-            seen[val] = c;
-          }
-        }
-      }
-    }
-
-    // Check columns
-    for (int c = 0; c < 9; c++) {
-      final seen = <int, int>{};
+      // Check rows
       for (int r = 0; r < 9; r++) {
-        final val = grid[r][c];
-        if (val != 0) {
-          if (seen.containsKey(val)) {
-            conflicts.add(CellPosition(row: seen[val]!, col: c));
-            conflicts.add(CellPosition(row: r, col: c));
-          } else {
-            seen[val] = r;
+        final seen = <int, int>{};
+        for (int c = 0; c < 9; c++) {
+          final val = grid[r][c];
+          if (val != 0) {
+            if (seen.containsKey(val)) {
+              conflicts.add(CellPosition(row: r, col: seen[val]!));
+              conflicts.add(CellPosition(row: r, col: c));
+            } else {
+              seen[val] = c;
+            }
           }
         }
       }
-    }
 
-    // Check 3x3 boxes
-    for (int boxRow = 0; boxRow < 3; boxRow++) {
-      for (int boxCol = 0; boxCol < 3; boxCol++) {
-        final seen = <int, CellPosition>{};
-        for (int r = 0; r < 3; r++) {
-          for (int c = 0; c < 3; c++) {
-            final rIdx = boxRow * 3 + r;
-            final cIdx = boxCol * 3 + c;
-            final val = grid[rIdx][cIdx];
-            if (val != 0) {
-              if (seen.containsKey(val)) {
-                conflicts.add(seen[val]!);
-                conflicts.add(CellPosition(row: rIdx, col: cIdx));
-              } else {
-                seen[val] = CellPosition(row: rIdx, col: cIdx);
+      // Check columns
+      for (int c = 0; c < 9; c++) {
+        final seen = <int, int>{};
+        for (int r = 0; r < 9; r++) {
+          final val = grid[r][c];
+          if (val != 0) {
+            if (seen.containsKey(val)) {
+              conflicts.add(CellPosition(row: seen[val]!, col: c));
+              conflicts.add(CellPosition(row: r, col: c));
+            } else {
+              seen[val] = r;
+            }
+          }
+        }
+      }
+
+      // Check 3x3 boxes
+      for (int boxRow = 0; boxRow < 3; boxRow++) {
+        for (int boxCol = 0; boxCol < 3; boxCol++) {
+          final seen = <int, CellPosition>{};
+          for (int r = 0; r < 3; r++) {
+            for (int c = 0; c < 3; c++) {
+              final rIdx = boxRow * 3 + r;
+              final cIdx = boxCol * 3 + c;
+              final val = grid[rIdx][cIdx];
+              if (val != 0) {
+                if (seen.containsKey(val)) {
+                  conflicts.add(seen[val]!);
+                  conflicts.add(CellPosition(row: rIdx, col: cIdx));
+                } else {
+                  seen[val] = CellPosition(row: rIdx, col: cIdx);
+                }
               }
             }
           }
         }
       }
-    }
 
-    return conflicts;
+      return conflicts;
+    });
+  }
+
+  String _gridHash(List<List<int>> grid) {
+    final buffer = StringBuffer();
+    for (int r = 0; r < 9; r++) {
+      for (int c = 0; c < 9; c++) {
+        buffer.write(grid[r][c]);
+      }
+    }
+    return buffer.toString();
   }
 
   bool _checkCompletion(List<List<int>> grid, List<List<int>> solution) {
@@ -554,18 +574,18 @@ state = currentState.copyWith(
     int col,
     int value,
   ) {
-    final newNotes = notes.map((r) => List<Set<int>>.from(r)).toList();
-    
+    final newNotes = _copyNotesGrid(notes);
+
     // Remove from row
     for (int c = 0; c < 9; c++) {
       newNotes[row][c].remove(value);
     }
-    
+
     // Remove from column
     for (int r = 0; r < 9; r++) {
       newNotes[r][col].remove(value);
     }
-    
+
     // Remove from box
     final boxRow = (row ~/ 3) * 3;
     final boxCol = (col ~/ 3) * 3;
@@ -574,10 +594,10 @@ state = currentState.copyWith(
         newNotes[r][c].remove(value);
       }
     }
-    
+
     // Clear the cell itself
     newNotes[row][col].clear();
-    
+
     return newNotes;
   }
 
@@ -618,6 +638,14 @@ state = currentState.copyWith(
       }
     }
     return newNotes;
+  }
+
+  List<List<int>> _copyGrid(List<List<int>> grid) {
+    return grid.map((row) => List<int>.from(row)).toList();
+  }
+
+  List<List<Set<int>>> _copyNotesGrid(List<List<Set<int>>> notes) {
+    return notes.map((row) => List<Set<int>>.from(row)).toList();
   }
 
   void clearHintState() {

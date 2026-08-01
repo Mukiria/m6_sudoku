@@ -1,7 +1,9 @@
 import 'cell.dart';
 
 class Board {
-  Board({List<List<Cell>>? cells}) : _cells = cells ?? _createEmptyGrid();
+  Board({List<List<Cell>>? cells}) : _cells = cells ?? _createEmptyGrid() {
+    _initMasks();
+  }
 
   static List<List<Cell>> _createEmptyGrid() {
     return List.generate(
@@ -11,6 +13,12 @@ class Board {
   }
 
   final List<List<Cell>> _cells;
+
+  // Bitmasks for fast constraint checking
+  // Each row/col/box has a 9-bit mask where bit i (0-8) represents digit i+1
+  final List<int> _rowMasks = List.filled(9, 0);
+  final List<int> _colMasks = List.filled(9, 0);
+  final List<int> _boxMasks = List.filled(9, 0);
 
   List<List<Cell>> get cells => _cells;
 
@@ -23,7 +31,24 @@ class Board {
   int getValue(int row, int col) => _cells[row][col].value;
 
   void setValue(int row, int col, int value) {
-    _cells[row][col] = _cells[row][col].copyWith(value: value);
+    final cell = _cells[row][col];
+    final oldValue = cell.value;
+
+    if (oldValue != 0) {
+      final bit = 1 << (oldValue - 1);
+      _rowMasks[row] &= ~bit;
+      _colMasks[col] &= ~bit;
+      _boxMasks[(row ~/ 3) * 3 + (col ~/ 3)] &= ~bit;
+    }
+
+    if (value != 0) {
+      final bit = 1 << (value - 1);
+      _rowMasks[row] |= bit;
+      _colMasks[col] |= bit;
+      _boxMasks[(row ~/ 3) * 3 + (col ~/ 3)] |= bit;
+    }
+
+    _cells[row][col] = cell.copyWith(value: value);
   }
 
   List<int> getRow(int row) => _cells[row].map((c) => c.value).toList();
@@ -48,41 +73,37 @@ class Board {
     if (value < 1 || value > 9) return false;
     if (_cells[row][col].isGiven) return false;
 
-    for (var c = 0; c < 9; c++) {
-      if (c != col && _cells[row][c].value == value) return false;
-    }
+    final bit = 1 << (value - 1);
+    final boxIndex = (row ~/ 3) * 3 + (col ~/ 3);
 
-    for (var r = 0; r < 9; r++) {
-      if (r != row && _cells[r][col].value == value) return false;
-    }
+    return (_rowMasks[row] & bit) == 0 &&
+        (_colMasks[col] & bit) == 0 &&
+        (_boxMasks[boxIndex] & bit) == 0;
+  }
 
-    final boxRow = row ~/ 3;
-    final boxCol = col ~/ 3;
-    for (var r = boxRow * 3; r < boxRow * 3 + 3; r++) {
-      for (var c = boxCol * 3; c < boxCol * 3 + 3; c++) {
-        if (r != row && c != col && _cells[r][c].value == value) return false;
-      }
-    }
-
-    return true;
+  int getCandidatesMask(int row, int col) {
+    if (_cells[row][col].value != 0) return 0;
+    final boxIndex = (row ~/ 3) * 3 + (col ~/ 3);
+    final usedMask = _rowMasks[row] | _colMasks[col] | _boxMasks[boxIndex];
+    return ALL_CANDIDATES & ~usedMask;
   }
 
   List<int> getCandidates(int row, int col) {
-    if (_cells[row][col].value != 0) return [];
-    final candidates = <int>[];
-    for (var v = 1; v <= 9; v++) {
-      if (isValidPlacement(row, col, v)) {
-        candidates.add(v);
+    final mask = getCandidatesMask(row, col);
+    final list = <int>[];
+    for (int v = 1; v <= 9; v++) {
+      if (mask & (1 << (v - 1)) != 0) {
+        list.add(v);
       }
     }
-    return candidates;
+    return list;
   }
 
   void updateCandidates() {
     for (var r = 0; r < 9; r++) {
       for (var c = 0; c < 9; c++) {
         if (_cells[r][c].value == 0) {
-          _cells[r][c] = _cells[r][c].copyWith(candidates: getCandidates(r, c));
+          _cells[r][c] = _cells[r][c].copyWith(candidates: getCandidatesMask(r, c));
         }
       }
     }
@@ -124,10 +145,16 @@ class Board {
       _cells.expand((row) => row).where((c) => c.isGiven).length;
 
   Board copy() {
-    return Board(
-      cells:
-          _cells.map((row) => row.map((c) => c.copyWith()).toList()).toList(),
-    );
+    final newBoard = Board();
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) {
+        newBoard._cells[r][c] = _cells[r][c].copyWith();
+      }
+      newBoard._rowMasks[r] = _rowMasks[r];
+      newBoard._colMasks[r] = _colMasks[r];
+      newBoard._boxMasks[r] = _boxMasks[r];
+    }
+    return newBoard;
   }
 
   List<List<int>> toGrid() =>
@@ -144,9 +171,29 @@ class Board {
           value: value,
           isGiven: value != 0,
         );
+        if (value != 0) {
+          final bit = 1 << (value - 1);
+          board._rowMasks[r] |= bit;
+          board._colMasks[c] |= bit;
+          board._boxMasks[(r ~/ 3) * 3 + (c ~/ 3)] |= bit;
+        }
       }
     }
     return board;
+  }
+
+  void _initMasks() {
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) {
+        final value = _cells[r][c].value;
+        if (value != 0) {
+          final bit = 1 << (value - 1);
+          _rowMasks[r] |= bit;
+          _colMasks[c] |= bit;
+          _boxMasks[(r ~/ 3) * 3 + (c ~/ 3)] |= bit;
+        }
+      }
+    }
   }
 
   @override
@@ -163,3 +210,5 @@ class Board {
     return buffer.toString();
   }
 }
+
+const int ALL_CANDIDATES = 0x1FF; // bits 0-8 set (1-9)

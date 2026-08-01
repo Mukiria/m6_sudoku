@@ -14,30 +14,39 @@ class UniqueSolutionValidator {
   }) {
     if (counter.count >= limit) return;
 
-    int index = -1;
-    for (var i = 0; i < 81; i++) {
-      final row = i ~/ 9;
-      final col = i % 9;
-      if (board.getValue(row, col) == 0) {
-        index = i;
-        break;
+    int bestRow = -1;
+    int bestCol = -1;
+    int minCandidates = 10;
+
+    // Find cell with minimum remaining values (MRV heuristic)
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) {
+        if (board.getValue(r, c) == 0) {
+          final candidates = board.getCandidates(r, c);
+          if (candidates.isEmpty) return; // Dead end
+          final count = candidates.length;
+          if (count < minCandidates) {
+            minCandidates = count;
+            bestRow = r;
+            bestCol = c;
+            if (count == 1) break;
+          }
+        }
       }
+      if (minCandidates == 1) break;
     }
 
-    if (index == -1) {
+    if (bestRow == -1) {
       counter.count++;
       return;
     }
 
-    final row = index ~/ 9;
-    final col = index % 9;
-    final candidates = board.getCandidates(row, col);
-
+    final candidates = board.getCandidates(bestRow, bestCol);
     for (final value in candidates) {
-      board.setValue(row, col, value);
-      _countSolutions(board, counter, limit: limit);
-      board.setValue(row, col, 0);
       if (counter.count >= limit) return;
+      board.setValue(bestRow, bestCol, value);
+      _countSolutions(board, counter, limit: limit);
+      board.setValue(bestRow, bestCol, 0);
     }
   }
 

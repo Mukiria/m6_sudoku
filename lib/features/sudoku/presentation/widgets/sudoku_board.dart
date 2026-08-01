@@ -32,141 +32,265 @@ class SudokuBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final extension = Theme.of(context).extension<AppThemeExtension>()!;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final gridSize = constraints.maxWidth;
         final cellSize = gridSize / 9;
 
-        return Container(
-          width: constraints.maxWidth,
-          height: constraints.maxWidth,
-          decoration: BoxDecoration(
-            color: Theme.of(context).extension<AppThemeExtension>()!.gridBackgroundColor,
-            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-            border: Border.all(
-              color: Theme.of(context).extension<AppThemeExtension>()!.subGridLineColor,
-              width: 3,
+        return RepaintBoundary(
+          child: Container(
+            width: constraints.maxWidth,
+            height: constraints.maxWidth,
+            decoration: BoxDecoration(
+              color: extension.gridBackgroundColor,
+              borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+              border: Border.all(
+                color: extension.subGridLineColor,
+                width: 3,
+              ),
+            ),
+            child: _BoardGrid(
+              puzzle: puzzle,
+              userGrid: userGrid,
+              notes: notes,
+              selectedCell: selectedCell,
+              highlightedCells: highlightedCells,
+              conflictCells: conflictCells,
+              isNoteMode: isNoteMode,
+              onCellTap: onCellTap,
+              onCellLongPress: onCellLongPress,
+              cellSize: cellSize,
+              extension: extension,
+              colorScheme: colorScheme,
             ),
           ),
-          child: Column(
-            children: List.generate(9, (row) {
-              return Expanded(
-                child: Row(
-                  children: List.generate(9, (col) {
-                    return _buildCell(context, row, col, cellSize)
-                        .animate()
-                        .fadeIn(
-                          duration: 300.ms,
-                          delay: Duration(milliseconds: (row * 9 + col) * 15),
-                        )
-                        .slideY(
-                          begin: 0.3,
-                          end: 0,
-                          duration: 300.ms,
-                          delay: Duration(milliseconds: (row * 9 + col) * 15),
-                          curve: Curves.easeOutCubic,
-                        );
-                  }),
-                ),
-              );
-            }),
-          ),
-        ).animate().fadeIn(duration: 300.ms).scale(
-          begin: const Offset(0.95, 0.95),
-          end: const Offset(1.0, 1.0),
-          duration: 400.ms,
-          curve: Curves.easeOutCubic,
         );
       },
     );
   }
+}
 
-  Widget _buildCell(BuildContext context, int row, int col, double cellSize) {
-    final extension = Theme.of(context).extension<AppThemeExtension>()!;
-    final colorScheme = Theme.of(context).colorScheme;
+class _BoardGrid extends StatelessWidget {
+  const _BoardGrid({
+    required this.puzzle,
+    required this.userGrid,
+    required this.notes,
+    required this.selectedCell,
+    required this.highlightedCells,
+    required this.conflictCells,
+    required this.isNoteMode,
+    required this.onCellTap,
+    required this.onCellLongPress,
+    required this.cellSize,
+    required this.extension,
+    required this.colorScheme,
+  });
 
+  final Puzzle puzzle;
+  final List<List<int>> userGrid;
+  final List<List<Set<int>>> notes;
+  final CellPosition? selectedCell;
+  final Set<CellPosition> highlightedCells;
+  final Set<CellPosition> conflictCells;
+  final bool isNoteMode;
+  final void Function(int row, int col) onCellTap;
+  final void Function(int row, int col) onCellLongPress;
+  final double cellSize;
+  final AppThemeExtension extension;
+  final ColorScheme colorScheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: List.generate(9, (row) {
+        return Expanded(
+          child: Row(
+            children: List.generate(9, (col) {
+              return _SudokuCell(
+                key: ValueKey('cell_${row}_${col}'),
+                row: row,
+                col: col,
+                cellSize: cellSize,
+                puzzle: puzzle,
+                userGrid: userGrid,
+                notes: notes,
+                selectedCell: selectedCell,
+                highlightedCells: highlightedCells,
+                conflictCells: conflictCells,
+                isNoteMode: isNoteMode,
+                onCellTap: onCellTap,
+                onCellLongPress: onCellLongPress,
+                extension: extension,
+                colorScheme: colorScheme,
+              );
+            }),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+class _SudokuCell extends StatelessWidget {
+  const _SudokuCell({
+    super.key,
+    required this.row,
+    required this.col,
+    required this.cellSize,
+    required this.puzzle,
+    required this.userGrid,
+    required this.notes,
+    required this.selectedCell,
+    required this.highlightedCells,
+    required this.conflictCells,
+    required this.isNoteMode,
+    required this.onCellTap,
+    required this.onCellLongPress,
+    required this.extension,
+    required this.colorScheme,
+  });
+
+  final int row;
+  final int col;
+  final double cellSize;
+  final Puzzle puzzle;
+  final List<List<int>> userGrid;
+  final List<List<Set<int>>> notes;
+  final CellPosition? selectedCell;
+  final Set<CellPosition> highlightedCells;
+  final Set<CellPosition> conflictCells;
+  final bool isNoteMode;
+  final void Function(int row, int col) onCellTap;
+  final void Function(int row, int col) onCellLongPress;
+  final AppThemeExtension extension;
+  final ColorScheme colorScheme;
+
+  @override
+  Widget build(BuildContext context) {
     final position = CellPosition(row: row, col: col);
     final isSelected = selectedCell?.row == row && selectedCell?.col == col;
     final isHighlighted = highlightedCells.contains(position);
     final isConflicted = conflictCells.contains(position);
     final isFixed = puzzle.grid[row][col] != 0;
-    final value = userGrid[row][col] != 0 ? userGrid[row][col] : (isFixed ? puzzle.grid[row][col] : null);
-    final cellNotes = notes[row][col].toList()..sort();
+    final userValue = userGrid[row][col];
+    final value = userValue != 0 ? userValue : (isFixed ? puzzle.grid[row][col] : null);
+    final cellNotes = notes[row][col];
 
-    Color backgroundColor;
-    Color borderColor;
-    double borderWidth = 1;
-
-    // Determine background and border colors based on cell state
-    if (isConflicted) {
-      backgroundColor = extension.cellErrorBackground!;
-      borderColor = extension.cellErrorBorder!;
-      borderWidth = 2;
-    } else if (isSelected) {
-      backgroundColor = extension.cellSelectedBackground!;
-      borderColor = extension.cellSelectedBorder!;
-      borderWidth = 2;
-    } else if (isHighlighted) {
-      backgroundColor = extension.cellHighlightBackground!;
-      borderColor = extension.cellBorder!;
-    } else if (isFixed && extension.cellFixedBackground != null) {
-      backgroundColor = extension.cellFixedBackground!;
-      borderColor = extension.cellFixedBorder!;
-    } else {
-      backgroundColor = extension.cellBackground!;
-      borderColor = extension.cellBorder!;
-    }
+    final (backgroundColor, borderColor, borderWidth) = _getCellDecoration(
+      isConflicted: isConflicted,
+      isSelected: isSelected,
+      isHighlighted: isHighlighted,
+      isFixed: isFixed,
+      extension: extension,
+    );
 
     final textColor = colorScheme.onSurface;
     final noteColor = colorScheme.onSurfaceVariant;
 
-    return AnimatedContainer(
-      duration: AppConstants.fastAnimation,
-      curve: Curves.easeInOut,
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        border: Border.all(color: borderColor, width: borderWidth),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => onCellTap(row, col),
-          onLongPress: () => onCellLongPress(row, col),
-          borderRadius: BorderRadius.zero,
-          splashColor: colorScheme.primary.withValues(alpha: 0.1),
-          highlightColor: colorScheme.primary.withValues(alpha: 0.05),
-          child: _buildCellContent(
-            value: value,
-            notes: cellNotes,
-            isFixed: isFixed,
-            isConflicted: isConflicted,
-            textColor: textColor,
-            noteColor: noteColor,
+    return RepaintBoundary(
+      child: AnimatedContainer(
+        duration: AppConstants.fastAnimation,
+        curve: Curves.easeInOut,
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          border: Border.all(color: borderColor, width: borderWidth),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => onCellTap(row, col),
+            onLongPress: () => onCellLongPress(row, col),
+            borderRadius: BorderRadius.zero,
+            splashColor: colorScheme.primary.withValues(alpha: 0.1),
+            highlightColor: colorScheme.primary.withValues(alpha: 0.05),
+            child: _buildCellContent(
+              value: value,
+              notes: cellNotes,
+              isFixed: isFixed,
+              isConflicted: isConflicted,
+              isSelected: isSelected,
+              textColor: textColor,
+              noteColor: noteColor,
+            ),
           ),
         ),
       ),
-    ).animate(target: isSelected ? 1 : 0).scale(
-      begin: const Offset(1, 1),
-      end: const Offset(1.03, 1.03),
-      duration: 150.ms,
-      curve: Curves.easeOutBack,
-    ).then().shimmer(
-      duration: 1000.ms,
-      color: colorScheme.primary.withValues(alpha: 0.3),
     );
   }
 
-  Widget _buildCellContent({
+  static (Color, Color, double) _getCellDecoration({
+    required bool isConflicted,
+    required bool isSelected,
+    required bool isHighlighted,
+    required bool isFixed,
+    required AppThemeExtension extension,
+  }) {
+    if (isConflicted) {
+      return (extension.cellErrorBackground!, extension.cellErrorBorder!, 2.0);
+    }
+    if (isSelected) {
+      return (extension.cellSelectedBackground!, extension.cellSelectedBorder!, 2.0);
+    }
+    if (isHighlighted) {
+      return (extension.cellHighlightBackground!, extension.cellBorder!, 1.0);
+    }
+    if (isFixed && extension.cellFixedBackground != null) {
+      return (extension.cellFixedBackground!, extension.cellFixedBorder!, 1.0);
+    }
+    return (extension.cellBackground!, extension.cellBorder!, 1.0);
+  }
+
+  static Widget _buildCellContent({
     required int? value,
-    required List<int> notes,
+    required Set<int> notes,
     required bool isFixed,
     required bool isConflicted,
+    required bool isSelected,
     required Color textColor,
     required Color noteColor,
   }) {
     if (value != null) {
-      return Center(
+      return _NumberCell(
+        value: value,
+        isFixed: isFixed,
+        isConflicted: isConflicted,
+        textColor: textColor,
+        isSelected: isSelected,
+      );
+    }
+
+    if (notes.isNotEmpty) {
+      return _NotesCell(notes: notes, noteColor: noteColor);
+    }
+
+    return const SizedBox.shrink();
+  }
+}
+
+class _NumberCell extends StatelessWidget {
+  const _NumberCell({
+    required this.value,
+    required this.isFixed,
+    required this.isConflicted,
+    required this.textColor,
+    required this.isSelected,
+  });
+
+  final int value;
+  final bool isFixed;
+  final bool isConflicted;
+  final Color textColor;
+  final bool isSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: AnimatedScale(
+        scale: isSelected ? 1.03 : 1.0,
+        duration: AppConstants.fastAnimation,
+        curve: Curves.easeOutBack,
         child: Text(
           value.toString(),
           style: TextStyle(
@@ -174,60 +298,52 @@ class SudokuBoard extends StatelessWidget {
             fontWeight: isFixed ? FontWeight.w700 : FontWeight.w600,
             color: isConflicted ? Colors.red : textColor,
           ),
-        ).animate(target: value != null ? 1 : 0).scale(
-          begin: const Offset(0.5, 0.5),
-          end: const Offset(1.0, 1.0),
-          duration: 200.ms,
-          curve: Curves.easeOutBack,
         ),
-      );
-    }
-
-    if (notes.isNotEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(4),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            for (int row = 0; row < 3; row++)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  for (int col = 0; col < 3; col++)
-                    _buildNote(row * 3 + col + 1, notes, noteColor)
-                        .animate()
-                        .fadeIn(
-                          duration: 150.ms,
-                          delay: Duration(milliseconds: (row * 3 + col) * 20),
-                        )
-                        .scale(
-                          begin: const Offset(0.5, 0.5),
-                          end: const Offset(1.0, 1.0),
-                          duration: 150.ms,
-                          delay: Duration(milliseconds: (row * 3 + col) * 20),
-                          curve: Curves.easeOutBack,
-                        ),
-                ],
-              ),
-          ],
-        ),
-      );
-    }
-
-    return const SizedBox.shrink();
+      ),
+    );
   }
+}
 
-  Widget _buildNote(int number, List<int> notes, Color noteColor) {
-    if (notes.contains(number)) {
-      return Text(
-        number.toString(),
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          color: noteColor,
-        ),
-      );
-    }
-    return const SizedBox(width: 12, height: 12);
+class _NotesCell extends StatelessWidget {
+  const _NotesCell({
+    required this.notes,
+    required this.noteColor,
+  });
+
+  final Set<int> notes;
+  final Color noteColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(4),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(3, (row) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(3, (col) {
+              final number = row * 3 + col + 1;
+              return SizedBox(
+                width: 12,
+                height: 12,
+                child: notes.contains(number)
+                    ? Center(
+                        child: Text(
+                          number.toString(),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: noteColor,
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              );
+            }),
+          );
+        }),
+      ),
+    );
   }
 }

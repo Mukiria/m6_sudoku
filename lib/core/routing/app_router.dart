@@ -17,133 +17,136 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: AppRoutes.home,
     debugLogDiagnostics: true,
-    transitionsBuilder: (context, state, child) {
-      final routeName = state.matchedLocation;
-
-      if (routeName == AppRoutes.game || routeName == AppRoutes.completion) {
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0, 1),
-            end: Offset.zero,
-          ).animate(CurvedAnimation(
-            parent: state.animation!,
-            curve: Curves.easeOutCubic,
-          )),
-          child: child,
-        );
-      } else if (routeName == AppRoutes.achievements ||
-          routeName == AppRoutes.dailyChallenge) {
-        return FadeTransition(
-          opacity: state.animation!,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.95, end: 1.0).animate(
-              CurvedAnimation(
-                  parent: state.animation!, curve: Curves.easeOutCubic),
-            ),
-            child: child,
-          ),
-        );
-      } else {
-        return FadeTransition(
-          opacity: state.animation!,
-          child: child,
-        );
-      }
-    },
     routes: [
       GoRoute(
         path: AppRoutes.home,
         name: 'home',
-        builder: (context, state) => const HomeScreen(),
+        pageBuilder: (context, state) => const MaterialPage(child: HomeScreen()),
       ),
       GoRoute(
         path: AppRoutes.difficultySelection,
         name: 'difficulty',
-        builder: (context, state) => const DifficultySelectionScreen(),
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: DifficultySelectionScreen()),
       ),
+
+      // Game route — slide up transition
       GoRoute(
         path: AppRoutes.game,
         name: 'game',
-        builder: (context, state) {
-          final difficulty = state.extra as String?;
-          return GameScreen(
-            difficulty: difficulty ?? AppConstants.difficultyEasy,
+        pageBuilder: (context, state) {
+          final difficulty = state.extra as String? ?? AppConstants.difficultyEasy;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: GameScreen(difficulty: difficulty),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+                    .animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+                child: child,
+              );
+            },
           );
         },
       ),
+
       GoRoute(
         path: AppRoutes.statistics,
         name: 'statistics',
-        builder: (context, state) => const StatisticsScreen(),
+        pageBuilder: (context, state) => const MaterialPage(child: StatisticsScreen()),
       ),
       GoRoute(
         path: AppRoutes.settings,
         name: 'settings',
-        builder: (context, state) => const SettingsScreen(),
+        pageBuilder: (context, state) => const MaterialPage(child: SettingsScreen()),
       ),
       GoRoute(
         path: AppRoutes.pause,
         name: 'pause',
-        builder: (context, state) => const PauseMenu(),
+        pageBuilder: (context, state) => const MaterialPage(child: PauseMenu()),
       ),
+
+      // Completion route — slide up transition
       GoRoute(
         path: AppRoutes.completion,
         name: 'completion',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>?;
-          return CompletionScreen(
+          final page = CompletionScreen(
             time: extra?['time'] as int? ?? 0,
             mistakes: extra?['mistakes'] as int? ?? 0,
             hintsUsed: extra?['hintsUsed'] as int? ?? 0,
-            difficulty:
-                extra?['difficulty'] as String? ?? AppConstants.difficultyEasy,
+            difficulty: extra?['difficulty'] as String? ?? AppConstants.difficultyEasy,
+          );
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: page,
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+                    .animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+                child: child,
+              );
+            },
           );
         },
       ),
+
       GoRoute(
         path: AppRoutes.puzzleLoading,
         name: 'puzzleLoading',
-        builder: (context, state) {
-          final difficulty = state.extra as String?;
-          return PuzzleLoadingScreen(
-            difficulty: difficulty ?? AppConstants.difficultyEasy,
-          );
+        pageBuilder: (context, state) {
+          final difficulty = state.extra as String? ?? AppConstants.difficultyEasy;
+          return MaterialPage(child: PuzzleLoadingScreen(difficulty: difficulty));
         },
       ),
+
+      // Achievements & Daily Challenge — fade + scale
       GoRoute(
         path: AppRoutes.dailyChallenge,
         name: 'dailyChallenge',
-        builder: (context, state) => const DailyChallengeScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const DailyChallengeScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: ScaleTransition(
+                scale: Tween<double>(begin: 0.95, end: 1.0).animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+                ),
+                child: child,
+              ),
+            );
+          },
+        ),
       ),
       GoRoute(
         path: AppRoutes.achievements,
         name: 'achievements',
-        builder: (context, state) => const AchievementScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const AchievementScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
       ),
     ],
-    errorBuilder:
-        (context, state) => Scaffold(
+    errorBuilder: (context, state) => Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
-            Text(
-              'Page Not Found',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            Text('Page Not Found', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 8),
-            Text(
-              state.error.toString(),
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
+            Text(state.error.toString(), style: Theme.of(context).textTheme.bodyMedium, textAlign: TextAlign.center),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => context.go(AppRoutes.home),
-              child: const Text('Go Home'),
-            ),
+            ElevatedButton(onPressed: () => context.go(AppRoutes.home), child: const Text('Go Home')),
           ],
         ),
       ),

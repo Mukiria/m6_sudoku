@@ -4,15 +4,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
-import 'package:m6_sudoku/shared/widgets/cards.dart';
-import 'package:m6_sudoku/shared/widgets/buttons.dart';
-import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
-import 'package:m6_sudoku/features/sudoku/presentation/providers/sudoku_providers.dart';
-import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
 import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart';
 import 'package:m6_sudoku/core/routing/app_router.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
-import 'package:m6_sudoku/features/sudoku/presentation/screens/puzzle_loading_screen.dart';
 
 class DifficultySelectionScreen extends ConsumerWidget {
   const DifficultySelectionScreen({super.key});

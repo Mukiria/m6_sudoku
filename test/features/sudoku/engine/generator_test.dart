@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:m6_sudoku/features/sudoku/engine/generator/puzzle_generator.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
-import 'package:m6_sudoku/features/sudoku/engine/models/board.dart';
 import 'package:m6_sudoku/features/sudoku/engine/validator/unique_solution_validator.dart';
 import 'package:m6_sudoku/features/sudoku/engine/solver/sudoku_solver.dart';
 

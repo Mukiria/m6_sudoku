@@ -164,7 +164,7 @@ void main() {
     });
 
     test('copyWith updates only specified fields', () {
-      const stats = DailyChallengeStats(
+      final stats = DailyChallengeStats(
         totalPlayed: 10,
         totalCompleted: 5,
         currentStreak: 3,
@@ -186,7 +186,7 @@ void main() {
     });
 
     test('toJson and fromJson roundtrip', () {
-      const stats = DailyChallengeStats(
+      final stats = DailyChallengeStats(
         totalPlayed: 25,
         totalCompleted: 15,
         currentStreak: 5,
@@ -205,7 +205,7 @@ void main() {
     });
 
     test('equality works correctly', () {
-      const s1 = DailyChallengeStats(
+      final s1 = DailyChallengeStats(
         totalPlayed: 10,
         totalCompleted: 5,
         currentStreak: 3,
@@ -213,7 +213,7 @@ void main() {
         lastPlayedDate: DateTime(2024, 6, 1),
       );
 
-      const s2 = DailyChallengeStats(
+      final s2 = DailyChallengeStats(
         totalPlayed: 10,
         totalCompleted: 5,
         currentStreak: 3,
@@ -221,7 +221,7 @@ void main() {
         lastPlayedDate: DateTime(2024, 6, 1),
       );
 
-      const s3 = DailyChallengeStats(
+      final s3 = DailyChallengeStats(
         totalPlayed: 11,
         totalCompleted: 5,
         currentStreak: 3,

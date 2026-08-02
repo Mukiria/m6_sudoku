@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
-import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart'
+import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart';
 import 'package:m6_sudoku/shared/widgets/cards.dart';
 import 'package:url_launcher/url_launcher.dart';
 

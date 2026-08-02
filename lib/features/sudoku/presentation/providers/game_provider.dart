@@ -78,6 +78,10 @@ class GameController extends _$GameController {
   void selectCell(int row, int col) {
     if (state == null) return;
 
+    final puzzle = state!.puzzle;
+    // Don't select fixed/given cells
+    if (puzzle.grid[row][col] != 0) return;
+
     state = state!.copyWith(
       selectedCell: CellPosition(row: row, col: col),
       highlightedCells: _getHighlightedCells(row, col),
@@ -165,6 +169,10 @@ class GameController extends _$GameController {
     if (state == null) return;
 
     final currentState = state!;
+    final puzzle = currentState.puzzle;
+    // Don't add notes to fixed/given cells
+    if (puzzle.grid[row][col] != 0) return;
+
     final currentNotes = currentState.notes[row][col];
     final newNotes = Set<int>.from(currentNotes);
 

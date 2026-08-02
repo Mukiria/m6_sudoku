@@ -10,6 +10,7 @@ class PuzzleLocalDataSource {
   PuzzleLocalDataSource(this._storage);
 
   final StorageService _storage;
+  int _solutions = 0;
 
   static const String _puzzleKey = 'current_puzzle';
   static const String _gameStateKey = 'game_state';
@@ -248,13 +249,13 @@ class PuzzleLocalDataSource {
   }
 
   bool _hasUniqueSolution(List<List<int>> grid) {
-    int solutions = 0;
-    _countSolutions(grid, solutions);
-    return solutions == 1;
+    _solutions = 0;
+    _countSolutions(grid);
+    return _solutions == 1;
   }
 
-  void _countSolutions(List<List<int>> grid, int solutions) {
-    if (solutions > 1) return;
+  void _countSolutions(List<List<int>> grid) {
+    if (_solutions > 1) return;
 
     int? emptyRow;
     int? emptyCol;
@@ -271,16 +272,16 @@ class PuzzleLocalDataSource {
     }
 
     if (emptyRow == null) {
-      solutions++;
+      _solutions++;
       return;
     }
 
     for (int num = 1; num <= 9; num++) {
       if (_isValid(grid, emptyRow!, emptyCol!, num)) {
         grid[emptyRow!][emptyCol!] = num;
-        _countSolutions(grid, solutions);
+        _countSolutions(grid);
         grid[emptyRow!][emptyCol!] = 0;
-        if (solutions > 1) return;
+        if (_solutions > 1) return;
       }
     }
   }

@@ -1,13 +1,81 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:m6_sudoku/core/errors/failures.dart';
 import 'package:m6_sudoku/core/services/storage_service.dart';
 import 'package:m6_sudoku/features/settings/domain/repositories/settings_repository.dart';
-import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
+import 'package:m6_sudoku/features/sudoku/domain/usecases/game_usecases.dart';
+import 'package:m6_sudoku/features/sudoku/domain/repositories/puzzle_repository.dart';
+import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
+import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/sudoku_providers.dart';
 import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart';
 import '../../fakes/fake_services.dart';
+
+class FakePuzzleRepository implements PuzzleRepository {
+  @override
+  Future<Either<Failure, Puzzle>> generatePuzzle(String difficulty) async => Left(CacheFailure('Not implemented'));
+
+  @override
+  Future<Either<Failure, Puzzle>> getPuzzle(String id) async => Left(CacheFailure('Not implemented'));
+
+  @override
+  Future<Either<Failure, void>> savePuzzle(Puzzle puzzle) async => Left(CacheFailure('Not implemented'));
+
+  @override
+  Future<Either<Failure, void>> deletePuzzle(String id) async => Left(CacheFailure('Not implemented'));
+
+  @override
+  Future<Either<Failure, Puzzle?>> getCurrentPuzzle() async => Left(CacheFailure('Not implemented'));
+
+  @override
+  Future<Either<Failure, void>> saveGameState(GameState state) async => Left(CacheFailure('Not implemented'));
+
+  @override
+  Future<Either<Failure, GameState?>> getGameState() async => Left(CacheFailure('Not implemented'));
+
+  @override
+  Future<Either<Failure, void>> clearGameState() async => Left(CacheFailure('Not implemented'));
+
+  @override
+  Future<Either<Failure, List<Puzzle>>> getPuzzleHistory() async => Left(CacheFailure('Not implemented'));
+
+  @override
+  Future<Either<Failure, void>> savePuzzleToHistory(Puzzle puzzle) async => Left(CacheFailure('Not implemented'));
+}
+
+class FakeGetHintUseCase extends GetHintUseCase {
+  FakeGetHintUseCase() : super(FakePuzzleRepository()) {
+    print('FakeGetHintUseCase created');
+  }
+
+  @override
+  Future<Either<Failure, HintCell?>> call({required GameState state}) async {
+    print('FakeGetHintUseCase.call called');
+    print('Puzzle grid: ${state.puzzle.grid}');
+    print('User grid: ${state.userGrid}');
+    // Return a direct reveal hint for the first empty cell
+    for (int r = 0; r < 9; r++) {
+      for (int c = 0; c < 9; c++) {
+        if (state.userGrid[r][c] == 0 && state.puzzle.grid[r][c] == 0) {
+          print('Found empty cell at $r,$c');
+          return Right(HintCell(
+            row: r,
+            col: c,
+            value: state.puzzle.solution[r][c],
+            isFixed: false,
+            hintType: HintType.directReveal,
+            explanation: 'Test hint',
+          ));
+        }
+      }
+    }
+    print('No empty cells found');
+    return const Right(null);
+  }
+}
 
 void main() {
   group('GameController - Gameplay Tests', () {
@@ -19,6 +87,7 @@ void main() {
           storageServiceProvider.overrideWithValue(FakeStorageService()),
           settingsRepositoryProvider.overrideWithValue(FakeSettingsRepository()),
           audioServiceProvider.overrideWithValue(FakeAudioService()),
+          getHintUseCaseProvider.overrideWithValue(FakeGetHintUseCase()),
         ],
       );
     });
@@ -84,12 +153,28 @@ void main() {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
         
-        controller.selectCell(2, 2);
-        
+        // Find an empty cell to select
         final state = container.read(gameControllerProvider);
+        int? emptyRow, emptyCol;
+        for (int r = 0; r < 9; r++) {
+          for (int c = 0; c < 9; c++) {
+            if (state!.userGrid[r][c] == 0 && state.puzzle.grid[r][c] == 0) {
+              emptyRow = r;
+              emptyCol = c;
+              break;
+            }
+          }
+          if (emptyRow != null) break;
+        }
         
-        expect(state!.selectedCell, const CellPosition(row: 2, col: 2));
-        expect(state.highlightedCells.length, 20); // 8 row + 8 col + 4 box - 1 overlap
+        if (emptyRow != null) {
+          controller.selectCell(emptyRow!, emptyCol!);
+          
+          final newState = container.read(gameControllerProvider);
+          
+          expect(newState!.selectedCell, CellPosition(row: emptyRow!, col: emptyCol!));
+          expect(newState.highlightedCells.length, 20); // 8 row + 8 col + 4 box - 1 overlap
+        }
       });
 
       test('does not select fixed cell', () async {

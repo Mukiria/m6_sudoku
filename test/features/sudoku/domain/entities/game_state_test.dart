@@ -172,6 +172,7 @@ void main() {
     });
 
     test('equality works correctly', () {
+      final fixedTime = DateTime(2024, 1, 1, 12, 0, 0);
       final state1 = GameState(
         puzzleId: 'test',
         puzzle: Puzzle(
@@ -180,7 +181,7 @@ void main() {
           solution: List.generate(9, (i) => List.filled(9, 0)),
           difficulty: 'easy',
           cluesCount: 36,
-          createdAt: DateTime.now(),
+          createdAt: fixedTime,
         ),
         userGrid: List.generate(9, (i) => List.filled(9, 0)),
         notes: List.generate(9, (i) => List.generate(9, (j) => <int>{})),
@@ -191,7 +192,7 @@ void main() {
         moveHistory: [],
         redoStack: [],
         status: GameStatus.playing,
-        lastPlayed: DateTime.now(),
+        lastPlayed: fixedTime,
         difficulty: Difficulty.easy,
         selectedCell: null,
         selectedNumber: null,
@@ -199,7 +200,7 @@ void main() {
         highlightedCells: {},
         conflictCells: {},
         hintState: testHint,
-        lastSaved: DateTime.now(),
+        lastSaved: fixedTime,
       );
 
       final state2 = GameState(
@@ -210,7 +211,7 @@ void main() {
           solution: List.generate(9, (i) => List.filled(9, 0)),
           difficulty: 'easy',
           cluesCount: 36,
-          createdAt: DateTime.now(),
+          createdAt: fixedTime,
         ),
         userGrid: List.generate(9, (i) => List.filled(9, 0)),
         notes: List.generate(9, (i) => List.generate(9, (j) => <int>{})),
@@ -221,7 +222,7 @@ void main() {
         moveHistory: [],
         redoStack: [],
         status: GameStatus.playing,
-        lastPlayed: DateTime.now(),
+        lastPlayed: fixedTime,
         difficulty: Difficulty.easy,
         selectedCell: null,
         selectedNumber: null,
@@ -229,7 +230,7 @@ void main() {
         highlightedCells: {},
         conflictCells: {},
         hintState: testHint,
-        lastSaved: DateTime.now(),
+        lastSaved: fixedTime,
       );
 
       expect(state1, equals(state2));

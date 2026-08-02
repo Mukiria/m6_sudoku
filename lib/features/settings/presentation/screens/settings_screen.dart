@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
-import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart';
+import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart'
 import 'package:m6_sudoku/shared/widgets/cards.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -174,14 +175,14 @@ class SettingsScreen extends ConsumerWidget {
               icon: Icons.privacy_tip_rounded,
               title: 'Privacy Policy',
               subtitle: 'Read our privacy policy',
-              onTap: () {},
+              onTap: () => _launchUrl('https://msixv.com/games/privacy-policy'),
             ),
             _buildSettingTile(
               context,
               icon: Icons.description_rounded,
               title: 'Terms of Service',
               subtitle: 'Read our terms of service',
-              onTap: () {},
+              onTap: () => _launchUrl('https://msixv.com/games/terms-of-service'),
             ),
             _buildSettingTile(
               context,
@@ -423,5 +424,12 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
     );
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $url');
+    }
   }
 }

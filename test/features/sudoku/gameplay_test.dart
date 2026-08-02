@@ -372,10 +372,20 @@ void main() {
         
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
-          controller.toggleNote(emptyRow!, emptyCol!, 5);
+          
+          // Find a note value that's NOT in the initial candidates for this cell
+          final initialNotes = state!.notes[emptyRow!][emptyCol!];
+          int noteToAdd = 1;
+          while (initialNotes.contains(noteToAdd) && noteToAdd <= 9) {
+            noteToAdd++;
+          }
+          // If all 1-9 are candidates (unlikely), use 1 anyway - test will still verify toggle behavior
+          if (noteToAdd > 9) noteToAdd = 1;
+          
+          controller.toggleNote(emptyRow!, emptyCol!, noteToAdd);
           
           final newState = container.read(gameControllerProvider);
-          expect(newState!.notes[emptyRow!][emptyCol!], contains(5));
+          expect(newState!.notes[emptyRow!][emptyCol!], contains(noteToAdd));
         }
       });
 
@@ -398,11 +408,22 @@ void main() {
         
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
-          controller.toggleNote(emptyRow!, emptyCol!, 5);
-          controller.toggleNote(emptyRow!, emptyCol!, 5);
+          
+          // Find a note value that's NOT in the initial candidates for this cell
+          final initialNotes = state!.notes[emptyRow!][emptyCol!];
+          int noteToAdd = 1;
+          while (initialNotes.contains(noteToAdd) && noteToAdd <= 9) {
+            noteToAdd++;
+          }
+          if (noteToAdd > 9) noteToAdd = 1;
+          
+          // First toggle adds the note
+          controller.toggleNote(emptyRow!, emptyCol!, noteToAdd);
+          // Second toggle removes it
+          controller.toggleNote(emptyRow!, emptyCol!, noteToAdd);
           
           final newState = container.read(gameControllerProvider);
-          expect(newState!.notes[emptyRow!][emptyCol!], isNot(contains(5)));
+          expect(newState!.notes[emptyRow!][emptyCol!], isNot(contains(noteToAdd)));
         }
       });
 

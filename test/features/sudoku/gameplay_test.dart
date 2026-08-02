@@ -1,15 +1,26 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:m6_sudoku/core/services/storage_service.dart';
+import 'package:m6_sudoku/features/settings/domain/repositories/settings_repository.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/providers/sudoku_providers.dart';
+import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart';
+import '../../fakes/fake_services.dart';
 
 void main() {
   group('GameController - Gameplay Tests', () {
     late ProviderContainer container;
 
     setUp(() {
-      container = ProviderContainer();
+      container = ProviderContainer(
+        overrides: [
+          storageServiceProvider.overrideWithValue(FakeStorageService()),
+          settingsRepositoryProvider.overrideWithValue(FakeSettingsRepository()),
+          audioServiceProvider.overrideWithValue(FakeAudioService()),
+        ],
+      );
     });
 
     tearDown(() {

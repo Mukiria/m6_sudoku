@@ -1,16 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:m6_sudoku/core/audio/audio_service.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/routing/app_router.dart';
+import 'package:m6_sudoku/core/services/storage_service.dart';
 import 'package:m6_sudoku/core/theme/app_theme.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/providers/sudoku_providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(const ProviderScope(child: M6SudokuApp()));
+  final prefs = await SharedPreferences.getInstance();
+  final storageService = StorageServiceImpl(prefs);
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        storageServiceProvider.overrideWithValue(storageService),
+      ],
+      child: const M6SudokuApp(),
+    ),
+  );
 }
 
 class M6SudokuApp extends ConsumerWidget {

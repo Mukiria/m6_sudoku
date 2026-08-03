@@ -1,13 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 
-enum SoundType {
-  buttonClick,
-  win,
-  error,
-  hint,
-  pause,
-  resume,
-}
+enum SoundType { buttonClick, win, error, hint, pause, resume }
 
 class AudioManager {
   AudioManager._();

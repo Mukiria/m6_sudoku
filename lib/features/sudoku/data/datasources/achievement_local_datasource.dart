@@ -226,16 +226,19 @@ class AchievementLocalDataSource {
         return Right(defaults);
       }
       final list = jsonDecode(jsonString) as List;
-      final achievements = list
-          .map((e) => Achievement.fromJson(e as Map<String, dynamic>))
-          .toList();
+      final achievements =
+          list
+              .map((e) => Achievement.fromJson(e as Map<String, dynamic>))
+              .toList();
       return Right(achievements);
     } catch (e) {
       return Left(CacheFailure('Failed to get achievements: $e'));
     }
   }
 
-  Future<Either<Failure, void>> saveAchievements(List<Achievement> achievements) async {
+  Future<Either<Failure, void>> saveAchievements(
+    List<Achievement> achievements,
+  ) async {
     try {
       await _storage.setString(
         _achievementsKey,
@@ -249,82 +252,80 @@ class AchievementLocalDataSource {
 
   Future<Either<Failure, void>> unlockAchievement(String id) async {
     final result = await getAchievements();
-    return result.fold(
-      (failure) => Left(failure),
-      (achievements) async {
-        final index = achievements.indexWhere((a) => a.id == id);
-        if (index == -1) {
-          return Left(NotFoundFailure('Achievement not found: $id'));
-        }
-        final achievement = achievements[index];
-        if (achievement.isUnlocked) {
-          return const Right(null);
-        }
-        final unlocked = achievement.copyWith(
-          isUnlocked: true,
-          currentProgress: achievement.targetValue,
-          unlockedAt: DateTime.now(),
-        );
-        achievements[index] = unlocked;
-        await _saveAchievements(achievements);
+    return result.fold((failure) => Left(failure), (achievements) async {
+      final index = achievements.indexWhere((a) => a.id == id);
+      if (index == -1) {
+        return Left(NotFoundFailure('Achievement not found: $id'));
+      }
+      final achievement = achievements[index];
+      if (achievement.isUnlocked) {
         return const Right(null);
-      },
-    );
+      }
+      final unlocked = achievement.copyWith(
+        isUnlocked: true,
+        currentProgress: achievement.targetValue,
+        unlockedAt: DateTime.now(),
+      );
+      achievements[index] = unlocked;
+      await _saveAchievements(achievements);
+      return const Right(null);
+    });
   }
 
   Future<Either<Failure, void>> updateProgress(String id, int progress) async {
     final result = await getAchievements();
-    return result.fold(
-      (failure) => Left(failure),
-      (achievements) async {
-        final index = achievements.indexWhere((a) => a.id == id);
-        if (index == -1) {
-          return Left(NotFoundFailure('Achievement not found: $id'));
-        }
-        final achievement = achievements[index];
-        if (achievement.isUnlocked) {
-          return const Right(null);
-        }
-        final newProgress = progress.clamp(0, achievement.targetValue);
-        final updated = achievement.copyWith(
-          currentProgress: newProgress,
-          isUnlocked: newProgress >= achievement.targetValue,
-          unlockedAt: newProgress >= achievement.targetValue ? DateTime.now() : null,
-        );
-        achievements[index] = updated;
-        await _saveAchievements(achievements);
+    return result.fold((failure) => Left(failure), (achievements) async {
+      final index = achievements.indexWhere((a) => a.id == id);
+      if (index == -1) {
+        return Left(NotFoundFailure('Achievement not found: $id'));
+      }
+      final achievement = achievements[index];
+      if (achievement.isUnlocked) {
         return const Right(null);
-      },
-    );
+      }
+      final newProgress = progress.clamp(0, achievement.targetValue);
+      final updated = achievement.copyWith(
+        currentProgress: newProgress,
+        isUnlocked: newProgress >= achievement.targetValue,
+        unlockedAt:
+            newProgress >= achievement.targetValue ? DateTime.now() : null,
+      );
+      achievements[index] = updated;
+      await _saveAchievements(achievements);
+      return const Right(null);
+    });
   }
 
   Future<Either<Failure, void>> incrementProgress(String id, int amount) async {
     final result = await getAchievements();
-    return result.fold(
-      (failure) => Left(failure),
-      (achievements) async {
-        final index = achievements.indexWhere((a) => a.id == id);
-        if (index == -1) {
-          return Left(NotFoundFailure('Achievement not found: $id'));
-        }
-        final achievement = achievements[index];
-        if (achievement.isUnlocked) {
-          return const Right(null);
-        }
-        final newProgress = (achievement.currentProgress + amount).clamp(0, achievement.targetValue);
-        final updated = achievement.copyWith(
-          currentProgress: newProgress,
-          isUnlocked: newProgress >= achievement.targetValue,
-          unlockedAt: newProgress >= achievement.targetValue ? DateTime.now() : null,
-        );
-        achievements[index] = updated;
-        await _saveAchievements(achievements);
+    return result.fold((failure) => Left(failure), (achievements) async {
+      final index = achievements.indexWhere((a) => a.id == id);
+      if (index == -1) {
+        return Left(NotFoundFailure('Achievement not found: $id'));
+      }
+      final achievement = achievements[index];
+      if (achievement.isUnlocked) {
         return const Right(null);
-      },
-    );
+      }
+      final newProgress = (achievement.currentProgress + amount).clamp(
+        0,
+        achievement.targetValue,
+      );
+      final updated = achievement.copyWith(
+        currentProgress: newProgress,
+        isUnlocked: newProgress >= achievement.targetValue,
+        unlockedAt:
+            newProgress >= achievement.targetValue ? DateTime.now() : null,
+      );
+      achievements[index] = updated;
+      await _saveAchievements(achievements);
+      return const Right(null);
+    });
   }
 
-  Future<Either<Failure, void>> _saveAchievements(List<Achievement> achievements) async {
+  Future<Either<Failure, void>> _saveAchievements(
+    List<Achievement> achievements,
+  ) async {
     try {
       await _storage.setString(
         _achievementsKey,
@@ -348,7 +349,8 @@ class AchievementLocalDataSource {
     final result = await getAchievements();
     return result.fold(
       (failure) => Left(failure),
-      (achievements) => Right(achievements.where((a) => !a.isUnlocked).toList()),
+      (achievements) =>
+          Right(achievements.where((a) => !a.isUnlocked).toList()),
     );
   }
 }

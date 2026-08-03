@@ -103,7 +103,9 @@ class Board {
     for (var r = 0; r < 9; r++) {
       for (var c = 0; c < 9; c++) {
         if (_cells[r][c].value == 0) {
-          _cells[r][c] = _cells[r][c].copyWith(candidates: getCandidatesMask(r, c));
+          _cells[r][c] = _cells[r][c].copyWith(
+            candidates: getCandidatesMask(r, c),
+          );
         }
       }
     }

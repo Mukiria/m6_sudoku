@@ -88,10 +88,12 @@ class NumberPad extends ConsumerWidget {
                   label: 'Erase',
                   onTap: () {
                     if (gameState.selectedCell != null) {
-                      ref.read(gameControllerProvider.notifier).clearCell(
-                        gameState.selectedCell!.row,
-                        gameState.selectedCell!.col,
-                      );
+                      ref
+                          .read(gameControllerProvider.notifier)
+                          .clearCell(
+                            gameState.selectedCell!.row,
+                            gameState.selectedCell!.col,
+                          );
                     }
                   },
                   color: extension.eraseButtonBackground!,
@@ -124,7 +126,8 @@ class NumberPad extends ConsumerWidget {
                 child: _buildActionButton(
                   icon: Icons.lightbulb_rounded,
                   label: 'Hint',
-                  onTap: () => ref.read(gameControllerProvider.notifier).useHint(),
+                  onTap:
+                      () => ref.read(gameControllerProvider.notifier).useHint(),
                   color: extension.hintButtonBackground!,
                   textColor: extension.hintButtonText!,
                   isEnabled: gameState.hintsUsed < 3,

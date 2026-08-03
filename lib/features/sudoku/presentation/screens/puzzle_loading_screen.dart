@@ -10,15 +10,13 @@ import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.d
 import 'package:m6_sudoku/core/routing/app_router.dart';
 
 class PuzzleLoadingScreen extends ConsumerStatefulWidget {
-  const PuzzleLoadingScreen({
-    super.key,
-    required this.difficulty,
-  });
+  const PuzzleLoadingScreen({super.key, required this.difficulty});
 
   final String difficulty;
 
   @override
-  ConsumerState<PuzzleLoadingScreen> createState() => _PuzzleLoadingScreenState();
+  ConsumerState<PuzzleLoadingScreen> createState() =>
+      _PuzzleLoadingScreenState();
 }
 
 class _PuzzleLoadingScreenState extends ConsumerState<PuzzleLoadingScreen> {
@@ -166,10 +164,7 @@ class _PuzzleLoadingScreenState extends ConsumerState<PuzzleLoadingScreen> {
                     Icons.error_outline_rounded,
                     size: 60,
                     color: extension.cellErrorBorder!,
-                  )
-                  .animate()
-                  .fadeIn(duration: 400.ms)
-                  .shake(),
+                  ).animate().fadeIn(duration: 400.ms).shake(),
                   const SizedBox(height: AppConstants.spacingLg),
                   Text(
                     _error!,
@@ -192,28 +187,34 @@ class _PuzzleLoadingScreenState extends ConsumerState<PuzzleLoadingScreen> {
                   ),
                 ] else ...[
                   SizedBox(
-                    width: 60,
-                    height: 60,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 4,
-                      valueColor: AlwaysStoppedAnimation<Color>(difficultyColor),
-                    ),
-                  )
-                  .animate()
-                  .fadeIn(duration: 400.ms, delay: 500.ms)
-                  .scale(duration: 400.ms, delay: 500.ms, curve: Curves.elasticOut),
+                        width: 60,
+                        height: 60,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            difficultyColor,
+                          ),
+                        ),
+                      )
+                      .animate()
+                      .fadeIn(duration: 400.ms, delay: 500.ms)
+                      .scale(
+                        duration: 400.ms,
+                        delay: 500.ms,
+                        curve: Curves.elasticOut,
+                      ),
 
                   const SizedBox(height: AppConstants.spacingLg),
 
                   Text(
-                    'Creating unique solution...',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  )
-                  .animate()
-                  .fadeIn(duration: 400.ms, delay: 600.ms)
-                  .slideY(begin: 0.3, end: 0),
+                        'Creating unique solution...',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      )
+                      .animate()
+                      .fadeIn(duration: 400.ms, delay: 600.ms)
+                      .slideY(begin: 0.3, end: 0),
                 ],
               ],
             ),

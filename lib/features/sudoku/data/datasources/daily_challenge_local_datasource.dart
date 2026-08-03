@@ -8,7 +8,6 @@ import 'package:m6_sudoku/features/sudoku/engine/generator/puzzle_generator.dart
 import 'package:m6_sudoku/core/errors/failures.dart';
 import 'package:m6_sudoku/core/services/storage_service.dart';
 
-
 class DailyChallengeLocalDataSource {
   DailyChallengeLocalDataSource(this._storage);
 
@@ -19,7 +18,7 @@ class DailyChallengeLocalDataSource {
 
   Future<Either<Failure, DailyChallenge>> getOrGenerateDailyChallenge() async {
     final today = _getTodayDateString();
-    
+
     // Check if today's challenge already exists
     final existing = await _getDailyChallenge(today);
     if (existing != null) {
@@ -97,9 +96,11 @@ class DailyChallengeLocalDataSource {
         totalPlayed: stats.totalPlayed + 1,
         totalCompleted: stats.totalCompleted + (challenge.isCompleted ? 1 : 0),
         currentStreak: challenge.isCompleted ? stats.currentStreak + 1 : 0,
-        bestStreak: challenge.isCompleted && (stats.currentStreak + 1) > stats.bestStreak
-            ? stats.currentStreak + 1
-            : stats.bestStreak,
+        bestStreak:
+            challenge.isCompleted &&
+                    (stats.currentStreak + 1) > stats.bestStreak
+                ? stats.currentStreak + 1
+                : stats.bestStreak,
         lastPlayedDate: DateTime.now(),
       );
       await _storage.setString(_dailyStatsKey, jsonEncode(newStats.toJson()));
@@ -141,15 +142,18 @@ class DailyChallengeLocalDataSource {
   Puzzle _generateDailyPuzzle(String date) {
     // Generate deterministic seed from date
     final seed = _dateToSeed(date);
-    
+
     // Use the puzzle generator with seed
     final generator = PuzzleGenerator(seed: seed);
     final board = generator.generatePuzzleWithDifficulty(Difficulty.medium);
-    
+
     // Convert board to puzzle format
-    final grid = List.generate(9, (r) => List.generate(9, (c) => board.getValue(r, c)));
+    final grid = List.generate(
+      9,
+      (r) => List.generate(9, (c) => board.getValue(r, c)),
+    );
     final solution = _getSolutionFromBoard(board);
-    
+
     return Puzzle(
       id: 'daily_$date',
       grid: grid,
@@ -171,7 +175,10 @@ class DailyChallengeLocalDataSource {
   }
 
   List<List<int>> _getSolutionFromBoard(Board board) {
-    return List.generate(9, (r) => List.generate(9, (c) => board.getValue(r, c)));
+    return List.generate(
+      9,
+      (r) => List.generate(9, (c) => board.getValue(r, c)),
+    );
   }
 
   String _getTodayDateString() {

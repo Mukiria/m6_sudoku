@@ -17,7 +17,10 @@ void main() {
       testPuzzle = Puzzle(
         id: 'test',
         grid: List.generate(9, (i) => List.generate(9, (j) => 0)),
-        solution: List.generate(9, (i) => List.generate(9, (j) => (i + j) % 9 + 1)),
+        solution: List.generate(
+          9,
+          (i) => List.generate(9, (j) => (i + j) % 9 + 1),
+        ),
         difficulty: 'medium',
         cluesCount: 30,
         createdAt: DateTime.now(),
@@ -55,15 +58,17 @@ void main() {
 
     testWidgets('renders 9x9 grid of cells', (WidgetTester tester) async {
       await tester.pumpWidget(createTestWidget());
-      
+
       // Find all InkWell widgets (cells)
       final cells = find.byType(InkWell);
       expect(cells, findsNWidgets(81));
     });
 
-    testWidgets('renders fixed values from puzzle', (WidgetTester tester) async {
+    testWidgets('renders fixed values from puzzle', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createTestWidget());
-      
+
       // Check for fixed values (5 at 0,0 and 3 at 1,1)
       expect(find.text('5'), findsWidgets);
       expect(find.text('3'), findsWidgets);
@@ -71,14 +76,14 @@ void main() {
 
     testWidgets('renders user values', (WidgetTester tester) async {
       await tester.pumpWidget(createTestWidget());
-      
+
       // Check for user value (7 at 2,2)
       expect(find.text('7'), findsWidgets);
     });
 
     testWidgets('renders notes in cell', (WidgetTester tester) async {
       await tester.pumpWidget(createTestWidget());
-      
+
       // Check for notes (1, 2, 3 at 3,3)
       expect(find.text('1'), findsWidgets);
       expect(find.text('2'), findsWidgets);
@@ -97,7 +102,10 @@ void main() {
               userGrid: testUserGrid,
               notes: testNotes,
               selectedCell: const CellPosition(row: 2, col: 2),
-              highlightedCells: {const CellPosition(row: 2, col: 0), const CellPosition(row: 0, col: 2)},
+              highlightedCells: {
+                const CellPosition(row: 2, col: 0),
+                const CellPosition(row: 0, col: 2),
+              },
               conflictCells: {},
               isNoteMode: false,
               onCellTap: (row, col) {},
@@ -106,7 +114,7 @@ void main() {
           ),
         ),
       );
-      
+
       await tester.pumpAndSettle();
       // Should render without errors
     });
@@ -132,7 +140,7 @@ void main() {
           ),
         ),
       );
-      
+
       await tester.pumpAndSettle();
       // Should render without errors
     });
@@ -140,7 +148,7 @@ void main() {
     testWidgets('handles cell tap', (WidgetTester tester) async {
       int? tappedRow;
       int? tappedCol;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light().copyWith(
@@ -164,11 +172,11 @@ void main() {
           ),
         ),
       );
-      
+
       // Tap on a cell
       await tester.tap(find.byType(InkWell).first);
       await tester.pump();
-      
+
       expect(tappedRow, isNotNull);
       expect(tappedCol, isNotNull);
     });
@@ -203,115 +211,129 @@ void main() {
     }
 
     testWidgets('renders difficulty badge', (WidgetTester tester) async {
-      await tester.pumpWidget(createTestWidget(
-        difficulty: 'medium',
-        timeElapsed: 0,
-        mistakes: 0,
-        hintsUsed: 0,
-        onPause: () {},
-        onHint: () {},
-        onUndo: () {},
-      ));
-      
+      await tester.pumpWidget(
+        createTestWidget(
+          difficulty: 'medium',
+          timeElapsed: 0,
+          mistakes: 0,
+          hintsUsed: 0,
+          onPause: () {},
+          onHint: () {},
+          onUndo: () {},
+        ),
+      );
+
       expect(find.text('Medium'), findsOneWidget);
     });
 
     testWidgets('renders timer', (WidgetTester tester) async {
-      await tester.pumpWidget(createTestWidget(
-        difficulty: 'easy',
-        timeElapsed: 125, // 2:05
-        mistakes: 0,
-        hintsUsed: 0,
-        onPause: () {},
-        onHint: () {},
-        onUndo: () {},
-      ));
-      
+      await tester.pumpWidget(
+        createTestWidget(
+          difficulty: 'easy',
+          timeElapsed: 125, // 2:05
+          mistakes: 0,
+          hintsUsed: 0,
+          onPause: () {},
+          onHint: () {},
+          onUndo: () {},
+        ),
+      );
+
       expect(find.text('02:05'), findsOneWidget);
     });
 
     testWidgets('renders mistakes counter', (WidgetTester tester) async {
-      await tester.pumpWidget(createTestWidget(
-        difficulty: 'hard',
-        timeElapsed: 0,
-        mistakes: 2,
-        hintsUsed: 0,
-        onPause: () {},
-        onHint: () {},
-        onUndo: () {},
-      ));
-      
+      await tester.pumpWidget(
+        createTestWidget(
+          difficulty: 'hard',
+          timeElapsed: 0,
+          mistakes: 2,
+          hintsUsed: 0,
+          onPause: () {},
+          onHint: () {},
+          onUndo: () {},
+        ),
+      );
+
       expect(find.text('2/3'), findsOneWidget);
     });
 
     testWidgets('renders hints counter', (WidgetTester tester) async {
-      await tester.pumpWidget(createTestWidget(
-        difficulty: 'expert',
-        timeElapsed: 0,
-        mistakes: 0,
-        hintsUsed: 1,
-        onPause: () {},
-        onHint: () {},
-        onUndo: () {},
-      ));
-      
+      await tester.pumpWidget(
+        createTestWidget(
+          difficulty: 'expert',
+          timeElapsed: 0,
+          mistakes: 0,
+          hintsUsed: 1,
+          onPause: () {},
+          onHint: () {},
+          onUndo: () {},
+        ),
+      );
+
       expect(find.text('1/3'), findsOneWidget);
     });
 
     testWidgets('pause button calls onPause', (WidgetTester tester) async {
       bool pauseCalled = false;
-      
-      await tester.pumpWidget(createTestWidget(
-        difficulty: 'easy',
-        timeElapsed: 0,
-        mistakes: 0,
-        hintsUsed: 0,
-        onPause: () => pauseCalled = true,
-        onHint: () {},
-        onUndo: () {},
-      ));
-      
+
+      await tester.pumpWidget(
+        createTestWidget(
+          difficulty: 'easy',
+          timeElapsed: 0,
+          mistakes: 0,
+          hintsUsed: 0,
+          onPause: () => pauseCalled = true,
+          onHint: () {},
+          onUndo: () {},
+        ),
+      );
+
       await tester.tap(find.byIcon(Icons.pause_rounded));
       await tester.pump();
-      
+
       expect(pauseCalled, true);
     });
 
     testWidgets('hint button calls onHint', (WidgetTester tester) async {
       bool hintCalled = false;
-      
-      await tester.pumpWidget(createTestWidget(
-        difficulty: 'easy',
-        timeElapsed: 0,
-        mistakes: 0,
-        hintsUsed: 0,
-        onPause: () {},
-        onHint: () => hintCalled = true,
-        onUndo: () {},
-      ));
-      
+
+      await tester.pumpWidget(
+        createTestWidget(
+          difficulty: 'easy',
+          timeElapsed: 0,
+          mistakes: 0,
+          hintsUsed: 0,
+          onPause: () {},
+          onHint: () => hintCalled = true,
+          onUndo: () {},
+        ),
+      );
+
       await tester.tap(find.byIcon(Icons.lightbulb_rounded));
       await tester.pump();
-      
+
       expect(hintCalled, true);
     });
 
     testWidgets('undo button calls onUndo', (WidgetTester tester) async {
       bool undoCalled = false;
-      
-      await tester.pumpWidget(createTestWidget(
-        difficulty: 'easy',
-        timeElapsed: 0,
-        mistakes: 0,
-        hintsUsed: 0,
-        onPause: () {},
-        onHint: () {},
-        onUndo: () => undoCalled = true,
-      ));
-      
+
+      await tester.pumpWidget(
+        createTestWidget(
+          difficulty: 'easy',
+          timeElapsed: 0,
+          mistakes: 0,
+          hintsUsed: 0,
+          onPause: () {},
+          onHint: () {},
+          onUndo: () => undoCalled = true,
+        ),
+      );
+
       await tester.tap(find.byIcon(Icons.undo_rounded));
       await tester.pump();
-      
+
       expect(undoCalled, true);
     });
   });
@@ -343,77 +365,87 @@ void main() {
     }
 
     testWidgets('renders number buttons 1-9', (WidgetTester tester) async {
-      await tester.pumpWidget(createTestWidget(
-        selectedNumber: null,
-        onNumberSelected: (_) {},
-        onNoteModeToggle: () {},
-        isNoteMode: false,
-        counts: {},
-        disabledNumbers: {},
-      ));
-      
+      await tester.pumpWidget(
+        createTestWidget(
+          selectedNumber: null,
+          onNumberSelected: (_) {},
+          onNoteModeToggle: () {},
+          isNoteMode: false,
+          counts: {},
+          disabledNumbers: {},
+        ),
+      );
+
       for (int i = 1; i <= 9; i++) {
         expect(find.text(i.toString()), findsWidgets);
       }
     });
 
     testWidgets('renders erase button', (WidgetTester tester) async {
-      await tester.pumpWidget(createTestWidget(
-        selectedNumber: null,
-        onNumberSelected: (_) {},
-        onNoteModeToggle: () {},
-        isNoteMode: false,
-        counts: {},
-        disabledNumbers: {},
-      ));
-      
+      await tester.pumpWidget(
+        createTestWidget(
+          selectedNumber: null,
+          onNumberSelected: (_) {},
+          onNoteModeToggle: () {},
+          isNoteMode: false,
+          counts: {},
+          disabledNumbers: {},
+        ),
+      );
+
       expect(find.byIcon(Icons.backspace_rounded), findsOneWidget);
       expect(find.text('Erase'), findsOneWidget);
     });
 
     testWidgets('renders mode toggle buttons', (WidgetTester tester) async {
-      await tester.pumpWidget(createTestWidget(
-        selectedNumber: null,
-        onNumberSelected: (_) {},
-        onNoteModeToggle: () {},
-        isNoteMode: false,
-        counts: {},
-        disabledNumbers: {},
-      ));
-      
+      await tester.pumpWidget(
+        createTestWidget(
+          selectedNumber: null,
+          onNumberSelected: (_) {},
+          onNoteModeToggle: () {},
+          isNoteMode: false,
+          counts: {},
+          disabledNumbers: {},
+        ),
+      );
+
       expect(find.text('Numbers'), findsOneWidget);
       expect(find.text('Notes'), findsOneWidget);
     });
 
     testWidgets('highlights selected number', (WidgetTester tester) async {
-      await tester.pumpWidget(createTestWidget(
-        selectedNumber: 5,
-        onNumberSelected: (_) {},
-        onNoteModeToggle: () {},
-        isNoteMode: false,
-        counts: {},
-        disabledNumbers: {},
-      ));
-      
+      await tester.pumpWidget(
+        createTestWidget(
+          selectedNumber: 5,
+          onNumberSelected: (_) {},
+          onNoteModeToggle: () {},
+          isNoteMode: false,
+          counts: {},
+          disabledNumbers: {},
+        ),
+      );
+
       // Should find the number 5 button as selected
       // This is tested by the presence of the widget
     });
 
     testWidgets('note mode toggle switches mode', (WidgetTester tester) async {
       bool noteModeToggled = false;
-      
-      await tester.pumpWidget(createTestWidget(
-        selectedNumber: null,
-        onNumberSelected: (_) {},
-        onNoteModeToggle: () => noteModeToggled = true,
-        isNoteMode: false,
-        counts: {},
-        disabledNumbers: {},
-      ));
-      
+
+      await tester.pumpWidget(
+        createTestWidget(
+          selectedNumber: null,
+          onNumberSelected: (_) {},
+          onNoteModeToggle: () => noteModeToggled = true,
+          isNoteMode: false,
+          counts: {},
+          disabledNumbers: {},
+        ),
+      );
+
       await tester.tap(find.text('Notes'));
       await tester.pump();
-      
+
       expect(noteModeToggled, true);
     });
   });

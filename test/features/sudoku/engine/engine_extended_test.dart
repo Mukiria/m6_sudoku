@@ -10,7 +10,7 @@ void main() {
       board.setValue(0, 0, 5);
       board.setValue(0, 1, 3);
       board.setValue(1, 0, 6);
-      
+
       final candidates = board.getCandidates(2, 2);
       expect(candidates, isNotEmpty);
       expect(candidates, isNot(contains(5)));
@@ -28,10 +28,10 @@ void main() {
     test('getFilledCount returns correct count', () {
       final board = Board();
       expect(board.filledCount, 0);
-      
+
       board.setValue(0, 0, 5);
       expect(board.filledCount, 1);
-      
+
       board.setValue(1, 1, 3);
       expect(board.filledCount, 2);
     });
@@ -40,7 +40,7 @@ void main() {
       final board = Board();
       board.setValue(0, 0, 5);
       board.setValue(1, 1, 3);
-      
+
       final grid = board.toGrid();
       expect(grid.length, 9);
       expect(grid[0].length, 9);
@@ -53,7 +53,7 @@ void main() {
       final grid = List.generate(9, (i) => List.generate(9, (j) => 0));
       grid[0][0] = 5;
       grid[1][1] = 3;
-      
+
       final board = Board.fromGrid(grid);
       expect(board.getValue(0, 0), 5);
       expect(board.getValue(1, 1), 3);
@@ -94,9 +94,9 @@ void main() {
       board.setValue(0, 0, 5);
       board.setValue(0, 1, 3);
       board.setValue(1, 0, 6);
-      
+
       board.updateCandidates();
-      
+
       // Check that updateCandidates runs without error
       // and that candidates can be retrieved
       final candidates = board.getCandidates(2, 2);
@@ -234,18 +234,36 @@ void main() {
     });
 
     test('Difficulty from name works', () {
-      expect(Difficulty.values.firstWhere((d) => d.name == 'easy'), Difficulty.easy);
-      expect(Difficulty.values.firstWhere((d) => d.name == 'medium'), Difficulty.medium);
-      expect(Difficulty.values.firstWhere((d) => d.name == 'hard'), Difficulty.hard);
-      expect(Difficulty.values.firstWhere((d) => d.name == 'expert'), Difficulty.expert);
-      expect(Difficulty.values.firstWhere((d) => d.name == 'evil'), Difficulty.evil);
+      expect(
+        Difficulty.values.firstWhere((d) => d.name == 'easy'),
+        Difficulty.easy,
+      );
+      expect(
+        Difficulty.values.firstWhere((d) => d.name == 'medium'),
+        Difficulty.medium,
+      );
+      expect(
+        Difficulty.values.firstWhere((d) => d.name == 'hard'),
+        Difficulty.hard,
+      );
+      expect(
+        Difficulty.values.firstWhere((d) => d.name == 'expert'),
+        Difficulty.expert,
+      );
+      expect(
+        Difficulty.values.firstWhere((d) => d.name == 'evil'),
+        Difficulty.evil,
+      );
     });
 
     test('Difficulty from name defaults to medium for invalid', () {
-      expect(Difficulty.values.firstWhere(
-        (d) => d.name == 'invalid',
-        orElse: () => Difficulty.medium,
-      ), Difficulty.medium);
+      expect(
+        Difficulty.values.firstWhere(
+          (d) => d.name == 'invalid',
+          orElse: () => Difficulty.medium,
+        ),
+        Difficulty.medium,
+      );
     });
 
     test('Difficulty values have correct display names', () {

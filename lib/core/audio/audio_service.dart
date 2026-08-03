@@ -9,10 +9,10 @@ final audioManagerProvider = Provider<AudioManager>((ref) {
 final audioServiceProvider = Provider<AudioService>((ref) {
   final audioManager = ref.read(audioManagerProvider);
   final settings = ref.read(settingsProvider);
-  
+
   // Sync mute state with settings
   audioManager.setMuted(!settings.soundEnabled);
-  
+
   return AudioService(audioManager);
 });
 
@@ -34,7 +34,7 @@ class AudioService {
 
   void setMuted(bool muted) => _audioManager.setMuted(muted);
   void setVolume(double volume) => _audioManager.setVolume(volume);
-  
+
   bool get isMuted => _audioManager.isMuted;
   double get volume => _audioManager.volume;
 }

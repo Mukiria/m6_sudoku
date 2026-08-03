@@ -40,7 +40,9 @@ class DailyChallengeRepositoryImpl implements DailyChallengeRepository {
       final result = await _dataSource.isDailyChallengeCompleted(date);
       return Right(result);
     } catch (e) {
-      return Left(CacheFailure('Failed to check daily challenge completion: $e'));
+      return Left(
+        CacheFailure('Failed to check daily challenge completion: $e'),
+      );
     }
   }
 }

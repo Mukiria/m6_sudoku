@@ -21,7 +21,10 @@ void main() {
       testPuzzle = Puzzle(
         id: 'test-puzzle-1',
         grid: List.generate(9, (i) => List.generate(9, (j) => (i + j) % 9 + 1)),
-        solution: List.generate(9, (i) => List.generate(9, (j) => (i + j) % 9 + 1)),
+        solution: List.generate(
+          9,
+          (i) => List.generate(9, (j) => (i + j) % 9 + 1),
+        ),
         difficulty: 'medium',
         cluesCount: 30,
         createdAt: DateTime(2024, 1, 1),
@@ -300,25 +303,31 @@ void main() {
 
   group('MoveType', () {
     test('all values exist', () {
-      expect(MoveType.values, containsAll([
-        MoveType.value,
-        MoveType.note,
-        MoveType.hint,
-        MoveType.undo,
-        MoveType.clear,
-        MoveType.redo,
-      ]));
+      expect(
+        MoveType.values,
+        containsAll([
+          MoveType.value,
+          MoveType.note,
+          MoveType.hint,
+          MoveType.undo,
+          MoveType.clear,
+          MoveType.redo,
+        ]),
+      );
     });
   });
 
   group('GameStatus', () {
     test('all values exist', () {
-      expect(GameStatus.values, containsAll([
-        GameStatus.playing,
-        GameStatus.paused,
-        GameStatus.completed,
-        GameStatus.failed,
-      ]));
+      expect(
+        GameStatus.values,
+        containsAll([
+          GameStatus.playing,
+          GameStatus.paused,
+          GameStatus.completed,
+          GameStatus.failed,
+        ]),
+      );
     });
   });
 }

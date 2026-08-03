@@ -10,8 +10,11 @@ void main() {
     setUp(() {
       testDate = DateTime(2024, 6, 15);
       final grid = List.generate(9, (i) => List.generate(9, (j) => 0));
-      final solution = List.generate(9, (i) => List.generate(9, (j) => ((i + j) % 9) + 1));
-      
+      final solution = List.generate(
+        9,
+        (i) => List.generate(9, (j) => ((i + j) % 9) + 1),
+      );
+
       testPuzzle = Puzzle(
         id: 'daily_2024-06-15',
         grid: List.generate(9, (i) => List.generate(9, (j) => 0)),

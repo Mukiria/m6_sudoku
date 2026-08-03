@@ -99,14 +99,16 @@ class AppButton extends StatelessWidget {
               textStyle: textStyle,
               minimumSize: Size(width ?? 0, buttonHeight),
               side: BorderSide(
-                color: effectiveOnPressed != null
-                    ? colorScheme.primary
-                    : colorScheme.outline.withValues(alpha: 0.5),
+                color:
+                    effectiveOnPressed != null
+                        ? colorScheme.primary
+                        : colorScheme.outline.withValues(alpha: 0.5),
                 width: 1.5,
               ),
-              foregroundColor: effectiveOnPressed != null
-                  ? colorScheme.primary
-                  : colorScheme.onSurface.withValues(alpha: 0.38),
+              foregroundColor:
+                  effectiveOnPressed != null
+                      ? colorScheme.primary
+                      : colorScheme.onSurface.withValues(alpha: 0.38),
             ),
             child: buttonChild,
           ),

@@ -65,52 +65,69 @@ final getHintUseCaseProvider = Provider<GetHintUseCase>((ref) {
   return GetHintUseCase(repo);
 });
 
-final dailyChallengeLocalDataSourceProvider = Provider<DailyChallengeLocalDataSource>((ref) {
-  final storage = ref.read(storageServiceProvider);
-  return DailyChallengeLocalDataSource(storage);
-});
+final dailyChallengeLocalDataSourceProvider =
+    Provider<DailyChallengeLocalDataSource>((ref) {
+      final storage = ref.read(storageServiceProvider);
+      return DailyChallengeLocalDataSource(storage);
+    });
 
-final dailyChallengeRepositoryProvider = Provider<DailyChallengeRepository>((ref) {
+final dailyChallengeRepositoryProvider = Provider<DailyChallengeRepository>((
+  ref,
+) {
   final dataSource = ref.read(dailyChallengeLocalDataSourceProvider);
   return DailyChallengeRepositoryImpl(dataSource);
 });
 
-final getOrGenerateDailyChallengeUseCaseProvider = Provider<GetOrGenerateDailyChallengeUseCase>((ref) {
-  final repo = ref.read(dailyChallengeRepositoryProvider);
-  return GetOrGenerateDailyChallengeUseCase(repo);
-});
+final getOrGenerateDailyChallengeUseCaseProvider =
+    Provider<GetOrGenerateDailyChallengeUseCase>((ref) {
+      final repo = ref.read(dailyChallengeRepositoryProvider);
+      return GetOrGenerateDailyChallengeUseCase(repo);
+    });
 
-final completeDailyChallengeUseCaseProvider = Provider<CompleteDailyChallengeUseCase>((ref) {
-  final repo = ref.read(dailyChallengeRepositoryProvider);
-  return CompleteDailyChallengeUseCase(repo);
-});
+final completeDailyChallengeUseCaseProvider =
+    Provider<CompleteDailyChallengeUseCase>((ref) {
+      final repo = ref.read(dailyChallengeRepositoryProvider);
+      return CompleteDailyChallengeUseCase(repo);
+    });
 
-final getDailyChallengeStatsUseCaseProvider = Provider<GetDailyChallengeStatsUseCase>((ref) {
-  final repo = ref.read(dailyChallengeRepositoryProvider);
-  return GetDailyChallengeStatsUseCase(repo);
-});
+final getDailyChallengeStatsUseCaseProvider =
+    Provider<GetDailyChallengeStatsUseCase>((ref) {
+      final repo = ref.read(dailyChallengeRepositoryProvider);
+      return GetDailyChallengeStatsUseCase(repo);
+    });
 
-final isDailyChallengeCompletedUseCaseProvider = Provider<IsDailyChallengeCompletedUseCase>((ref) {
-  final repo = ref.read(dailyChallengeRepositoryProvider);
-  return IsDailyChallengeCompletedUseCase(repo);
-});
+final isDailyChallengeCompletedUseCaseProvider =
+    Provider<IsDailyChallengeCompletedUseCase>((ref) {
+      final repo = ref.read(dailyChallengeRepositoryProvider);
+      return IsDailyChallengeCompletedUseCase(repo);
+    });
 
 final dailyChallengeProvider = FutureProvider<DailyChallenge>((ref) async {
   final useCase = ref.read(getOrGenerateDailyChallengeUseCaseProvider);
   final result = await useCase();
-  return result.fold((failure) => throw Exception(failure.message), (challenge) => challenge);
+  return result.fold(
+    (failure) => throw Exception(failure.message),
+    (challenge) => challenge,
+  );
 });
 
-final dailyChallengeStatsProvider = FutureProvider<DailyChallengeStats>((ref) async {
+final dailyChallengeStatsProvider = FutureProvider<DailyChallengeStats>((
+  ref,
+) async {
   final useCase = ref.read(getDailyChallengeStatsUseCaseProvider);
   final result = await useCase();
-  return result.fold((failure) => throw Exception(failure.message), (stats) => stats);
+  return result.fold(
+    (failure) => throw Exception(failure.message),
+    (stats) => stats,
+  );
 });
 
-final achievementLocalDataSourceProvider = Provider<AchievementLocalDataSource>((ref) {
-  final storage = ref.read(storageServiceProvider);
-  return AchievementLocalDataSource(storage);
-});
+final achievementLocalDataSourceProvider = Provider<AchievementLocalDataSource>(
+  (ref) {
+    final storage = ref.read(storageServiceProvider);
+    return AchievementLocalDataSource(storage);
+  },
+);
 
 final achievementRepositoryProvider = Provider<AchievementRepository>((ref) {
   final dataSource = ref.read(achievementLocalDataSourceProvider);
@@ -122,41 +139,55 @@ final getAchievementsUseCaseProvider = Provider<GetAchievementsUseCase>((ref) {
   return GetAchievementsUseCase(repo);
 });
 
-final unlockAchievementUseCaseProvider = Provider<UnlockAchievementUseCase>((ref) {
+final unlockAchievementUseCaseProvider = Provider<UnlockAchievementUseCase>((
+  ref,
+) {
   final repo = ref.read(achievementRepositoryProvider);
   return UnlockAchievementUseCase(repo);
 });
 
-final updateAchievementProgressUseCaseProvider = Provider<UpdateAchievementProgressUseCase>((ref) {
-  final repo = ref.read(achievementRepositoryProvider);
-  return UpdateAchievementProgressUseCase(repo);
-});
+final updateAchievementProgressUseCaseProvider =
+    Provider<UpdateAchievementProgressUseCase>((ref) {
+      final repo = ref.read(achievementRepositoryProvider);
+      return UpdateAchievementProgressUseCase(repo);
+    });
 
-final incrementAchievementProgressUseCaseProvider = Provider<IncrementAchievementProgressUseCase>((ref) {
-  final repo = ref.read(achievementRepositoryProvider);
-  return IncrementAchievementProgressUseCase(repo);
-});
+final incrementAchievementProgressUseCaseProvider =
+    Provider<IncrementAchievementProgressUseCase>((ref) {
+      final repo = ref.read(achievementRepositoryProvider);
+      return IncrementAchievementProgressUseCase(repo);
+    });
 
-final getUnlockedAchievementsUseCaseProvider = Provider<GetUnlockedAchievementsUseCase>((ref) {
-  final repo = ref.read(achievementRepositoryProvider);
-  return GetUnlockedAchievementsUseCase(repo);
-});
+final getUnlockedAchievementsUseCaseProvider =
+    Provider<GetUnlockedAchievementsUseCase>((ref) {
+      final repo = ref.read(achievementRepositoryProvider);
+      return GetUnlockedAchievementsUseCase(repo);
+    });
 
-final getLockedAchievementsUseCaseProvider = Provider<GetLockedAchievementsUseCase>((ref) {
-  final repo = ref.read(achievementRepositoryProvider);
-  return GetLockedAchievementsUseCase(repo);
-});
+final getLockedAchievementsUseCaseProvider =
+    Provider<GetLockedAchievementsUseCase>((ref) {
+      final repo = ref.read(achievementRepositoryProvider);
+      return GetLockedAchievementsUseCase(repo);
+    });
 
 final achievementsProvider = FutureProvider<List<Achievement>>((ref) async {
   final useCase = ref.read(getAchievementsUseCaseProvider);
   final result = await useCase();
-  return result.fold((failure) => throw Exception(failure.message), (achievements) => achievements);
+  return result.fold(
+    (failure) => throw Exception(failure.message),
+    (achievements) => achievements,
+  );
 });
 
-final unlockedAchievementsProvider = FutureProvider<List<Achievement>>((ref) async {
+final unlockedAchievementsProvider = FutureProvider<List<Achievement>>((
+  ref,
+) async {
   final useCase = ref.read(getUnlockedAchievementsUseCaseProvider);
   final result = await useCase();
-  return result.fold((failure) => throw Exception(failure.message), (achievements) => achievements);
+  return result.fold(
+    (failure) => throw Exception(failure.message),
+    (achievements) => achievements,
+  );
 });
 
 final audioManagerProvider = Provider<AudioManager>((ref) {
@@ -166,9 +197,9 @@ final audioManagerProvider = Provider<AudioManager>((ref) {
 final audioServiceProvider = Provider<AudioService>((ref) {
   final audioManager = ref.read(audioManagerProvider);
   final settings = ref.read(settingsProvider);
-  
+
   // Sync mute state with settings
   audioManager.setMuted(!settings.soundEnabled);
-  
+
   return AudioService(audioManager);
 });

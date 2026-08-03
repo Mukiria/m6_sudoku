@@ -26,37 +26,36 @@ class GameController extends _$GameController {
     final generatePuzzle = ref.read(generatePuzzleUseCaseProvider);
     final result = await generatePuzzle(difficulty.name);
 
-    state = result.fold(
-      (failure) => throw Exception(failure.message),
-      (puzzle) {
-        final initialNotes = _recomputeNotesBitmask(
-          puzzle.grid.map((row) => List<int>.from(row)).toList(),
-          puzzle,
-        );
-        return GameState(
-          puzzleId: puzzle.id,
-          puzzle: puzzle,
-          userGrid: puzzle.grid.map((row) => List<int>.from(row)).toList(),
-          notes: initialNotes,
-          timeElapsed: 0,
-          mistakes: 0,
-          hintsUsed: 0,
-          penaltyTime: 0,
-          moveHistory: [],
-          redoStack: [],
-          status: GameStatus.playing,
-          lastPlayed: DateTime.now(),
-          difficulty: difficulty,
-          selectedCell: null,
-          selectedNumber: null,
-          isNoteMode: false,
-          highlightedCells: {},
-          conflictCells: {},
-          hintState: null,
-          lastSaved: DateTime.now(),
-        );
-      },
-    );
+    state = result.fold((failure) => throw Exception(failure.message), (
+      puzzle,
+    ) {
+      final initialNotes = _recomputeNotesBitmask(
+        puzzle.grid.map((row) => List<int>.from(row)).toList(),
+        puzzle,
+      );
+      return GameState(
+        puzzleId: puzzle.id,
+        puzzle: puzzle,
+        userGrid: puzzle.grid.map((row) => List<int>.from(row)).toList(),
+        notes: initialNotes,
+        timeElapsed: 0,
+        mistakes: 0,
+        hintsUsed: 0,
+        penaltyTime: 0,
+        moveHistory: [],
+        redoStack: [],
+        status: GameStatus.playing,
+        lastPlayed: DateTime.now(),
+        difficulty: difficulty,
+        selectedCell: null,
+        selectedNumber: null,
+        isNoteMode: false,
+        highlightedCells: {},
+        conflictCells: {},
+        hintState: null,
+        lastSaved: DateTime.now(),
+      );
+    });
     _startAutoSave();
   }
 
@@ -94,7 +93,11 @@ class GameController extends _$GameController {
     if (state == null) return;
     if (state!.selectedCell == null) return;
 
-    final isFixed = state!.puzzle.grid[state!.selectedCell!.row][state!.selectedCell!.col] != 0;
+    final isFixed =
+        state!.puzzle.grid[state!.selectedCell!.row][state!
+            .selectedCell!
+            .col] !=
+        0;
     if (isFixed) return;
 
     if (state!.isNoteMode) {
@@ -123,7 +126,12 @@ class GameController extends _$GameController {
         isCorrect ? currentState.mistakes : currentState.mistakes + 1;
 
     // Auto-remove candidates from affected cells using bitmasks
-    final newNotesGrid = _autoRemoveCandidatesBitmask(currentState.notes, row, col, value);
+    final newNotesGrid = _autoRemoveCandidatesBitmask(
+      currentState.notes,
+      row,
+      col,
+      value,
+    );
 
     final newMove = Move(
       row: row,
@@ -574,7 +582,10 @@ class GameController extends _$GameController {
   }
 
   // Bitmask-based notes computation - much faster than Set-based
-  List<List<Set<int>>> _recomputeNotesBitmask(List<List<int>> grid, Puzzle puzzle) {
+  List<List<Set<int>>> _recomputeNotesBitmask(
+    List<List<int>> grid,
+    Puzzle puzzle,
+  ) {
     final newNotesBitmask = List.generate(9, (_) => List.generate(9, (_) => 0));
 
     // Precompute row, col, box masks for the current grid + puzzle givens
@@ -607,18 +618,21 @@ class GameController extends _$GameController {
     }
 
     // Convert bitmasks to Sets for the GameState
-    return List.generate(9, (r) => List.generate(9, (c) {
-      final mask = newNotesBitmask[r][c];
-      if (mask == 0) return <int>{};
-      final set = <int>{};
-      var m = mask;
-      while (m != 0) {
-        final bit = m & -m;
-        set.add(_bitToDigit(bit));
-        m &= m - 1;
-      }
-      return set;
-    }));
+    return List.generate(
+      9,
+      (r) => List.generate(9, (c) {
+        final mask = newNotesBitmask[r][c];
+        if (mask == 0) return <int>{};
+        final set = <int>{};
+        var m = mask;
+        while (m != 0) {
+          final bit = m & -m;
+          set.add(_bitToDigit(bit));
+          m &= m - 1;
+        }
+        return set;
+      }),
+    );
   }
 
   List<List<Set<int>>> _autoRemoveCandidatesBitmask(
@@ -656,16 +670,26 @@ class GameController extends _$GameController {
 
   static int _bitToDigit(int bit) {
     switch (bit) {
-      case 0x001: return 1;
-      case 0x002: return 2;
-      case 0x004: return 3;
-      case 0x008: return 4;
-      case 0x010: return 5;
-      case 0x020: return 6;
-      case 0x040: return 7;
-      case 0x080: return 8;
-      case 0x100: return 9;
-      default: return 0;
+      case 0x001:
+        return 1;
+      case 0x002:
+        return 2;
+      case 0x004:
+        return 3;
+      case 0x008:
+        return 4;
+      case 0x010:
+        return 5;
+      case 0x020:
+        return 6;
+      case 0x040:
+        return 7;
+      case 0x080:
+        return 8;
+      case 0x100:
+        return 9;
+      default:
+        return 0;
     }
   }
 
@@ -718,7 +742,10 @@ class GameController extends _$GameController {
 
     // Evil Conqueror (secret)
     if (difficulty == 'evil') {
-      ref.read(incrementAchievementProgressUseCaseProvider)('evil_conqueror', 1);
+      ref.read(incrementAchievementProgressUseCaseProvider)(
+        'evil_conqueror',
+        1,
+      );
     }
 
     // All Difficulties - check what difficulties have been won
@@ -791,6 +818,8 @@ class TimerController extends StateNotifier<int> {
   }
 }
 
-final timerControllerProvider = StateNotifierProvider<TimerController, int>((ref) {
+final timerControllerProvider = StateNotifierProvider<TimerController, int>((
+  ref,
+) {
   return TimerController(ref);
 });

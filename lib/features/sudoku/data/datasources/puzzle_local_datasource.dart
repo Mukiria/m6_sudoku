@@ -54,12 +54,16 @@ class PuzzleLocalDataSource {
   Future<void> _cachePuzzle(Puzzle puzzle) async {
     try {
       final jsonString = _storage.getString('$_cacheKey${puzzle.difficulty}');
-      final list = jsonString != null ? jsonDecode(jsonString) as List : <dynamic>[];
+      final list =
+          jsonString != null ? jsonDecode(jsonString) as List : <dynamic>[];
       list.insert(0, puzzle.toJson());
       if (list.length > _maxCachedPuzzlesPerDifficulty) {
         list.removeRange(_maxCachedPuzzlesPerDifficulty, list.length);
       }
-      await _storage.setString('$_cacheKey${puzzle.difficulty}', jsonEncode(list));
+      await _storage.setString(
+        '$_cacheKey${puzzle.difficulty}',
+        jsonEncode(list),
+      );
     } catch (_) {
       // Silently fail caching
     }

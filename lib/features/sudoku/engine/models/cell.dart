@@ -39,16 +39,26 @@ class Cell {
 
   static int _bitToDigit(int bit) {
     switch (bit) {
-      case 0x001: return 1;
-      case 0x002: return 2;
-      case 0x004: return 3;
-      case 0x008: return 4;
-      case 0x010: return 5;
-      case 0x020: return 6;
-      case 0x040: return 7;
-      case 0x080: return 8;
-      case 0x100: return 9;
-      default: return 0;
+      case 0x001:
+        return 1;
+      case 0x002:
+        return 2;
+      case 0x004:
+        return 3;
+      case 0x008:
+        return 4;
+      case 0x010:
+        return 5;
+      case 0x020:
+        return 6;
+      case 0x040:
+        return 7;
+      case 0x080:
+        return 8;
+      case 0x100:
+        return 9;
+      default:
+        return 0;
     }
   }
 

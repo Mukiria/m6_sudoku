@@ -105,38 +105,40 @@ class GetHintUseCase {
 
   Future<Either<Failure, HintCell?>> call({required GameState state}) async {
     final puzzle = state.puzzle;
-    
+
     // First try to find a logical hint (naked single)
     final logicalHint = _findNakedSingle(state);
     if (logicalHint != null) {
       return Right(logicalHint);
     }
-    
+
     // Then try hidden single
     final hiddenHint = _findHiddenSingle(state);
     if (hiddenHint != null) {
       return Right(hiddenHint);
     }
-    
+
     // Fallback to direct reveal
     for (int r = 0; r < 9; r++) {
       for (int c = 0; c < 9; c++) {
         if (state.userGrid[r][c] == 0 && puzzle.grid[r][c] == 0) {
           final solutionValue = puzzle.solution[r][c];
-          return Right(HintCell(
-            row: r,
-            col: c,
-            value: solutionValue,
-            isFixed: false,
-            hintType: HintType.directReveal,
-            explanation: 'The solution value for this cell is $solutionValue',
-          ));
+          return Right(
+            HintCell(
+              row: r,
+              col: c,
+              value: solutionValue,
+              isFixed: false,
+              hintType: HintType.directReveal,
+              explanation: 'The solution value for this cell is $solutionValue',
+            ),
+          );
         }
       }
     }
     return const Right(null);
   }
-  
+
   HintCell? _findNakedSingle(GameState state) {
     final puzzle = state.puzzle;
     for (int r = 0; r < 9; r++) {
@@ -150,7 +152,8 @@ class GetHintUseCase {
               value: candidates.first,
               isFixed: false,
               hintType: HintType.nakedSingle,
-              explanation: 'This cell can only be ${candidates.first} (naked single)',
+              explanation:
+                  'This cell can only be ${candidates.first} (naked single)',
             );
           }
         }
@@ -158,7 +161,7 @@ class GetHintUseCase {
     }
     return null;
   }
-  
+
   HintCell? _findHiddenSingle(GameState state) {
     final puzzle = state.puzzle;
     // Check rows
@@ -182,7 +185,8 @@ class GetHintUseCase {
             value: digit,
             isFixed: false,
             hintType: HintType.hiddenSingle,
-            explanation: 'Digit $digit can only go in this cell in this row (hidden single)',
+            explanation:
+                'Digit $digit can only go in this cell in this row (hidden single)',
           );
         }
       }
@@ -208,7 +212,8 @@ class GetHintUseCase {
             value: digit,
             isFixed: false,
             hintType: HintType.hiddenSingle,
-            explanation: 'Digit $digit can only go in this cell in this column (hidden single)',
+            explanation:
+                'Digit $digit can only go in this cell in this column (hidden single)',
           );
         }
       }
@@ -223,7 +228,8 @@ class GetHintUseCase {
             for (int c = 0; c < 3; c++) {
               final cellR = boxRow * 3 + r;
               final cellC = boxCol * 3 + c;
-              if (state.userGrid[cellR][cellC] == 0 && puzzle.grid[cellR][cellC] == 0) {
+              if (state.userGrid[cellR][cellC] == 0 &&
+                  puzzle.grid[cellR][cellC] == 0) {
                 final candidates = _getCandidates(state, cellR, cellC);
                 if (candidates.contains(digit)) {
                   count++;
@@ -240,7 +246,8 @@ class GetHintUseCase {
               value: digit,
               isFixed: false,
               hintType: HintType.hiddenSingle,
-              explanation: 'Digit $digit can only go in this cell in this box (hidden single)',
+              explanation:
+                  'Digit $digit can only go in this cell in this box (hidden single)',
             );
           }
         }
@@ -248,7 +255,7 @@ class GetHintUseCase {
     }
     return null;
   }
-  
+
   List<int> _getCandidates(GameState state, int row, int col) {
     final puzzle = state.puzzle;
     final candidates = <int>{};
@@ -257,12 +264,18 @@ class GetHintUseCase {
     }
     // Remove from row
     for (int c = 0; c < 9; c++) {
-      final val = state.userGrid[row][c] != 0 ? state.userGrid[row][c] : puzzle.grid[row][c];
+      final val =
+          state.userGrid[row][c] != 0
+              ? state.userGrid[row][c]
+              : puzzle.grid[row][c];
       if (val != 0) candidates.remove(val);
     }
     // Remove from column
     for (int r = 0; r < 9; r++) {
-      final val = state.userGrid[r][col] != 0 ? state.userGrid[r][col] : puzzle.grid[r][col];
+      final val =
+          state.userGrid[r][col] != 0
+              ? state.userGrid[r][col]
+              : puzzle.grid[r][col];
       if (val != 0) candidates.remove(val);
     }
     // Remove from box
@@ -270,7 +283,10 @@ class GetHintUseCase {
     final boxCol = (col ~/ 3) * 3;
     for (int r = boxRow; r < boxRow + 3; r++) {
       for (int c = boxCol; c < boxCol + 3; c++) {
-        final val = state.userGrid[r][c] != 0 ? state.userGrid[r][c] : puzzle.grid[r][c];
+        final val =
+            state.userGrid[r][c] != 0
+                ? state.userGrid[r][c]
+                : puzzle.grid[r][c];
         if (val != 0) candidates.remove(val);
       }
     }

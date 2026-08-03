@@ -23,7 +23,7 @@ class HintOverlay extends StatelessWidget {
     Color hintColor;
     IconData hintIcon;
     String title;
-    
+
     switch (hintState.type) {
       case HintType.nakedSingle:
         hintColor = Colors.green;
@@ -53,10 +53,8 @@ class HintOverlay extends StatelessWidget {
           // Background overlay
           Container(
             color: Colors.black.withValues(alpha: 0.5),
-          )
-          .animate()
-          .fadeIn(duration: 300.ms),
-          
+          ).animate().fadeIn(duration: 300.ms),
+
           // Hint card
           Center(
             child: Container(
@@ -64,7 +62,9 @@ class HintOverlay extends StatelessWidget {
               padding: const EdgeInsets.all(AppConstants.spacingXl),
               decoration: BoxDecoration(
                 color: colorScheme.surface,
-                borderRadius: BorderRadius.circular(AppConstants.largeBorderRadius),
+                borderRadius: BorderRadius.circular(
+                  AppConstants.largeBorderRadius,
+                ),
                 border: Border.all(color: hintColor, width: 2),
                 boxShadow: [
                   BoxShadow(
@@ -79,122 +79,128 @@ class HintOverlay extends StatelessWidget {
                 children: [
                   // Icon
                   Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: hintColor.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(hintIcon, color: hintColor, size: 40),
-                  )
-                  .animate()
-                  .scale(duration: 500.ms, curve: Curves.elasticOut)
-                  .shimmer(duration: 1500.ms),
-                  
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: hintColor.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(hintIcon, color: hintColor, size: 40),
+                      )
+                      .animate()
+                      .scale(duration: 500.ms, curve: Curves.elasticOut)
+                      .shimmer(duration: 1500.ms),
+
                   const SizedBox(height: AppConstants.spacingLg),
-                  
+
                   // Title
                   Text(
-                    title,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: hintColor,
-                    ),
-                  )
-                  .animate()
-                  .fadeIn(duration: 400.ms, delay: 200.ms)
-                  .slideY(begin: 0.3, end: 0),
-                  
+                        title,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: hintColor,
+                        ),
+                      )
+                      .animate()
+                      .fadeIn(duration: 400.ms, delay: 200.ms)
+                      .slideY(begin: 0.3, end: 0),
+
                   const SizedBox(height: AppConstants.spacingMd),
-                  
+
                   // Explanation
                   Text(
-                    hintState.explanation,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  )
-                  .animate()
-                  .fadeIn(duration: 400.ms, delay: 300.ms)
-                  .slideY(begin: 0.3, end: 0),
-                  
+                        hintState.explanation,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        textAlign: TextAlign.center,
+                      )
+                      .animate()
+                      .fadeIn(duration: 400.ms, delay: 300.ms)
+                      .slideY(begin: 0.3, end: 0),
+
                   const SizedBox(height: AppConstants.spacingMd),
-                  
+
                   // Cell position
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: hintColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'Row ${hintState.cell.row + 1}, Column ${hintState.cell.col + 1}',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: hintColor,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                  )
-                  .animate()
-                  .fadeIn(duration: 400.ms, delay: 400.ms)
-                  .slideY(begin: 0.3, end: 0),
-                  
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: hintColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          'Row ${hintState.cell.row + 1}, Column ${hintState.cell.col + 1}',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: hintColor,
+                            fontFamily: 'monospace',
+                          ),
+                        ),
+                      )
+                      .animate()
+                      .fadeIn(duration: 400.ms, delay: 400.ms)
+                      .slideY(begin: 0.3, end: 0),
+
                   const SizedBox(height: AppConstants.spacingLg),
-                  
+
                   // Value revealed
                   Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: hintColor,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        hintState.value.toString(),
-                        style: theme.textTheme.displayLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: hintColor,
+                          shape: BoxShape.circle,
                         ),
-                      ),
-                    ),
-                  )
-                  .animate()
-                  .fadeIn(duration: 400.ms, delay: 500.ms)
-                  .scale(duration: 500.ms, delay: 500.ms, curve: Curves.elasticOut)
-                  .shimmer(duration: 2000.ms),
-                  
+                        child: Center(
+                          child: Text(
+                            hintState.value.toString(),
+                            style: theme.textTheme.displayLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      )
+                      .animate()
+                      .fadeIn(duration: 400.ms, delay: 500.ms)
+                      .scale(
+                        duration: 500.ms,
+                        delay: 500.ms,
+                        curve: Curves.elasticOut,
+                      )
+                      .shimmer(duration: 2000.ms),
+
                   const SizedBox(height: AppConstants.spacingXl),
-                  
+
                   // Dismiss button
                   SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: onDismiss,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: hintColor,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: onDismiss,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: hintColor,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                AppConstants.borderRadius,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            'Got it!',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        'Got it!',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  )
-                  .animate()
-                  .fadeIn(duration: 400.ms, delay: 600.ms)
-                  .slideY(begin: 0.3, end: 0),
+                      )
+                      .animate()
+                      .fadeIn(duration: 400.ms, delay: 600.ms)
+                      .slideY(begin: 0.3, end: 0),
                 ],
               ),
             ),

@@ -9,7 +9,7 @@ void main() {
       test('solves completely empty board', () {
         final board = Board();
         final result = SudokuSolver.solve(board);
-        
+
         expect(result, true);
         expect(board.isComplete, true);
         expect(board.isValid, true);
@@ -18,9 +18,9 @@ void main() {
       test('solves board with single given', () {
         final board = Board();
         board.setValue(0, 0, 5);
-        
+
         final result = SudokuSolver.solve(board);
-        
+
         expect(result, true);
         expect(board.isComplete, true);
         expect(board.isValid, true);
@@ -32,9 +32,9 @@ void main() {
         board.setValue(0, 1, 3);
         board.setValue(1, 0, 6);
         board.setValue(1, 1, 2);
-        
+
         final result = SudokuSolver.solve(board);
-        
+
         expect(result, true);
         expect(board.isComplete, true);
         expect(board.isValid, true);
@@ -45,7 +45,7 @@ void main() {
         board.setValue(0, 0, 5);
         board.setValue(1, 1, 3);
         board.setValue(2, 2, 7);
-        
+
         final givenCells = <String, int>{};
         for (int r = 0; r < 9; r++) {
           for (int c = 0; c < 9; c++) {
@@ -54,9 +54,9 @@ void main() {
             }
           }
         }
-        
+
         SudokuSolver.solve(board);
-        
+
         // Check given cells are preserved
         for (final entry in givenCells.entries) {
           final parts = entry.key.split(',');
@@ -71,7 +71,7 @@ void main() {
       test('solves empty board with candidates', () {
         final board = Board();
         final result = SudokuSolver.solveWithCandidates(board);
-        
+
         expect(result, true);
         expect(board.isComplete, true);
         expect(board.isValid, true);
@@ -82,9 +82,9 @@ void main() {
         board.setValue(0, 0, 5);
         board.setValue(0, 1, 3);
         board.setValue(1, 0, 6);
-        
+
         final result = SudokuSolver.solveWithCandidates(board);
-        
+
         expect(result, true);
         expect(board.isComplete, true);
         expect(board.isValid, true);
@@ -101,7 +101,7 @@ void main() {
           board.setValue(r, c, (r + c) % 9 + 1);
         }
       }
-      
+
       expect(UniqueSolutionValidator.hasUniqueSolution(board), true);
     });
 
@@ -111,13 +111,13 @@ void main() {
       board.setValue(0, 0, 5);
       board.setValue(1, 1, 3);
       board.setValue(2, 2, 7);
-      
+
       expect(UniqueSolutionValidator.hasUniqueSolution(board), false);
     });
 
     test('rejects empty board', () {
       final board = Board();
-      
+
       expect(UniqueSolutionValidator.hasUniqueSolution(board), false);
     });
 
@@ -134,7 +134,7 @@ void main() {
         [0, 0, 2, 0, 1, 0, 0, 0, 0],
         [0, 0, 0, 0, 4, 0, 0, 0, 9],
       ];
-      
+
       final board = Board.fromGrid(grid);
       expect(UniqueSolutionValidator.hasUniqueSolution(board), true);
     });

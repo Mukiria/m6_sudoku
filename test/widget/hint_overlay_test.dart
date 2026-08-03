@@ -15,10 +15,7 @@ void main() {
           extensions: [AppThemeExtension.light],
         ),
         home: Scaffold(
-          body: HintOverlay(
-            hintState: hintState,
-            onDismiss: onDismiss,
-          ),
+          body: HintOverlay(hintState: hintState, onDismiss: onDismiss),
         ),
       );
     }
@@ -32,13 +29,12 @@ void main() {
         shownAt: DateTime.now(),
       );
 
-      await tester.pumpWidget(createTestWidget(
-        hintState: hintState,
-        onDismiss: () {},
-      ));
+      await tester.pumpWidget(
+        createTestWidget(hintState: hintState, onDismiss: () {}),
+      );
 
       await tester.pumpAndSettle();
-      
+
       expect(find.text('Naked Single'), findsOneWidget);
     });
 
@@ -47,18 +43,23 @@ void main() {
         type: HintType.hiddenSingle,
         cell: const CellPosition(row: 2, col: 2),
         value: 7,
-        explanation: 'Digit 7 can only go in this cell in this row (hidden single)',
+        explanation:
+            'Digit 7 can only go in this cell in this row (hidden single)',
         shownAt: DateTime.now(),
       );
 
-      await tester.pumpWidget(createTestWidget(
-        hintState: hintState,
-        onDismiss: () {},
-      ));
+      await tester.pumpWidget(
+        createTestWidget(hintState: hintState, onDismiss: () {}),
+      );
 
       await tester.pumpAndSettle();
-      
-      expect(find.text('Digit 7 can only go in this cell in this row (hidden single)'), findsOneWidget);
+
+      expect(
+        find.text(
+          'Digit 7 can only go in this cell in this row (hidden single)',
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('renders cell position', (WidgetTester tester) async {
@@ -70,13 +71,12 @@ void main() {
         shownAt: DateTime.now(),
       );
 
-      await tester.pumpWidget(createTestWidget(
-        hintState: hintState,
-        onDismiss: () {},
-      ));
+      await tester.pumpWidget(
+        createTestWidget(hintState: hintState, onDismiss: () {}),
+      );
 
       await tester.pumpAndSettle();
-      
+
       expect(find.text('Row 5, Column 6'), findsOneWidget);
     });
 
@@ -89,19 +89,18 @@ void main() {
         shownAt: DateTime.now(),
       );
 
-      await tester.pumpWidget(createTestWidget(
-        hintState: hintState,
-        onDismiss: () {},
-      ));
+      await tester.pumpWidget(
+        createTestWidget(hintState: hintState, onDismiss: () {}),
+      );
 
       await tester.pumpAndSettle();
-      
+
       expect(find.text('9'), findsWidgets);
     });
 
     testWidgets('dismiss button calls onDismiss', (WidgetTester tester) async {
       bool dismissCalled = false;
-      
+
       final hintState = HintState(
         type: HintType.nakedSingle,
         cell: const CellPosition(row: 2, col: 2),
@@ -110,20 +109,24 @@ void main() {
         shownAt: DateTime.now(),
       );
 
-      await tester.pumpWidget(createTestWidget(
-        hintState: hintState,
-        onDismiss: () => dismissCalled = true,
-      ));
+      await tester.pumpWidget(
+        createTestWidget(
+          hintState: hintState,
+          onDismiss: () => dismissCalled = true,
+        ),
+      );
 
       await tester.pumpAndSettle();
-      
+
       await tester.tap(find.text('Got it!'));
       await tester.pump();
-      
+
       expect(dismissCalled, true);
     });
 
-    testWidgets('renders different hint type colors', (WidgetTester tester) async {
+    testWidgets('renders different hint type colors', (
+      WidgetTester tester,
+    ) async {
       // Test naked single (green)
       var hintState = HintState(
         type: HintType.nakedSingle,
@@ -133,20 +136,19 @@ void main() {
         shownAt: DateTime.now(),
       );
 
-      await tester.pumpWidget(MaterialApp(
-        theme: ThemeData.light().copyWith(
-          extensions: [AppThemeExtension.light],
-        ),
-        home: Scaffold(
-          body: HintOverlay(
-            hintState: hintState,
-            onDismiss: () {},
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: [AppThemeExtension.light],
+          ),
+          home: Scaffold(
+            body: HintOverlay(hintState: hintState, onDismiss: () {}),
           ),
         ),
-      ));
+      );
 
       await tester.pumpAndSettle();
-      
+
       // Test hidden single (blue)
       hintState = HintState(
         type: HintType.hiddenSingle,
@@ -156,20 +158,19 @@ void main() {
         shownAt: DateTime.now(),
       );
 
-      await tester.pumpWidget(MaterialApp(
-        theme: ThemeData.light().copyWith(
-          extensions: [AppThemeExtension.light],
-        ),
-        home: Scaffold(
-          body: HintOverlay(
-            hintState: hintState,
-            onDismiss: () {},
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: [AppThemeExtension.light],
+          ),
+          home: Scaffold(
+            body: HintOverlay(hintState: hintState, onDismiss: () {}),
           ),
         ),
-      ));
+      );
 
       await tester.pumpAndSettle();
-      
+
       // Test direct reveal (orange)
       hintState = HintState(
         type: HintType.directReveal,
@@ -179,22 +180,23 @@ void main() {
         shownAt: DateTime.now(),
       );
 
-      await tester.pumpWidget(MaterialApp(
-        theme: ThemeData.light().copyWith(
-          extensions: [AppThemeExtension.light],
-        ),
-        home: Scaffold(
-          body: HintOverlay(
-            hintState: hintState,
-            onDismiss: () {},
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: [AppThemeExtension.light],
+          ),
+          home: Scaffold(
+            body: HintOverlay(hintState: hintState, onDismiss: () {}),
           ),
         ),
-      ));
+      );
 
       await tester.pumpAndSettle();
     });
 
-    testWidgets('shows secret achievement as locked', (WidgetTester tester) async {
+    testWidgets('shows secret achievement as locked', (
+      WidgetTester tester,
+    ) async {
       // This tests the achievement screen logic, not hint overlay
       // But we can test that locked achievements show as ???
       // This is more of an integration test

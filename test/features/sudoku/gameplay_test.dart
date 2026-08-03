@@ -16,34 +16,44 @@ import '../../fakes/fake_services.dart';
 
 class FakePuzzleRepository implements PuzzleRepository {
   @override
-  Future<Either<Failure, Puzzle>> generatePuzzle(String difficulty) async => Left(CacheFailure('Not implemented'));
+  Future<Either<Failure, Puzzle>> generatePuzzle(String difficulty) async =>
+      Left(CacheFailure('Not implemented'));
 
   @override
-  Future<Either<Failure, Puzzle>> getPuzzle(String id) async => Left(CacheFailure('Not implemented'));
+  Future<Either<Failure, Puzzle>> getPuzzle(String id) async =>
+      Left(CacheFailure('Not implemented'));
 
   @override
-  Future<Either<Failure, void>> savePuzzle(Puzzle puzzle) async => Left(CacheFailure('Not implemented'));
+  Future<Either<Failure, void>> savePuzzle(Puzzle puzzle) async =>
+      Left(CacheFailure('Not implemented'));
 
   @override
-  Future<Either<Failure, void>> deletePuzzle(String id) async => Left(CacheFailure('Not implemented'));
+  Future<Either<Failure, void>> deletePuzzle(String id) async =>
+      Left(CacheFailure('Not implemented'));
 
   @override
-  Future<Either<Failure, Puzzle?>> getCurrentPuzzle() async => Left(CacheFailure('Not implemented'));
+  Future<Either<Failure, Puzzle?>> getCurrentPuzzle() async =>
+      Left(CacheFailure('Not implemented'));
 
   @override
-  Future<Either<Failure, void>> saveGameState(GameState state) async => Left(CacheFailure('Not implemented'));
+  Future<Either<Failure, void>> saveGameState(GameState state) async =>
+      Left(CacheFailure('Not implemented'));
 
   @override
-  Future<Either<Failure, GameState?>> getGameState() async => Left(CacheFailure('Not implemented'));
+  Future<Either<Failure, GameState?>> getGameState() async =>
+      Left(CacheFailure('Not implemented'));
 
   @override
-  Future<Either<Failure, void>> clearGameState() async => Left(CacheFailure('Not implemented'));
+  Future<Either<Failure, void>> clearGameState() async =>
+      Left(CacheFailure('Not implemented'));
 
   @override
-  Future<Either<Failure, List<Puzzle>>> getPuzzleHistory() async => Left(CacheFailure('Not implemented'));
+  Future<Either<Failure, List<Puzzle>>> getPuzzleHistory() async =>
+      Left(CacheFailure('Not implemented'));
 
   @override
-  Future<Either<Failure, void>> savePuzzleToHistory(Puzzle puzzle) async => Left(CacheFailure('Not implemented'));
+  Future<Either<Failure, void>> savePuzzleToHistory(Puzzle puzzle) async =>
+      Left(CacheFailure('Not implemented'));
 }
 
 class FakeGetHintUseCase extends GetHintUseCase {
@@ -61,14 +71,16 @@ class FakeGetHintUseCase extends GetHintUseCase {
       for (int c = 0; c < 9; c++) {
         if (state.userGrid[r][c] == 0 && state.puzzle.grid[r][c] == 0) {
           print('Found empty cell at $r,$c');
-          return Right(HintCell(
-            row: r,
-            col: c,
-            value: state.puzzle.solution[r][c],
-            isFixed: false,
-            hintType: HintType.directReveal,
-            explanation: 'Test hint',
-          ));
+          return Right(
+            HintCell(
+              row: r,
+              col: c,
+              value: state.puzzle.solution[r][c],
+              isFixed: false,
+              hintType: HintType.directReveal,
+              explanation: 'Test hint',
+            ),
+          );
         }
       }
     }
@@ -85,7 +97,9 @@ void main() {
       container = ProviderContainer(
         overrides: [
           storageServiceProvider.overrideWithValue(FakeStorageService()),
-          settingsRepositoryProvider.overrideWithValue(FakeSettingsRepository()),
+          settingsRepositoryProvider.overrideWithValue(
+            FakeSettingsRepository(),
+          ),
           audioServiceProvider.overrideWithValue(FakeAudioService()),
           getHintUseCaseProvider.overrideWithValue(FakeGetHintUseCase()),
         ],
@@ -100,9 +114,9 @@ void main() {
       test('creates new game with correct initial state', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
-        
+
         expect(state, isNotNull);
         expect(state!.status, GameStatus.playing);
         expect(state.timeElapsed, 0);
@@ -120,9 +134,9 @@ void main() {
       test('initializes with correct puzzle for difficulty', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.expert);
-        
+
         final state = container.read(gameControllerProvider);
-        
+
         expect(state, isNotNull);
         expect(state!.puzzle.difficulty, 'expert');
         expect(state.userGrid, isNotNull);
@@ -132,9 +146,9 @@ void main() {
       test('initial notes are computed correctly', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
-        
+
         // Notes should be computed for empty cells
         for (int r = 0; r < 9; r++) {
           for (int c = 0; c < 9; c++) {
@@ -152,7 +166,7 @@ void main() {
       test('selects cell and updates highlighted cells', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         // Find an empty cell to select
         final state = container.read(gameControllerProvider);
         int? emptyRow, emptyCol;
@@ -166,24 +180,30 @@ void main() {
           }
           if (emptyRow != null) break;
         }
-        
+
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
-          
+
           final newState = container.read(gameControllerProvider);
-          
-          expect(newState!.selectedCell, CellPosition(row: emptyRow!, col: emptyCol!));
-          expect(newState.highlightedCells.length, 20); // 8 row + 8 col + 4 box - 1 overlap
+
+          expect(
+            newState!.selectedCell,
+            CellPosition(row: emptyRow!, col: emptyCol!),
+          );
+          expect(
+            newState.highlightedCells.length,
+            20,
+          ); // 8 row + 8 col + 4 box - 1 overlap
         }
       });
 
       test('does not select fixed cell', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         final puzzle = state!.puzzle;
-        
+
         // Find a fixed cell
         int? fixedRow, fixedCol;
         for (int r = 0; r < 9; r++) {
@@ -196,7 +216,7 @@ void main() {
           }
           if (fixedRow != null) break;
         }
-        
+
         if (fixedRow != null) {
           controller.selectCell(fixedRow!, fixedCol!);
           final state = container.read(gameControllerProvider);
@@ -210,7 +230,7 @@ void main() {
       test('places correct value', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         // Find an empty cell
         final state = container.read(gameControllerProvider);
         int? emptyRow, emptyCol;
@@ -224,11 +244,11 @@ void main() {
           }
           if (emptyRow != null) break;
         }
-        
+
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
           controller.setValue(emptyRow!, emptyCol!, 5);
-          
+
           final newState = container.read(gameControllerProvider);
           expect(newState!.userGrid[emptyRow!][emptyCol!], 5);
         }
@@ -237,7 +257,7 @@ void main() {
       test('increments mistakes for incorrect value', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? emptyRow, emptyCol;
         int correctValue = 0;
@@ -252,13 +272,13 @@ void main() {
           }
           if (emptyRow != null) break;
         }
-        
+
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
           // Use wrong value
           final wrongValue = correctValue == 9 ? 1 : correctValue + 1;
           controller.setValue(emptyRow!, emptyCol!, wrongValue);
-          
+
           final newState = container.read(gameControllerProvider);
           expect(newState!.mistakes, 1);
         }
@@ -267,7 +287,7 @@ void main() {
       test('does not increment mistakes for correct value', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? emptyRow, emptyCol;
         int correctValue = 0;
@@ -282,11 +302,11 @@ void main() {
           }
           if (emptyRow != null) break;
         }
-        
+
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
           controller.setValue(emptyRow!, emptyCol!, correctValue);
-          
+
           final newState = container.read(gameControllerProvider);
           expect(newState!.mistakes, 0);
         }
@@ -295,7 +315,7 @@ void main() {
       test('does not overwrite fixed cell', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? fixedRow, fixedCol;
         for (int r = 0; r < 9; r++) {
@@ -308,12 +328,12 @@ void main() {
           }
           if (fixedRow != null) break;
         }
-        
+
         if (fixedRow != null) {
           final originalValue = state!.userGrid[fixedRow!][fixedCol!];
           controller.selectCell(fixedRow!, fixedCol!);
           controller.setValue(fixedRow!, fixedCol!, 9);
-          
+
           final newState = container.read(gameControllerProvider);
           expect(newState!.userGrid[fixedRow!][fixedCol!], originalValue);
         }
@@ -322,7 +342,7 @@ void main() {
       test('does not set same value twice', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? emptyRow, emptyCol;
         int correctValue = 0;
@@ -337,17 +357,20 @@ void main() {
           }
           if (emptyRow != null) break;
         }
-        
+
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
           controller.setValue(emptyRow!, emptyCol!, correctValue);
-          
+
           final stateAfterFirst = container.read(gameControllerProvider);
           controller.setValue(emptyRow!, emptyCol!, correctValue);
-          
+
           final stateAfterSecond = container.read(gameControllerProvider);
           // Should not add duplicate move
-          expect(stateAfterSecond!.moveHistory.length, stateAfterFirst!.moveHistory.length);
+          expect(
+            stateAfterSecond!.moveHistory.length,
+            stateAfterFirst!.moveHistory.length,
+          );
         }
       });
     });
@@ -356,7 +379,7 @@ void main() {
       test('adds note when not present', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? emptyRow, emptyCol;
         for (int r = 0; r < 9; r++) {
@@ -369,10 +392,10 @@ void main() {
           }
           if (emptyRow != null) break;
         }
-        
+
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
-          
+
           // Find a note value that's NOT in the initial candidates for this cell
           final initialNotes = state!.notes[emptyRow!][emptyCol!];
           int noteToAdd = 1;
@@ -381,9 +404,9 @@ void main() {
           }
           // If all 1-9 are candidates (unlikely), use 1 anyway - test will still verify toggle behavior
           if (noteToAdd > 9) noteToAdd = 1;
-          
+
           controller.toggleNote(emptyRow!, emptyCol!, noteToAdd);
-          
+
           final newState = container.read(gameControllerProvider);
           expect(newState!.notes[emptyRow!][emptyCol!], contains(noteToAdd));
         }
@@ -392,7 +415,7 @@ void main() {
       test('removes note when already present', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? emptyRow, emptyCol;
         for (int r = 0; r < 9; r++) {
@@ -405,10 +428,10 @@ void main() {
           }
           if (emptyRow != null) break;
         }
-        
+
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
-          
+
           // Find a note value that's NOT in the initial candidates for this cell
           final initialNotes = state!.notes[emptyRow!][emptyCol!];
           int noteToAdd = 1;
@@ -416,21 +439,24 @@ void main() {
             noteToAdd++;
           }
           if (noteToAdd > 9) noteToAdd = 1;
-          
+
           // First toggle adds the note
           controller.toggleNote(emptyRow!, emptyCol!, noteToAdd);
           // Second toggle removes it
           controller.toggleNote(emptyRow!, emptyCol!, noteToAdd);
-          
+
           final newState = container.read(gameControllerProvider);
-          expect(newState!.notes[emptyRow!][emptyCol!], isNot(contains(noteToAdd)));
+          expect(
+            newState!.notes[emptyRow!][emptyCol!],
+            isNot(contains(noteToAdd)),
+          );
         }
       });
 
       test('does not add notes to fixed cell', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? fixedRow, fixedCol;
         for (int r = 0; r < 9; r++) {
@@ -443,11 +469,11 @@ void main() {
           }
           if (fixedRow != null) break;
         }
-        
+
         if (fixedRow != null) {
           controller.selectCell(fixedRow!, fixedCol!);
           controller.toggleNote(fixedRow!, fixedCol!, 5);
-          
+
           final newState = container.read(gameControllerProvider);
           expect(newState!.notes[fixedRow!][fixedCol!], isEmpty);
         }
@@ -458,7 +484,7 @@ void main() {
       test('clears user value', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? emptyRow, emptyCol;
         int correctValue = 0;
@@ -473,13 +499,13 @@ void main() {
           }
           if (emptyRow != null) break;
         }
-        
+
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
           controller.setValue(emptyRow!, emptyCol!, correctValue);
-          
+
           controller.clearCell(emptyRow!, emptyCol!);
-          
+
           final newState = container.read(gameControllerProvider);
           expect(newState!.userGrid[emptyRow!][emptyCol!], 0);
         }
@@ -488,7 +514,7 @@ void main() {
       test('clears notes', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? emptyRow, emptyCol;
         for (int r = 0; r < 9; r++) {
@@ -501,12 +527,12 @@ void main() {
           }
           if (emptyRow != null) break;
         }
-        
+
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
           controller.toggleNote(emptyRow!, emptyCol!, 5);
           controller.clearCell(emptyRow!, emptyCol!);
-          
+
           final newState = container.read(gameControllerProvider);
           expect(newState!.notes[emptyRow!][emptyCol!], isEmpty);
         }
@@ -515,7 +541,7 @@ void main() {
       test('does not clear fixed cell', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? fixedRow, fixedCol;
         for (int r = 0; r < 9; r++) {
@@ -528,11 +554,11 @@ void main() {
           }
           if (fixedRow != null) break;
         }
-        
+
         if (fixedRow != null) {
           final originalValue = state!.userGrid[fixedRow!][fixedCol!];
           controller.clearCell(fixedRow!, fixedCol!);
-          
+
           final newState = container.read(gameControllerProvider);
           expect(newState!.userGrid[fixedRow!][fixedCol!], originalValue);
         }
@@ -543,7 +569,7 @@ void main() {
       test('undo removes last move', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? emptyRow, emptyCol;
         int correctValue = 0;
@@ -558,14 +584,14 @@ void main() {
           }
           if (emptyRow != null) break;
         }
-        
+
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
           controller.setValue(emptyRow!, emptyCol!, correctValue);
-          
+
           final stateAfterMove = container.read(gameControllerProvider);
           controller.undo();
-          
+
           final stateAfterUndo = container.read(gameControllerProvider);
           expect(stateAfterUndo!.userGrid[emptyRow!][emptyCol!], 0);
           expect(stateAfterUndo.moveHistory.length, state!.moveHistory.length);
@@ -575,7 +601,7 @@ void main() {
       test('redo reapplies undone move', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? emptyRow, emptyCol;
         int correctValue = 0;
@@ -590,13 +616,13 @@ void main() {
           }
           if (emptyRow != null) break;
         }
-        
+
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
           controller.setValue(emptyRow!, emptyCol!, correctValue);
           controller.undo();
           controller.redo();
-          
+
           final stateAfterRedo = container.read(gameControllerProvider);
           expect(stateAfterRedo!.userGrid[emptyRow!][emptyCol!], correctValue);
         }
@@ -605,7 +631,7 @@ void main() {
       test('undo clears redo stack on new move', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? emptyRow, emptyCol;
         int correctValue = 0;
@@ -620,15 +646,15 @@ void main() {
           }
           if (emptyRow != null) break;
         }
-        
+
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
           controller.setValue(emptyRow!, emptyCol!, correctValue);
           controller.undo();
-          
+
           // Make a new move
           controller.setValue(emptyRow!, emptyCol!, correctValue);
-          
+
           final newState = container.read(gameControllerProvider);
           expect(newState!.redoStack, isEmpty);
         }
@@ -639,12 +665,12 @@ void main() {
       test('uses hint and adds penalty time', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         final timeBefore = state!.timeElapsed;
-        
+
         await controller.useHint();
-        
+
         final newState = container.read(gameControllerProvider);
         expect(newState!.hintsUsed, 1);
         expect(newState!.penaltyTime, greaterThan(0));
@@ -654,10 +680,10 @@ void main() {
       test('adds correct penalty for direct reveal', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         // We can't easily control hint type, but we can verify penalty is added
         await controller.useHint();
-        
+
         final newState = container.read(gameControllerProvider);
         expect(newState!.penaltyTime, greaterThanOrEqualTo(15));
       });
@@ -667,9 +693,9 @@ void main() {
       test('pause changes status to paused', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         controller.pause();
-        
+
         final state = container.read(gameControllerProvider);
         expect(state!.status, GameStatus.paused);
       });
@@ -677,10 +703,10 @@ void main() {
       test('resume changes status to playing', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         controller.pause();
         controller.resume();
-        
+
         final state = container.read(gameControllerProvider);
         expect(state!.status, GameStatus.playing);
       });
@@ -690,7 +716,7 @@ void main() {
       test('detects completion when grid matches solution', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         // Fill the entire grid with solution
         for (int r = 0; r < 9; r++) {
@@ -701,7 +727,7 @@ void main() {
             }
           }
         }
-        
+
         final finalState = container.read(gameControllerProvider);
         expect(finalState!.status, GameStatus.completed);
       });
@@ -711,7 +737,7 @@ void main() {
       test('fails after 3 mistakes', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? emptyRow, emptyCol;
         int correctValue = 0;
@@ -726,10 +752,10 @@ void main() {
           }
           if (emptyRow != null) break;
         }
-        
+
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
-          
+
           // Make 3 mistakes
           for (int i = 1; i <= 3; i++) {
             final wrongValue = (correctValue + i) % 9 + 1;
@@ -737,7 +763,7 @@ void main() {
               controller.setValue(emptyRow!, emptyCol!, wrongValue);
             }
           }
-          
+
           final finalState = container.read(gameControllerProvider);
           expect(finalState!.status, GameStatus.failed);
           expect(finalState!.mistakes, 3);
@@ -749,10 +775,10 @@ void main() {
       test('increments timer every second', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         expect(state!.timeElapsed, 0);
-        
+
         // Note: Timer is handled by TimerController, not directly testable here
         // This test verifies the initial state
       });
@@ -762,7 +788,7 @@ void main() {
       test('restores saved game state', () async {
         final controller = container.read(gameControllerProvider.notifier);
         await controller.newGame(Difficulty.easy);
-        
+
         final state = container.read(gameControllerProvider);
         int? emptyRow, emptyCol;
         int correctValue = 0;
@@ -777,16 +803,16 @@ void main() {
           }
           if (emptyRow != null) break;
         }
-        
+
         if (emptyRow != null) {
           controller.selectCell(emptyRow!, emptyCol!);
           controller.setValue(emptyRow!, emptyCol!, correctValue);
-          
+
           final stateAfterMove = container.read(gameControllerProvider);
-          
+
           // Continue the saved game
           await controller.continueGame(stateAfterMove!);
-          
+
           final continuedState = container.read(gameControllerProvider);
           expect(continuedState!.userGrid[emptyRow!][emptyCol!], correctValue);
           expect(continuedState.timeElapsed, stateAfterMove!.timeElapsed);

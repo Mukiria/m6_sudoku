@@ -83,7 +83,9 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(statisticsProvider.notifier).recordGame(
+      ref
+          .read(statisticsProvider.notifier)
+          .recordGame(
             difficulty: widget.difficulty,
             timeSeconds: widget.time,
             mistakes: widget.mistakes,
@@ -298,11 +300,7 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
               numberOfParticles: 10,
               maxBlastForce: 5,
               minBlastForce: 2,
-              colors: [
-                difficultyColor,
-                Colors.white,
-                Colors.yellow,
-              ],
+              colors: [difficultyColor, Colors.white, Colors.yellow],
             ),
           ),
           Align(
@@ -314,11 +312,7 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
               numberOfParticles: 10,
               maxBlastForce: 5,
               minBlastForce: 2,
-              colors: [
-                difficultyColor,
-                Colors.white,
-                Colors.yellow,
-              ],
+              colors: [difficultyColor, Colors.white, Colors.yellow],
             ),
           ),
         ],

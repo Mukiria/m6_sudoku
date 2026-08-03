@@ -8,7 +8,10 @@ void main() {
 
     setUp(() {
       validGrid = List.generate(9, (i) => List.generate(9, (j) => 0));
-      validSolution = List.generate(9, (i) => List.generate(9, (j) => ((i * 3 + i ~/ 3 + j) % 9) + 1));
+      validSolution = List.generate(
+        9,
+        (i) => List.generate(9, (j) => ((i * 3 + i ~/ 3 + j) % 9) + 1),
+      );
       // Set some initial values
       validGrid[0][0] = 5;
       validGrid[0][1] = 3;
@@ -66,7 +69,10 @@ void main() {
       final puzzle = Puzzle(
         id: 'test-puzzle-1',
         grid: List.generate(9, (i) => List.generate(9, (j) => (i + j) % 9)),
-        solution: List.generate(9, (i) => List.generate(9, (j) => (i + j) % 9 + 1)),
+        solution: List.generate(
+          9,
+          (i) => List.generate(9, (j) => (i + j) % 9 + 1),
+        ),
         difficulty: 'hard',
         cluesCount: 26,
         createdAt: DateTime(2024, 6, 15),
@@ -92,7 +98,10 @@ void main() {
 
     test('isValid validates grid correctly', () {
       // Valid grid
-      final validGrid = List.generate(9, (i) => List.generate(9, (j) => ((i * 3 + i ~/ 3 + j) % 9) + 1));
+      final validGrid = List.generate(
+        9,
+        (i) => List.generate(9, (j) => ((i * 3 + i ~/ 3 + j) % 9) + 1),
+      );
       final validPuzzle = Puzzle(
         id: 'valid',
         grid: validGrid,
@@ -130,7 +139,10 @@ void main() {
       );
       expect(emptyPuzzle.isComplete, isFalse);
 
-      final fullValidGrid = List.generate(9, (i) => List.generate(9, (j) => ((i * 3 + i ~/ 3 + j) % 9) + 1));
+      final fullValidGrid = List.generate(
+        9,
+        (i) => List.generate(9, (j) => ((i * 3 + i ~/ 3 + j) % 9) + 1),
+      );
       final completePuzzle = Puzzle(
         id: 'complete',
         grid: fullValidGrid,

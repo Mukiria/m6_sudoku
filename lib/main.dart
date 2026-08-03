@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:m6_sudoku/core/audio/audio_service.dart' hide audioServiceProvider;
+import 'package:m6_sudoku/core/audio/audio_service.dart'
+    hide audioServiceProvider;
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/routing/app_router.dart';
 import 'package:m6_sudoku/core/services/storage_service.dart';
@@ -18,9 +19,7 @@ void main() async {
 
   runApp(
     ProviderScope(
-      overrides: [
-        storageServiceProvider.overrideWithValue(storageService),
-      ],
+      overrides: [storageServiceProvider.overrideWithValue(storageService)],
       child: const M6SudokuApp(),
     ),
   );
@@ -33,7 +32,7 @@ class M6SudokuApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
     final themeMode = ref.watch(themeModeProvider);
-    
+
     // Initialize audio service on first build
     ref.listen(audioServiceProvider, (_, __) {});
 

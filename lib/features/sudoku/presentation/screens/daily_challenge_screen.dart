@@ -13,7 +13,8 @@ class DailyChallengeScreen extends ConsumerStatefulWidget {
   const DailyChallengeScreen({super.key});
 
   @override
-  ConsumerState<DailyChallengeScreen> createState() => _DailyChallengeScreenState();
+  ConsumerState<DailyChallengeScreen> createState() =>
+      _DailyChallengeScreenState();
 }
 
 class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
@@ -42,35 +43,44 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
       ),
       body: dailyChallengeAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 64, color: Colors.red),
-              const SizedBox(height: 16),
-              Text('Failed to load daily challenge', style: theme.textTheme.titleLarge),
-              const SizedBox(height: 8),
-              Text(error.toString(), style: theme.textTheme.bodyMedium),
-              const SizedBox(height: 16),
-              AppButton(
-                onPressed: () {
-                  ref.invalidate(dailyChallengeProvider);
-                },
-                child: const Text('Retry'),
+        error:
+            (error, stack) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Failed to load daily challenge',
+                    style: theme.textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(error.toString(), style: theme.textTheme.bodyMedium),
+                  const SizedBox(height: 16),
+                  AppButton(
+                    onPressed: () {
+                      ref.invalidate(dailyChallengeProvider);
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        data: (challenge) => statsAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => _buildContent(context, challenge, null),
-          data: (stats) => _buildContent(context, challenge, stats),
-        ),
+            ),
+        data:
+            (challenge) => statsAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stack) => _buildContent(context, challenge, null),
+              data: (stats) => _buildContent(context, challenge, stats),
+            ),
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, DailyChallenge challenge, DailyChallengeStats? stats) {
+  Widget _buildContent(
+    BuildContext context,
+    DailyChallenge challenge,
+    DailyChallengeStats? stats,
+  ) {
     final theme = Theme.of(context);
     final extension = theme.extension<AppThemeExtension>()!;
     final colorScheme = theme.colorScheme;
@@ -86,7 +96,8 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
           const SizedBox(height: AppConstants.spacingXl),
 
           // Stats row
-          if (stats != null) _buildStatsRow(theme, extension, colorScheme, stats),
+          if (stats != null)
+            _buildStatsRow(theme, extension, colorScheme, stats),
           const SizedBox(height: AppConstants.spacingXl),
 
           // Puzzle preview or completion info
@@ -105,9 +116,16 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
     );
   }
 
-  Widget _buildHeader(ThemeData theme, AppThemeExtension extension, ColorScheme colorScheme, DailyChallenge challenge, bool isCompleted) {
+  Widget _buildHeader(
+    ThemeData theme,
+    AppThemeExtension extension,
+    ColorScheme colorScheme,
+    DailyChallenge challenge,
+    bool isCompleted,
+  ) {
     final date = DateTime.parse(challenge.date);
-    final formattedDate = '${_getMonthName(date.month)} ${date.day}, ${date.year}';
+    final formattedDate =
+        '${_getMonthName(date.month)} ${date.day}, ${date.year}';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,14 +133,16 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: isCompleted
-                ? extension.difficultyEasyColor!.withValues(alpha: 0.1)
-                : extension.difficultyMediumColor!.withValues(alpha: 0.1),
+            color:
+                isCompleted
+                    ? extension.difficultyEasyColor!.withValues(alpha: 0.1)
+                    : extension.difficultyMediumColor!.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isCompleted
-                  ? extension.difficultyEasyColor!
-                  : extension.difficultyMediumColor!,
+              color:
+                  isCompleted
+                      ? extension.difficultyEasyColor!
+                      : extension.difficultyMediumColor!,
               width: 1.5,
             ),
           ),
@@ -130,20 +150,24 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                isCompleted ? Icons.check_circle_rounded : Icons.calendar_today_rounded,
+                isCompleted
+                    ? Icons.check_circle_rounded
+                    : Icons.calendar_today_rounded,
                 size: 16,
-                color: isCompleted
-                    ? extension.difficultyEasyColor!
-                    : extension.difficultyMediumColor!,
+                color:
+                    isCompleted
+                        ? extension.difficultyEasyColor!
+                        : extension.difficultyMediumColor!,
               ),
               const SizedBox(width: 8),
               Text(
                 formattedDate,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: isCompleted
-                      ? extension.difficultyEasyColor!
-                      : extension.difficultyMediumColor!,
+                  color:
+                      isCompleted
+                          ? extension.difficultyEasyColor!
+                          : extension.difficultyMediumColor!,
                 ),
               ),
             ],
@@ -169,7 +193,12 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
     );
   }
 
-  Widget _buildStatsRow(ThemeData theme, AppThemeExtension extension, ColorScheme colorScheme, DailyChallengeStats stats) {
+  Widget _buildStatsRow(
+    ThemeData theme,
+    AppThemeExtension extension,
+    ColorScheme colorScheme,
+    DailyChallengeStats stats,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -261,7 +290,12 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
     );
   }
 
-  Widget _buildCompletionCard(ThemeData theme, AppThemeExtension extension, ColorScheme colorScheme, DailyChallenge challenge) {
+  Widget _buildCompletionCard(
+    ThemeData theme,
+    AppThemeExtension extension,
+    ColorScheme colorScheme,
+    DailyChallenge challenge,
+  ) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppConstants.spacingLg),
@@ -273,7 +307,9 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
           ],
         ),
         borderRadius: BorderRadius.circular(AppConstants.largeBorderRadius),
-        border: Border.all(color: extension.difficultyEasyColor!.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: extension.difficultyEasyColor!.withValues(alpha: 0.3),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,7 +322,11 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
                   color: extension.difficultyEasyColor!,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.check_circle_rounded, color: Colors.white, size: 28),
+                child: const Icon(
+                  Icons.check_circle_rounded,
+                  color: Colors.white,
+                  size: 28,
+                ),
               ),
               const SizedBox(width: AppConstants.spacingMd),
               Expanded(
@@ -389,7 +429,13 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
     );
   }
 
-  Widget _buildPlayButton(ThemeData theme, AppThemeExtension extension, ColorScheme colorScheme, BuildContext context, DailyChallenge challenge) {
+  Widget _buildPlayButton(
+    ThemeData theme,
+    AppThemeExtension extension,
+    ColorScheme colorScheme,
+    BuildContext context,
+    DailyChallenge challenge,
+  ) {
     return Column(
       children: [
         Container(
@@ -403,7 +449,9 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
               ],
             ),
             borderRadius: BorderRadius.circular(AppConstants.largeBorderRadius),
-            border: Border.all(color: extension.difficultyMediumColor!.withValues(alpha: 0.3)),
+            border: Border.all(
+              color: extension.difficultyMediumColor!.withValues(alpha: 0.3),
+            ),
           ),
           child: Stack(
             children: [
@@ -413,7 +461,9 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
                 child: Icon(
                   Icons.grid_3x3_rounded,
                   size: 120,
-                  color: extension.difficultyMediumColor!.withValues(alpha: 0.1),
+                  color: extension.difficultyMediumColor!.withValues(
+                    alpha: 0.1,
+                  ),
                 ),
               ),
               Center(
@@ -427,8 +477,15 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
                         color: extension.difficultyMediumColor!,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 30),
-                    ).animate().scale(duration: 600.ms, curve: Curves.elasticOut),
+                      child: const Icon(
+                        Icons.play_arrow_rounded,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    ).animate().scale(
+                      duration: 600.ms,
+                      curve: Curves.elasticOut,
+                    ),
                     const SizedBox(height: AppConstants.spacingMd),
                     Text(
                       'Play Daily Challenge',
@@ -453,10 +510,7 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
         const SizedBox(height: AppConstants.spacingLg),
         AppButton(
           onPressed: () {
-            context.push(
-              AppRoutes.game,
-              extra: 'daily_${challenge.date}',
-            );
+            context.push(AppRoutes.game, extra: 'daily_${challenge.date}');
           },
           variant: AppButtonVariant.filled,
           size: AppButtonSize.large,
@@ -467,7 +521,11 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
     );
   }
 
-  Widget _buildRules(ThemeData theme, AppThemeExtension extension, ColorScheme colorScheme) {
+  Widget _buildRules(
+    ThemeData theme,
+    AppThemeExtension extension,
+    ColorScheme colorScheme,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppConstants.spacingLg),
       decoration: BoxDecoration(
@@ -517,7 +575,13 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
     );
   }
 
-  Widget _buildRuleItem(ThemeData theme, AppThemeExtension extension, ColorScheme colorScheme, String text, IconData icon) {
+  Widget _buildRuleItem(
+    ThemeData theme,
+    AppThemeExtension extension,
+    ColorScheme colorScheme,
+    String text,
+    IconData icon,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppConstants.spacingMd),
       child: Row(
@@ -529,7 +593,11 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
               color: extension.difficultyMediumColor!.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, size: 20, color: extension.difficultyMediumColor!),
+            child: Icon(
+              icon,
+              size: 20,
+              color: extension.difficultyMediumColor!,
+            ),
           ),
           const SizedBox(width: AppConstants.spacingMd),
           Expanded(
@@ -547,8 +615,18 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
 
   String _getMonthName(int month) {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return months[month - 1];
   }

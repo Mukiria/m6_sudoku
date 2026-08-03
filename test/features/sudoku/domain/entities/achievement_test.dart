@@ -175,15 +175,18 @@ void main() {
 
   group('AchievementCategory', () {
     test('all categories exist', () {
-      expect(AchievementCategory.values, containsAll([
-        AchievementCategory.wins,
-        AchievementCategory.perfect,
-        AchievementCategory.noHints,
-        AchievementCategory.difficulty,
-        AchievementCategory.speed,
-        AchievementCategory.streak,
-        AchievementCategory.special,
-      ]));
+      expect(
+        AchievementCategory.values,
+        containsAll([
+          AchievementCategory.wins,
+          AchievementCategory.perfect,
+          AchievementCategory.noHints,
+          AchievementCategory.difficulty,
+          AchievementCategory.speed,
+          AchievementCategory.streak,
+          AchievementCategory.special,
+        ]),
+      );
     });
 
     test('display names are correct', () {
@@ -212,7 +215,8 @@ void main() {
       );
 
       // Helper function to calculate progress percentage
-      final progressPercent = (achievement.currentProgress / achievement.targetValue) * 100;
+      final progressPercent =
+          (achievement.currentProgress / achievement.targetValue) * 100;
       expect(progressPercent, equals(50.0));
     });
 

@@ -110,33 +110,34 @@ class _GameScreenState extends ConsumerState<GameScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Game Over'),
-        content: const Text('You made 3 mistakes. Better luck next time!'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              context.pop();
-              context.go(AppRoutes.home);
-            },
-            child: const Text('Main Menu'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Game Over'),
+            content: const Text('You made 3 mistakes. Better luck next time!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  context.pop();
+                  context.go(AppRoutes.home);
+                },
+                child: const Text('Main Menu'),
+              ),
+              TextButton(
+                onPressed: () {
+                  context.pop();
+                  final difficulty = Difficulty.values.firstWhere(
+                    (d) => d.name == widget.difficulty,
+                    orElse: () => Difficulty.easy,
+                  );
+                  ref.read(gameControllerProvider.notifier).newGame(difficulty);
+                  ref.read(timerControllerProvider.notifier).reset();
+                  ref.read(timerControllerProvider.notifier).start();
+                  _hasNavigated = false;
+                },
+                child: const Text('Try Again'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              context.pop();
-              final difficulty = Difficulty.values.firstWhere(
-                (d) => d.name == widget.difficulty,
-                orElse: () => Difficulty.easy,
-              );
-              ref.read(gameControllerProvider.notifier).newGame(difficulty);
-              ref.read(timerControllerProvider.notifier).reset();
-              ref.read(timerControllerProvider.notifier).start();
-              _hasNavigated = false;
-            },
-            child: const Text('Try Again'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -151,17 +152,18 @@ class _GameScreenState extends ConsumerState<GameScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => HintOverlay(
-        hintState: hintState,
-        onDismiss: () {
-          Navigator.of(context).pop();
-          setState(() {
-            _showHintOverlay = false;
-          });
-          // Clear hint state after dismissing
-          ref.read(gameControllerProvider.notifier).clearHintState();
-        },
-      ),
+      builder:
+          (context) => HintOverlay(
+            hintState: hintState,
+            onDismiss: () {
+              Navigator.of(context).pop();
+              setState(() {
+                _showHintOverlay = false;
+              });
+              // Clear hint state after dismissing
+              ref.read(gameControllerProvider.notifier).clearHintState();
+            },
+          ),
     );
   }
 
@@ -199,7 +201,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 mistakes: gameState.mistakes,
                 hintsUsed: gameState.hintsUsed,
                 onPause: _showPauseOverlay,
-                onHint: () => ref.read(gameControllerProvider.notifier).useHint(),
+                onHint:
+                    () => ref.read(gameControllerProvider.notifier).useHint(),
                 onUndo: () => ref.read(gameControllerProvider.notifier).undo(),
               ),
               Expanded(
@@ -246,10 +249,14 @@ class _GameScreenState extends ConsumerState<GameScreen>
               NumberPad(
                 selectedNumber: gameState.selectedNumber,
                 onNumberSelected:
-                    (number) =>
-                        ref.read(gameControllerProvider.notifier).selectNumber(number),
+                    (number) => ref
+                        .read(gameControllerProvider.notifier)
+                        .selectNumber(number),
                 onNoteModeToggle:
-                    () => ref.read(gameControllerProvider.notifier).toggleNoteMode(),
+                    () =>
+                        ref
+                            .read(gameControllerProvider.notifier)
+                            .toggleNoteMode(),
                 isNoteMode: gameState.isNoteMode,
                 counts: _getNumberCounts(gameState),
                 disabledNumbers: _getDisabledNumbers(gameState),
@@ -261,7 +268,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   ActionButton(
                     icon: const Icon(Icons.undo_rounded),
                     label: 'Undo',
-                    onPressed: () => ref.read(gameControllerProvider.notifier).undo(),
+                    onPressed:
+                        () => ref.read(gameControllerProvider.notifier).undo(),
                     variant: ActionButtonVariant.secondary,
                     isEnabled: gameState.moveHistory.isNotEmpty,
                   ),
@@ -269,7 +277,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   ActionButton(
                     icon: const Icon(Icons.lightbulb_rounded),
                     label: 'Hint',
-                    onPressed: () => ref.read(gameControllerProvider.notifier).useHint(),
+                    onPressed:
+                        () =>
+                            ref.read(gameControllerProvider.notifier).useHint(),
                     variant: ActionButtonVariant.primary,
                     isEnabled: gameState.hintsUsed < 3,
                   ),
@@ -308,43 +318,45 @@ class _GameScreenState extends ConsumerState<GameScreen>
       context: context,
       builder:
           (context) => Container(
-        padding: const EdgeInsets.all(AppConstants.spacingLg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Cell Options',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: AppConstants.spacingLg),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            padding: const EdgeInsets.all(AppConstants.spacingLg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                AppButton(
-                  onPressed: () {
-                    ref.read(gameControllerProvider.notifier).clearCell(row, col);
-                    Navigator.pop(context);
-                  },
-                  variant: AppButtonVariant.outlined,
-                  child: const Text('Clear'),
+                Text(
+                  'Cell Options',
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
-                AppButton(
-                  onPressed: () {
-                    // Toggle note mode for this cell
-                    Navigator.pop(context);
-                  },
-                  variant: AppButtonVariant.filled,
-                  child: Text(
-                    gameState.notes[row][col].isNotEmpty
-                        ? 'Clear Notes'
-                        : 'Add Notes',
-                  ),
+                const SizedBox(height: AppConstants.spacingLg),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    AppButton(
+                      onPressed: () {
+                        ref
+                            .read(gameControllerProvider.notifier)
+                            .clearCell(row, col);
+                        Navigator.pop(context);
+                      },
+                      variant: AppButtonVariant.outlined,
+                      child: const Text('Clear'),
+                    ),
+                    AppButton(
+                      onPressed: () {
+                        // Toggle note mode for this cell
+                        Navigator.pop(context);
+                      },
+                      variant: AppButtonVariant.filled,
+                      child: Text(
+                        gameState.notes[row][col].isNotEmpty
+                            ? 'Clear Notes'
+                            : 'Add Notes',
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 

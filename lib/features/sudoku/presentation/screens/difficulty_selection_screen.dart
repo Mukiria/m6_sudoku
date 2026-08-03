@@ -100,7 +100,8 @@ class DifficultyCard extends StatelessWidget {
         difficultyColor = extension.difficultyExpertColor;
         break;
       case Difficulty.evil:
-        difficultyColor = extension.difficultyHardColor; // Use hard color for evil
+        difficultyColor =
+            extension.difficultyHardColor; // Use hard color for evil
         break;
     }
 

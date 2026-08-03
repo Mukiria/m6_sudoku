@@ -31,7 +31,8 @@ class GameState with _$GameState {
     @Default(1) int saveVersion,
   }) = _GameState;
 
-  factory GameState.fromJson(Map<String, dynamic> json) => _$GameStateFromJson(json);
+  factory GameState.fromJson(Map<String, dynamic> json) =>
+      _$GameStateFromJson(json);
 }
 
 @freezed
@@ -44,10 +45,19 @@ class HintState with _$HintState {
     required DateTime shownAt,
   }) = _HintState;
 
-  factory HintState.fromJson(Map<String, dynamic> json) => _$HintStateFromJson(json);
+  factory HintState.fromJson(Map<String, dynamic> json) =>
+      _$HintStateFromJson(json);
 }
 
-enum HintType { directReveal, nakedSingle, hiddenSingle, nakedPair, hiddenPair, pointingPair, boxLineReduction }
+enum HintType {
+  directReveal,
+  nakedSingle,
+  hiddenSingle,
+  nakedPair,
+  hiddenPair,
+  pointingPair,
+  boxLineReduction,
+}
 
 @freezed
 class Move with _$Move {
@@ -69,10 +79,9 @@ enum GameStatus { playing, paused, completed, failed }
 
 @freezed
 class CellPosition with _$CellPosition {
-  const factory CellPosition({
-    required int row,
-    required int col,
-  }) = _CellPosition;
+  const factory CellPosition({required int row, required int col}) =
+      _CellPosition;
 
-  factory CellPosition.fromJson(Map<String, dynamic> json) => _$CellPositionFromJson(json);
+  factory CellPosition.fromJson(Map<String, dynamic> json) =>
+      _$CellPositionFromJson(json);
 }

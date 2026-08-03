@@ -21,13 +21,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.home,
         name: 'home',
-        pageBuilder: (context, state) => const MaterialPage(child: HomeScreen()),
+        pageBuilder:
+            (context, state) => const MaterialPage(child: HomeScreen()),
       ),
       GoRoute(
         path: AppRoutes.difficultySelection,
         name: 'difficulty',
-        pageBuilder: (context, state) =>
-            const MaterialPage(child: DifficultySelectionScreen()),
+        pageBuilder:
+            (context, state) =>
+                const MaterialPage(child: DifficultySelectionScreen()),
       ),
 
       // Game route — slide up transition
@@ -35,15 +37,27 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.game,
         name: 'game',
         pageBuilder: (context, state) {
-          final difficulty = state.extra as String? ?? AppConstants.difficultyEasy;
+          final difficulty =
+              state.extra as String? ?? AppConstants.difficultyEasy;
           return CustomTransitionPage(
             key: state.pageKey,
             child: GameScreen(difficulty: difficulty),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
               return SlideTransition(
-                position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-                    .animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+                position: Tween<Offset>(
+                  begin: const Offset(0, 1),
+                  end: Offset.zero,
+                ).animate(
+                  CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  ),
+                ),
                 child: child,
               );
             },
@@ -54,12 +68,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.statistics,
         name: 'statistics',
-        pageBuilder: (context, state) => const MaterialPage(child: StatisticsScreen()),
+        pageBuilder:
+            (context, state) => const MaterialPage(child: StatisticsScreen()),
       ),
       GoRoute(
         path: AppRoutes.settings,
         name: 'settings',
-        pageBuilder: (context, state) => const MaterialPage(child: SettingsScreen()),
+        pageBuilder:
+            (context, state) => const MaterialPage(child: SettingsScreen()),
       ),
       GoRoute(
         path: AppRoutes.pause,
@@ -77,16 +93,28 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             time: extra?['time'] as int? ?? 0,
             mistakes: extra?['mistakes'] as int? ?? 0,
             hintsUsed: extra?['hintsUsed'] as int? ?? 0,
-            difficulty: extra?['difficulty'] as String? ?? AppConstants.difficultyEasy,
+            difficulty:
+                extra?['difficulty'] as String? ?? AppConstants.difficultyEasy,
           );
           return CustomTransitionPage(
             key: state.pageKey,
             child: page,
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
               return SlideTransition(
-                position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-                    .animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+                position: Tween<Offset>(
+                  begin: const Offset(0, 1),
+                  end: Offset.zero,
+                ).animate(
+                  CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  ),
+                ),
                 child: child,
               );
             },
@@ -98,8 +126,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.puzzleLoading,
         name: 'puzzleLoading',
         pageBuilder: (context, state) {
-          final difficulty = state.extra as String? ?? AppConstants.difficultyEasy;
-          return MaterialPage(child: PuzzleLoadingScreen(difficulty: difficulty));
+          final difficulty =
+              state.extra as String? ?? AppConstants.difficultyEasy;
+          return MaterialPage(
+            child: PuzzleLoadingScreen(difficulty: difficulty),
+          );
         },
       ),
 
@@ -107,50 +138,76 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.dailyChallenge,
         name: 'dailyChallenge',
-        pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: const DailyChallengeScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: ScaleTransition(
-                scale: Tween<double>(begin: 0.95, end: 1.0).animate(
-                  CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
-                ),
-                child: child,
-              ),
-            );
-          },
-        ),
+        pageBuilder:
+            (context, state) => CustomTransitionPage(
+              key: state.pageKey,
+              child: const DailyChallengeScreen(),
+              transitionsBuilder: (
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+              ) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: Tween<double>(begin: 0.95, end: 1.0).animate(
+                      CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeOutCubic,
+                      ),
+                    ),
+                    child: child,
+                  ),
+                );
+              },
+            ),
       ),
       GoRoute(
         path: AppRoutes.achievements,
         name: 'achievements',
-        pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: const AchievementScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-        ),
+        pageBuilder:
+            (context, state) => CustomTransitionPage(
+              key: state.pageKey,
+              child: const AchievementScreen(),
+              transitionsBuilder: (
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+              ) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+            ),
       ),
     ],
-    errorBuilder: (context, state) => Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
-            const SizedBox(height: 16),
-            Text('Page Not Found', style: Theme.of(context).textTheme.headlineMedium),
-            const SizedBox(height: 8),
-            Text(state.error.toString(), style: Theme.of(context).textTheme.bodyMedium, textAlign: TextAlign.center),
-            const SizedBox(height: 16),
-            ElevatedButton(onPressed: () => context.go(AppRoutes.home), child: const Text('Go Home')),
-          ],
+    errorBuilder:
+        (context, state) => Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                const SizedBox(height: 16),
+                Text(
+                  'Page Not Found',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  state.error.toString(),
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => context.go(AppRoutes.home),
+                  child: const Text('Go Home'),
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
-    ),
   );
 });
 

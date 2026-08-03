@@ -69,7 +69,11 @@ class PuzzleGenerator {
 
   /// Attempts to find a solution different from the known one.
   /// Returns true if a different solution exists.
-  bool _findDifferentSolution(Board board, List<List<int>> knownSolution, int index) {
+  bool _findDifferentSolution(
+    Board board,
+    List<List<int>> knownSolution,
+    int index,
+  ) {
     if (index >= 81) {
       // Found a complete solution - check if it's different from known
       for (var r = 0; r < 9; r++) {
@@ -90,11 +94,11 @@ class PuzzleGenerator {
     }
 
     final candidates = board.getCandidates(row, col);
-    
+
     // Try candidates that differ from known solution first (more likely to find alternative)
     final knownValue = knownSolution[row][col];
     final orderedCandidates = <int>[];
-    
+
     // First try values different from known solution
     for (final v in candidates) {
       if (v != knownValue) orderedCandidates.add(v);
@@ -157,7 +161,8 @@ class PuzzleGenerator {
 class _FastRandom {
   int _seed;
 
-  _FastRandom([int? seed]) : _seed = seed ?? DateTime.now().microsecondsSinceEpoch;
+  _FastRandom([int? seed])
+    : _seed = seed ?? DateTime.now().microsecondsSinceEpoch;
 
   int nextInt(int max) {
     _seed = (_seed * 1664525 + 1013904223) & 0xFFFFFFFF;

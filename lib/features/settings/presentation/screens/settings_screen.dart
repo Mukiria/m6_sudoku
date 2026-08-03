@@ -182,7 +182,8 @@ class SettingsScreen extends ConsumerWidget {
               icon: Icons.description_rounded,
               title: 'Terms of Service',
               subtitle: 'Read our terms of service',
-              onTap: () => _launchUrl('https://msixv.com/games/terms-of-service'),
+              onTap:
+                  () => _launchUrl('https://msixv.com/games/terms-of-service'),
             ),
             _buildSettingTile(
               context,

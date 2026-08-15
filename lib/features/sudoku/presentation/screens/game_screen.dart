@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
-import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 import 'package:m6_sudoku/shared/widgets/buttons.dart';
 import 'package:m6_sudoku/shared/widgets/sudoku_widgets.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
@@ -170,9 +169,6 @@ class _GameScreenState extends ConsumerState<GameScreen>
   @override
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameControllerProvider);
-    final theme = Theme.of(context);
-    final extension = theme.extension<AppThemeExtension>()!;
-    final colorScheme = theme.colorScheme;
 
     if (gameState == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -206,43 +202,25 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 onUndo: () => ref.read(gameControllerProvider.notifier).undo(),
               ),
               Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final gridSize = constraints.maxWidth - 32;
-                    return Center(
-                      child: Container(
-                        width: gridSize.clamp(0, AppConstants.gridSizePx),
-                        height: gridSize.clamp(0, AppConstants.gridSizePx),
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: extension.gridBackgroundColor,
-                          borderRadius: BorderRadius.circular(
-                            AppConstants.borderRadius,
-                          ),
-                          border: Border.all(
-                            color: extension.subGridLineColor,
-                            width: 2.5,
-                          ),
-                        ),
-                        child: SudokuBoard(
-                          puzzle: gameState.puzzle,
-                          userGrid: gameState.userGrid,
-                          notes: gameState.notes,
-                          selectedCell: gameState.selectedCell,
-                          highlightedCells: gameState.highlightedCells,
-                          conflictCells: gameState.conflictCells,
-                          isNoteMode: gameState.isNoteMode,
-                          onCellTap:
-                              (row, col) => ref
-                                  .read(gameControllerProvider.notifier)
-                                  .selectCell(row, col),
-                          onCellLongPress:
-                              (row, col) =>
-                                  _showCellOptions(row, col, gameState),
-                        ),
-                      ),
-                    );
-                  },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppConstants.spacingMd,
+                  ),
+                  child: SudokuBoard(
+                    puzzle: gameState.puzzle,
+                    userGrid: gameState.userGrid,
+                    notes: gameState.notes,
+                    selectedCell: gameState.selectedCell,
+                    highlightedCells: gameState.highlightedCells,
+                    conflictCells: gameState.conflictCells,
+                    isNoteMode: gameState.isNoteMode,
+                    onCellTap:
+                        (row, col) => ref
+                            .read(gameControllerProvider.notifier)
+                            .selectCell(row, col),
+                    onCellLongPress:
+                        (row, col) => _showCellOptions(row, col, gameState),
+                  ),
                 ),
               ),
               const SizedBox(height: AppConstants.spacingMd),

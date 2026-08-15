@@ -1,8 +1,14 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
+
+/// Caps the rendered board size on very large screens (tablets, desktop)
+/// so cells stay comfortably readable instead of growing unbounded.
+const double _maxBoardSize = 720.0;
 
 class SudokuBoard extends StatelessWidget {
   const SudokuBoard({
@@ -35,24 +41,46 @@ class SudokuBoard extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final gridSize = constraints.maxWidth;
+        final maxWidth = constraints.maxWidth;
+        final maxHeight =
+            constraints.hasBoundedHeight ? constraints.maxHeight : maxWidth;
+        final side = math.min(maxWidth, maxHeight).clamp(0.0, _maxBoardSize);
+        final cellSize = side / AppConstants.gridSize;
+
         return Center(
           child: SizedBox(
-            width: gridSize,
-            height: gridSize,
+            width: side,
+            height: side,
             child: RepaintBoundary(
-              child: _SudokuBoardView(
-                puzzle: puzzle,
-                userGrid: userGrid,
-                notes: notes,
-                selectedCell: selectedCell,
-                highlightedCells: highlightedCells,
-                conflictCells: conflictCells,
-                isNoteMode: isNoteMode,
-                onCellTap: onCellTap,
-                onCellLongPress: onCellLongPress,
-                extension: extension,
-                colorScheme: colorScheme,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: extension.gridBackgroundColor,
+                  borderRadius: BorderRadius.circular(
+                    AppConstants.borderRadius,
+                  ),
+                  border: Border.all(
+                    color: extension.subGridLineColor,
+                    width: 2.0,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(
+                    AppConstants.borderRadius,
+                  ),
+                  child: _SudokuBoardView(
+                    puzzle: puzzle,
+                    userGrid: userGrid,
+                    notes: notes,
+                    selectedCell: selectedCell,
+                    highlightedCells: highlightedCells,
+                    conflictCells: conflictCells,
+                    cellSize: cellSize,
+                    onCellTap: onCellTap,
+                    onCellLongPress: onCellLongPress,
+                    extension: extension,
+                    colorScheme: colorScheme,
+                  ),
+                ),
               ),
             ),
           ),
@@ -62,6 +90,12 @@ class SudokuBoard extends StatelessWidget {
   }
 }
 
+/// Renders the 81 cells in a single [GridView.builder] so every column and
+/// row shares one layout pass — this is what guarantees the grid is a
+/// perfect square with perfectly aligned borders. Grid lines are drawn as
+/// part of each cell's own border (see [_SudokuCell]) rather than by a
+/// separate overlay, so they can never drift out of alignment with the
+/// cells they outline.
 class _SudokuBoardView extends StatelessWidget {
   const _SudokuBoardView({
     required this.puzzle,
@@ -70,7 +104,7 @@ class _SudokuBoardView extends StatelessWidget {
     required this.selectedCell,
     required this.highlightedCells,
     required this.conflictCells,
-    required this.isNoteMode,
+    required this.cellSize,
     required this.onCellTap,
     required this.onCellLongPress,
     required this.extension,
@@ -83,7 +117,7 @@ class _SudokuBoardView extends StatelessWidget {
   final CellPosition? selectedCell;
   final Set<CellPosition> highlightedCells;
   final Set<CellPosition> conflictCells;
-  final bool isNoteMode;
+  final double cellSize;
   final void Function(int row, int col) onCellTap;
   final void Function(int row, int col) onCellLongPress;
   final AppThemeExtension extension;
@@ -91,168 +125,42 @@ class _SudokuBoardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _SudokuGridPainter(
-        selectedCell: selectedCell,
-        highlightedCells: highlightedCells,
-        conflictCells: conflictCells,
-        extension: extension,
-        colorScheme: colorScheme,
+    return GridView.builder(
+      padding: EdgeInsets.zero,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: AppConstants.gridSize,
       ),
-      child: GridView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 9,
-        ),
-        itemCount: 81,
-        itemBuilder: (context, index) {
-          final row = index ~/ 9;
-          final col = index % 9;
-          final position = CellPosition(row: row, col: col);
-          final isFixed = puzzle.grid[row][col] != 0;
-          final userValue = userGrid[row][col];
-          final value =
-              userValue != 0
-                  ? userValue
-                  : (isFixed ? puzzle.grid[row][col] : null);
-          final cellNotes = notes[row][col];
-          final isSelected = selectedCell == position;
-          final isHighlighted = highlightedCells.contains(position);
-          final isConflicted = conflictCells.contains(position);
-
-          return _SudokuCell(
-            key: ValueKey('cell_$row$col'),
-            row: row,
-            col: col,
-            value: value,
-            cellNotes: cellNotes,
-            isFixed: isFixed,
-            isSelected: isSelected,
-            isHighlighted: isHighlighted,
-            isConflicted: isConflicted,
-            isNoteMode: isNoteMode,
-            onCellTap: onCellTap,
-            onCellLongPress: onCellLongPress,
-            extension: extension,
-            colorScheme: colorScheme,
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _SudokuGridPainter extends CustomPainter {
-  _SudokuGridPainter({
-    required this.selectedCell,
-    required this.highlightedCells,
-    required this.conflictCells,
-    required this.extension,
-    required this.colorScheme,
-  });
-
-  final CellPosition? selectedCell;
-  final Set<CellPosition> highlightedCells;
-  final Set<CellPosition> conflictCells;
-  final AppThemeExtension extension;
-  final ColorScheme colorScheme;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final cellSize = size.width / 9;
-    const thinLineWidth = 1.0;
-    const thickLineWidth = 3.0;
-
-    final thinPaint =
-        Paint()
-          ..color = extension.cellBorder
-          ..strokeWidth = thinLineWidth
-          ..style = PaintingStyle.stroke;
-
-    final thickPaint =
-        Paint()
-          ..color = extension.subGridLineColor
-          ..strokeWidth = thickLineWidth
-          ..style = PaintingStyle.stroke;
-
-    final selectedRow = selectedCell?.row;
-    final selectedCol = selectedCell?.col;
-
-    for (int i = 0; i <= 9; i++) {
-      final offset = i * cellSize;
-      final isThick = i % 3 == 0;
-      final paint = isThick ? thickPaint : thinPaint;
-
-      canvas.drawLine(Offset(offset, 0), Offset(offset, size.height), paint);
-      canvas.drawLine(Offset(0, offset), Offset(size.width, offset), paint);
-    }
-
-    if (selectedCell != null) {
-      _drawHighlights(canvas, size, cellSize, selectedRow!, selectedCol!);
-    }
-  }
-
-  void _drawHighlights(
-    Canvas canvas,
-    Size size,
-    double cellSize,
-    int selectedRow,
-    int selectedCol,
-  ) {
-    final highlightPaint =
-        Paint()
-          ..color = extension.cellHighlightBackground
-          ..style = PaintingStyle.fill;
-
-    final relatedPaint =
-        Paint()
-          ..color = extension.cellRelatedBackground
-          ..style = PaintingStyle.fill;
-
-    for (int row = 0; row < 9; row++) {
-      for (int col = 0; col < 9; col++) {
+      itemCount: AppConstants.totalCells,
+      itemBuilder: (context, index) {
+        final row = index ~/ AppConstants.gridSize;
+        final col = index % AppConstants.gridSize;
         final position = CellPosition(row: row, col: col);
-        if (highlightedCells.contains(position)) {
-          final rect = Rect.fromLTWH(
-            col * cellSize,
-            row * cellSize,
-            cellSize,
-            cellSize,
-          );
-          if (row == selectedRow && col == selectedCol) {
-            canvas.drawRect(rect, highlightPaint);
-          } else if (row == selectedRow ||
-              col == selectedCol ||
-              (row ~/ 3 == selectedRow ~/ 3 && col ~/ 3 == selectedCol ~/ 3)) {
-            canvas.drawRect(rect, relatedPaint);
-          }
-        }
-      }
-    }
+        final isFixed = puzzle.grid[row][col] != 0;
+        final userValue = userGrid[row][col];
+        final value =
+            userValue != 0
+                ? userValue
+                : (isFixed ? puzzle.grid[row][col] : null);
 
-    if (conflictCells.isNotEmpty) {
-      final conflictPaint =
-          Paint()
-            ..color = extension.cellErrorBackground.withValues(alpha: 0.3)
-            ..style = PaintingStyle.fill;
-      for (final pos in conflictCells) {
-        final rect = Rect.fromLTWH(
-          pos.col * cellSize,
-          pos.row * cellSize,
-          cellSize,
-          cellSize,
+        return _SudokuCell(
+          key: ValueKey('cell_$row$col'),
+          row: row,
+          col: col,
+          value: value,
+          cellNotes: notes[row][col],
+          isFixed: isFixed,
+          isSelected: selectedCell == position,
+          isHighlighted: highlightedCells.contains(position),
+          isConflicted: conflictCells.contains(position),
+          cellSize: cellSize,
+          onCellTap: onCellTap,
+          onCellLongPress: onCellLongPress,
+          extension: extension,
+          colorScheme: colorScheme,
         );
-        canvas.drawRect(rect, conflictPaint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _SudokuGridPainter oldDelegate) {
-    return oldDelegate.selectedCell != selectedCell ||
-        oldDelegate.highlightedCells != highlightedCells ||
-        oldDelegate.conflictCells != conflictCells ||
-        oldDelegate.extension != extension;
+      },
+    );
   }
 }
 
@@ -267,7 +175,7 @@ class _SudokuCell extends StatelessWidget {
     required this.isSelected,
     required this.isHighlighted,
     required this.isConflicted,
-    required this.isNoteMode,
+    required this.cellSize,
     required this.onCellTap,
     required this.onCellLongPress,
     required this.extension,
@@ -282,7 +190,7 @@ class _SudokuCell extends StatelessWidget {
   final bool isSelected;
   final bool isHighlighted;
   final bool isConflicted;
-  final bool isNoteMode;
+  final double cellSize;
   final void Function(int row, int col) onCellTap;
   final void Function(int row, int col) onCellLongPress;
   final AppThemeExtension extension;
@@ -290,57 +198,73 @@ class _SudokuCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (backgroundColor, borderColor) = _getCellDecoration();
-
+    // Background color and border are the only things that change with
+    // selection state — the cell's footprint never changes, so selection
+    // and highlighting can never shift neighboring cells or push the grid
+    // out of alignment.
     return RepaintBoundary(
       child: AnimatedContainer(
         duration: AppConstants.fastAnimation,
         curve: Curves.easeInOut,
-        decoration: BoxDecoration(color: backgroundColor),
+        decoration: BoxDecoration(color: _backgroundColor(), border: _border()),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: () => onCellTap(row, col),
             onLongPress: () => onCellLongPress(row, col),
-            borderRadius: BorderRadius.zero,
-            splashColor: colorScheme.primary.withValues(alpha: 0.1),
-            highlightColor: colorScheme.primary.withValues(alpha: 0.05),
-            child: _buildCellContent(),
+            splashColor: colorScheme.primary.withValues(alpha: 0.12),
+            highlightColor: colorScheme.primary.withValues(alpha: 0.06),
+            child: Center(child: _buildContent()),
           ),
         ),
       ),
     );
   }
 
-  (Color, Color) _getCellDecoration() {
-    if (isConflicted) {
-      return (extension.cellErrorBackground, extension.cellErrorBorder);
-    }
-    if (isSelected) {
-      return (extension.cellSelectedBackground, extension.cellSelectedBorder);
-    }
-    if (isHighlighted) {
-      return (extension.cellHighlightBackground, Colors.transparent);
-    }
-    if (isFixed) {
-      return (extension.cellFixedBackground, Colors.transparent);
-    }
-    return (extension.cellBackground, Colors.transparent);
+  Color _backgroundColor() {
+    if (isConflicted) return extension.cellErrorBackground;
+    if (isSelected) return extension.cellSelectedBackground;
+    if (isHighlighted) return extension.cellRelatedBackground;
+    if (isFixed) return extension.cellFixedBackground;
+    return extension.cellBackground;
   }
 
-  Widget _buildCellContent() {
+  /// Thin lines between cells, thick lines every three cells to mark the
+  /// 3x3 boxes. Only the right/bottom edges are drawn — the last row/column
+  /// of a box relies on the outer board border instead — so no two cells
+  /// ever draw overlapping edges of differing widths.
+  Border _border() {
+    final thin = BorderSide(color: extension.cellBorder, width: 1.0);
+    final thick = BorderSide(color: extension.subGridLineColor, width: 2.0);
+
+    return Border(
+      right:
+          col == AppConstants.gridSize - 1
+              ? BorderSide.none
+              : ((col + 1) % AppConstants.subGridSize == 0 ? thick : thin),
+      bottom:
+          row == AppConstants.gridSize - 1
+              ? BorderSide.none
+              : ((row + 1) % AppConstants.subGridSize == 0 ? thick : thin),
+    );
+  }
+
+  Widget _buildContent() {
     if (value != null) {
       return _NumberCell(
         value: value!,
         isFixed: isFixed,
         isConflicted: isConflicted,
-        isSelected: isSelected,
-        extension: extension,
+        cellSize: cellSize,
       );
     }
 
     if (cellNotes.isNotEmpty) {
-      return _NotesCell(notes: cellNotes, extension: extension);
+      return SizedBox(
+        width: cellSize,
+        height: cellSize,
+        child: _NotesGrid(notes: cellNotes, cellSize: cellSize),
+      );
     }
 
     return const SizedBox.shrink();
@@ -352,90 +276,84 @@ class _NumberCell extends StatelessWidget {
     required this.value,
     required this.isFixed,
     required this.isConflicted,
-    required this.isSelected,
-    required this.extension,
+    required this.cellSize,
   });
 
   final int value;
   final bool isFixed;
   final bool isConflicted;
-  final bool isSelected;
-  final AppThemeExtension extension;
+  final double cellSize;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: AnimatedScale(
-        scale: isSelected ? 1.03 : 1.0,
-        duration: AppConstants.fastAnimation,
-        curve: Curves.easeOutBack,
-        child: Text(
-          value.toString(),
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: isFixed ? FontWeight.w700 : FontWeight.w600,
-            color:
-                isConflicted
-                    ? Colors.redAccent
-                    : (isFixed ? Colors.white : Colors.lightBlueAccent),
-            height: 1.0,
-          ),
+    final fontSize = (cellSize * 0.5).clamp(14.0, 34.0);
+
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(
+        value.toString(),
+        style: TextStyle(
+          fontSize: fontSize,
+          fontWeight: isFixed ? FontWeight.w700 : FontWeight.w600,
+          color:
+              isConflicted
+                  ? Colors.redAccent
+                  : (isFixed ? Colors.white : Colors.lightBlueAccent),
+          height: 1.0,
         ),
       ),
     );
   }
 }
 
-class _NotesCell extends StatelessWidget {
-  const _NotesCell({required this.notes, required this.extension});
+/// A clean 3x3 mini-grid of candidate notes, laid out with [Table] so every
+/// slot gets an exact, equal share of the cell — no two notes can ever
+/// collide, and each digit sits in the same spot regardless of which other
+/// notes are present.
+class _NotesGrid extends StatelessWidget {
+  const _NotesGrid({required this.notes, required this.cellSize});
 
   final Set<int> notes;
-  final AppThemeExtension extension;
+  final double cellSize;
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final cellSize = constraints.maxWidth;
-        final noteSize = cellSize / 3;
-        final fontSize = (noteSize * 0.55).clamp(8.0, 14.0);
+    final unit = cellSize / AppConstants.subGridSize;
+    final fontSize = (unit * 0.6).clamp(7.0, 13.0);
 
-        return Padding(
-          padding: EdgeInsets.all(cellSize * 0.05),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(3, (row) {
-              return SizedBox(
-                height: noteSize,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: List.generate(3, (col) {
-                    final number = row * 3 + col + 1;
-                    final showNote = notes.contains(number);
-                    return SizedBox(
-                      width: noteSize,
-                      child: Center(
-                        child:
-                            showNote
-                                ? Text(
-                                  number.toString(),
-                                  style: TextStyle(
-                                    fontSize: fontSize,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey.shade400,
-                                    height: 1.0,
-                                  ),
-                                )
-                                : const SizedBox.shrink(),
-                      ),
-                    );
-                  }),
-                ),
-              );
-            }),
-          ),
-        );
+    return Table(
+      columnWidths: const {
+        0: FlexColumnWidth(),
+        1: FlexColumnWidth(),
+        2: FlexColumnWidth(),
       },
+      children: List.generate(AppConstants.subGridSize, (r) {
+        return TableRow(
+          children: List.generate(AppConstants.subGridSize, (c) {
+            final number = r * AppConstants.subGridSize + c + 1;
+            final showNote = notes.contains(number);
+
+            return SizedBox(
+              height: unit,
+              child:
+                  showNote
+                      ? FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          number.toString(),
+                          style: TextStyle(
+                            fontSize: fontSize,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey.shade400,
+                            height: 1.0,
+                          ),
+                        ),
+                      )
+                      : const SizedBox.shrink(),
+            );
+          }),
+        );
+      }),
     );
   }
 }

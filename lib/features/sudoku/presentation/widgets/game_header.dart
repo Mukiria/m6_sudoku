@@ -11,7 +11,6 @@ class GameHeader extends ConsumerWidget {
     required this.mistakes,
     required this.hintsUsed,
     required this.onPause,
-    required this.onHint,
     required this.onUndo,
   });
 
@@ -20,7 +19,6 @@ class GameHeader extends ConsumerWidget {
   final int mistakes;
   final int hintsUsed;
   final VoidCallback onPause;
-  final VoidCallback onHint;
   final VoidCallback onUndo;
 
   @override

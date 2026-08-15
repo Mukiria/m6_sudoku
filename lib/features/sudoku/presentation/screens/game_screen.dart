@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/shared/widgets/buttons.dart';
-import 'package:m6_sudoku/shared/widgets/sudoku_widgets.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/number_pad.dart';
@@ -197,14 +196,12 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 mistakes: gameState.mistakes,
                 hintsUsed: gameState.hintsUsed,
                 onPause: _showPauseOverlay,
-                onHint:
-                    () => ref.read(gameControllerProvider.notifier).useHint(),
                 onUndo: () => ref.read(gameControllerProvider.notifier).undo(),
               ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: AppConstants.spacingMd,
+                    horizontal: AppConstants.spacingSm,
                   ),
                   child: SudokuBoard(
                     puzzle: gameState.puzzle,
@@ -239,48 +236,6 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 counts: _getNumberCounts(gameState),
                 disabledNumbers: _getDisabledNumbers(gameState),
               ),
-              const SizedBox(height: AppConstants.spacingSm),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ActionButton(
-                    icon: const Icon(Icons.undo_rounded),
-                    label: 'Undo',
-                    onPressed:
-                        () => ref.read(gameControllerProvider.notifier).undo(),
-                    variant: ActionButtonVariant.secondary,
-                    isEnabled: gameState.moveHistory.isNotEmpty,
-                  ),
-                  const SizedBox(width: AppConstants.spacingMd),
-                  ActionButton(
-                    icon: const Icon(Icons.lightbulb_rounded),
-                    label: 'Hint',
-                    onPressed:
-                        () =>
-                            ref.read(gameControllerProvider.notifier).useHint(),
-                    variant: ActionButtonVariant.primary,
-                    isEnabled: gameState.hintsUsed < 3,
-                  ),
-                  const SizedBox(width: AppConstants.spacingMd),
-                  ActionButton(
-                    icon: const Icon(Icons.delete_rounded),
-                    label: 'Erase',
-                    onPressed: () {
-                      if (gameState.selectedCell != null) {
-                        ref
-                            .read(gameControllerProvider.notifier)
-                            .clearCell(
-                              gameState.selectedCell!.row,
-                              gameState.selectedCell!.col,
-                            );
-                      }
-                    },
-                    variant: ActionButtonVariant.destructive,
-                    isEnabled: gameState.selectedCell != null,
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppConstants.spacingMd),
             ],
           ),
         ),

@@ -189,7 +189,6 @@ void main() {
       required int mistakes,
       required int hintsUsed,
       required VoidCallback onPause,
-      required VoidCallback onHint,
       required VoidCallback onUndo,
     }) {
       return MaterialApp(
@@ -203,7 +202,6 @@ void main() {
             mistakes: mistakes,
             hintsUsed: hintsUsed,
             onPause: onPause,
-            onHint: onHint,
             onUndo: onUndo,
           ),
         ),
@@ -218,7 +216,6 @@ void main() {
           mistakes: 0,
           hintsUsed: 0,
           onPause: () {},
-          onHint: () {},
           onUndo: () {},
         ),
       );
@@ -234,7 +231,6 @@ void main() {
           mistakes: 0,
           hintsUsed: 0,
           onPause: () {},
-          onHint: () {},
           onUndo: () {},
         ),
       );
@@ -250,7 +246,6 @@ void main() {
           mistakes: 2,
           hintsUsed: 0,
           onPause: () {},
-          onHint: () {},
           onUndo: () {},
         ),
       );
@@ -266,7 +261,6 @@ void main() {
           mistakes: 0,
           hintsUsed: 1,
           onPause: () {},
-          onHint: () {},
           onUndo: () {},
         ),
       );
@@ -284,7 +278,6 @@ void main() {
           mistakes: 0,
           hintsUsed: 0,
           onPause: () => pauseCalled = true,
-          onHint: () {},
           onUndo: () {},
         ),
       );
@@ -293,27 +286,6 @@ void main() {
       await tester.pump();
 
       expect(pauseCalled, true);
-    });
-
-    testWidgets('hint button calls onHint', (WidgetTester tester) async {
-      bool hintCalled = false;
-
-      await tester.pumpWidget(
-        createTestWidget(
-          difficulty: 'easy',
-          timeElapsed: 0,
-          mistakes: 0,
-          hintsUsed: 0,
-          onPause: () {},
-          onHint: () => hintCalled = true,
-          onUndo: () {},
-        ),
-      );
-
-      await tester.tap(find.byIcon(Icons.lightbulb_rounded));
-      await tester.pump();
-
-      expect(hintCalled, true);
     });
 
     testWidgets('undo button calls onUndo', (WidgetTester tester) async {
@@ -326,7 +298,6 @@ void main() {
           mistakes: 0,
           hintsUsed: 0,
           onPause: () {},
-          onHint: () {},
           onUndo: () => undoCalled = true,
         ),
       );
@@ -394,7 +365,6 @@ void main() {
       );
 
       expect(find.byIcon(Icons.backspace_rounded), findsOneWidget);
-      expect(find.text('Erase'), findsOneWidget);
     });
 
     testWidgets('renders mode toggle buttons', (WidgetTester tester) async {

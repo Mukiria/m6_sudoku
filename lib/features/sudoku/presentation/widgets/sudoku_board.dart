@@ -8,7 +8,7 @@ import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
 
 /// Caps the rendered board size on very large screens (tablets, desktop)
 /// so cells stay comfortably readable instead of growing unbounded.
-const double _maxBoardSize = 720.0;
+const double _maxBoardSize = 900.0;
 
 class SudokuBoard extends StatelessWidget {
   const SudokuBoard({
@@ -286,7 +286,7 @@ class _NumberCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fontSize = (cellSize * 0.5).clamp(14.0, 34.0);
+    final fontSize = (cellSize * 0.38).clamp(11.0, 26.0);
 
     return FittedBox(
       fit: BoxFit.scaleDown,

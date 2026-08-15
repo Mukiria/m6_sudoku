@@ -85,7 +85,7 @@ class NumberPad extends ConsumerWidget {
               if (index == 9) {
                 return _buildActionButton(
                   icon: Icons.backspace_rounded,
-                  label: 'Erase',
+                  tooltip: 'Erase',
                   onTap: () {
                     if (gameState.selectedCell != null) {
                       ref
@@ -97,7 +97,7 @@ class NumberPad extends ConsumerWidget {
                     }
                   },
                   color: extension.eraseButtonBackground!,
-                  textColor: extension.eraseButtonText!,
+                  iconColor: extension.eraseButtonText!,
                 );
               }
 
@@ -119,32 +119,21 @@ class NumberPad extends ConsumerWidget {
 
           const SizedBox(height: AppConstants.spacingMd),
 
-          // Action Buttons
-          Row(
-            children: [
-              Expanded(
-                child: _buildActionButton(
-                  icon: Icons.lightbulb_rounded,
-                  label: 'Hint',
-                  onTap:
-                      () => ref.read(gameControllerProvider.notifier).useHint(),
-                  color: extension.hintButtonBackground!,
-                  textColor: extension.hintButtonText!,
-                  isEnabled: gameState.hintsUsed < 3,
-                ),
+          // Hint Button
+          Center(
+            child: SizedBox(
+              width: 56,
+              height: 56,
+              child: _buildActionButton(
+                icon: Icons.lightbulb_rounded,
+                tooltip: 'Hint',
+                onTap:
+                    () => ref.read(gameControllerProvider.notifier).useHint(),
+                color: extension.hintButtonBackground!,
+                iconColor: extension.hintButtonText!,
+                isEnabled: gameState.hintsUsed < 3,
               ),
-              const SizedBox(width: AppConstants.spacingMd),
-              Expanded(
-                child: _buildActionButton(
-                  icon: Icons.undo_rounded,
-                  label: 'Undo',
-                  onTap: () => ref.read(gameControllerProvider.notifier).undo(),
-                  color: extension.undoButtonBackground!,
-                  textColor: extension.undoButtonText!,
-                  isEnabled: gameState.moveHistory.isNotEmpty,
-                ),
-              ),
-            ],
+            ),
           ),
         ],
       ),
@@ -210,47 +199,36 @@ class NumberPad extends ConsumerWidget {
 
   Widget _buildActionButton({
     required IconData icon,
-    required String label,
+    required String tooltip,
     required VoidCallback onTap,
     required Color color,
-    required Color textColor,
+    required Color iconColor,
     bool isEnabled = true,
   }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: isEnabled ? onTap : null,
-        borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            color: isEnabled ? color : color.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-            border: Border.all(
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isEnabled ? onTap : null,
+          borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            decoration: BoxDecoration(
               color: isEnabled ? color : color.withValues(alpha: 0.3),
-              width: 1.5,
+              borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+              border: Border.all(
+                color: isEnabled ? color : color.withValues(alpha: 0.3),
+                width: 1.5,
+              ),
             ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
+            child: Center(
+              child: Icon(
                 icon,
-                size: 20,
-                color: isEnabled ? textColor : textColor.withValues(alpha: 0.3),
+                size: 22,
+                color: isEnabled ? iconColor : iconColor.withValues(alpha: 0.3),
               ),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color:
-                      isEnabled ? textColor : textColor.withValues(alpha: 0.3),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

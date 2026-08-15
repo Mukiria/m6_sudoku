@@ -190,7 +190,10 @@ class SettingsScreen extends ConsumerWidget {
               icon: Icons.star_rounded,
               title: 'Rate App',
               subtitle: 'Enjoying M6 Sudoku? Rate us!',
-              onTap: () {},
+              onTap:
+                  () => _launchUrl(
+                    'https://play.google.com/store/apps/details?id=${AppConstants.bundleId}',
+                  ),
             ),
           ]),
           const SizedBox(height: AppConstants.spacingXl),

@@ -174,5 +174,6 @@ class Settings extends Equatable {
     hapticFeedbackEnabled,
     soundEffectsEnabled,
     autoSaveEnabled,
+    animationsEnabled,
   ];
 }

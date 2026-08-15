@@ -196,10 +196,13 @@ final audioManagerProvider = Provider<AudioManager>((ref) {
 
 final audioServiceProvider = Provider<AudioService>((ref) {
   final audioManager = ref.read(audioManagerProvider);
-  final settings = ref.read(settingsProvider);
+  final soundEnabled = ref.watch(
+    settingsProvider.select((settings) => settings.soundEnabled),
+  );
 
-  // Sync mute state with settings
-  audioManager.setMuted(!settings.soundEnabled);
+  audioManager.initialize();
+  // Kept in sync with the settings toggle for the lifetime of the app.
+  audioManager.setMuted(!soundEnabled);
 
   return AudioService(audioManager);
 });

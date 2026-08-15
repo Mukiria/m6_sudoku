@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 
 enum SoundType { buttonClick, win, error, hint, pause, resume }
 
@@ -10,13 +11,16 @@ class AudioManager {
   final AudioPlayer _player = AudioPlayer();
   bool _isMuted = false;
   double _volume = 1.0;
+  bool _initialized = false;
 
   bool get isMuted => _isMuted;
   double get volume => _volume;
 
   Future<void> initialize() async {
+    if (_initialized) return;
+    _initialized = true;
     await _player.setReleaseMode(ReleaseMode.stop);
-    await _player.setVolume(_volume);
+    await _player.setVolume(_isMuted ? 0 : _volume);
   }
 
   void setMuted(bool muted) {
@@ -43,24 +47,24 @@ class AudioManager {
       await _player.play(AssetSource(assetPath));
     } catch (e) {
       // Silently fail if sound file not found
-      print('Failed to play sound: $e');
+      debugPrint('Failed to play sound: $e');
     }
   }
 
   String _getAssetPath(SoundType type) {
     switch (type) {
       case SoundType.buttonClick:
-        return 'audio/click.mp3';
+        return 'audio/click.wav';
       case SoundType.win:
-        return 'audio/win.mp3';
+        return 'audio/win.wav';
       case SoundType.error:
-        return 'audio/error.mp3';
+        return 'audio/error.wav';
       case SoundType.hint:
-        return 'audio/hint.mp3';
+        return 'audio/hint.wav';
       case SoundType.pause:
-        return 'audio/pause.mp3';
+        return 'audio/pause.wav';
       case SoundType.resume:
-        return 'audio/resume.mp3';
+        return 'audio/resume.wav';
     }
   }
 

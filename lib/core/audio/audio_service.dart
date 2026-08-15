@@ -1,20 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:m6_sudoku/core/audio/audio_manager.dart';
-import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart';
-
-final audioManagerProvider = Provider<AudioManager>((ref) {
-  return AudioManager.instance;
-});
-
-final audioServiceProvider = Provider<AudioService>((ref) {
-  final audioManager = ref.read(audioManagerProvider);
-  final settings = ref.read(settingsProvider);
-
-  // Sync mute state with settings
-  audioManager.setMuted(!settings.soundEnabled);
-
-  return AudioService(audioManager);
-});
 
 class AudioService {
   AudioService(this._audioManager);

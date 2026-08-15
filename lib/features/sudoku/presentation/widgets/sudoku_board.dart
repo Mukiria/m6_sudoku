@@ -55,31 +55,23 @@ class SudokuBoard extends StatelessWidget {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: extension.gridBackgroundColor,
-                  borderRadius: BorderRadius.circular(
-                    AppConstants.borderRadius,
-                  ),
                   border: Border.all(
                     color: extension.subGridLineColor,
                     width: 2.0,
                   ),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                    AppConstants.borderRadius,
-                  ),
-                  child: _SudokuBoardView(
-                    puzzle: puzzle,
-                    userGrid: userGrid,
-                    notes: notes,
-                    selectedCell: selectedCell,
-                    highlightedCells: highlightedCells,
-                    conflictCells: conflictCells,
-                    cellSize: cellSize,
-                    onCellTap: onCellTap,
-                    onCellLongPress: onCellLongPress,
-                    extension: extension,
-                    colorScheme: colorScheme,
-                  ),
+                child: _SudokuBoardView(
+                  puzzle: puzzle,
+                  userGrid: userGrid,
+                  notes: notes,
+                  selectedCell: selectedCell,
+                  highlightedCells: highlightedCells,
+                  conflictCells: conflictCells,
+                  cellSize: cellSize,
+                  onCellTap: onCellTap,
+                  onCellLongPress: onCellLongPress,
+                  extension: extension,
+                  colorScheme: colorScheme,
                 ),
               ),
             ),

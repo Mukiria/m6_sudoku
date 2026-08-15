@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
-import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
-import 'package:m6_sudoku/shared/widgets/sudoku_widgets.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
 
+/// The game's control panel: an action row (Undo / Erase / Notes / Hint)
+/// followed by the 1-9 number row. Undo, Erase, and Hint act directly on
+/// [gameControllerProvider] since they need no per-cell context from the
+/// caller — only number selection is routed back up, since the caller owns
+/// what "select a number" means for cell input.
 class NumberPad extends ConsumerWidget {
   const NumberPad({
     super.key,
@@ -12,7 +15,6 @@ class NumberPad extends ConsumerWidget {
     required this.onNumberSelected,
     required this.onNoteModeToggle,
     required this.isNoteMode,
-    required this.counts,
     required this.disabledNumbers,
   });
 
@@ -20,174 +22,205 @@ class NumberPad extends ConsumerWidget {
   final void Function(int) onNumberSelected;
   final void Function() onNoteModeToggle;
   final bool isNoteMode;
-  final Map<int, int> counts;
   final Set<int> disabledNumbers;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameControllerProvider);
-    final theme = Theme.of(context);
-    final extension = theme.extension<AppThemeExtension>()!;
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     if (gameState == null) return const SizedBox.shrink();
 
+    final hintsRemaining = (3 - gameState.hintsUsed).clamp(0, 3);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _ActionCard(
+          colorScheme: colorScheme,
+          children: [
+            _ActionButton(
+              icon: Icons.undo_rounded,
+              label: 'Undo',
+              isEnabled: gameState.moveHistory.isNotEmpty,
+              onTap: () => ref.read(gameControllerProvider.notifier).undo(),
+              colorScheme: colorScheme,
+            ),
+            _ActionButton(
+              icon: Icons.backspace_outlined,
+              label: 'Erase',
+              isEnabled: gameState.selectedCell != null,
+              onTap: () {
+                final cell = gameState.selectedCell;
+                if (cell != null) {
+                  ref
+                      .read(gameControllerProvider.notifier)
+                      .clearCell(cell.row, cell.col);
+                }
+              },
+              colorScheme: colorScheme,
+            ),
+            _ActionButton(
+              icon: Icons.edit_note_rounded,
+              label: 'Notes',
+              onTap: onNoteModeToggle,
+              colorScheme: colorScheme,
+              badgeText: isNoteMode ? 'ON' : 'OFF',
+              badgeColor:
+                  isNoteMode ? colorScheme.primary : colorScheme.outlineVariant,
+              badgeTextColor:
+                  isNoteMode
+                      ? colorScheme.onPrimary
+                      : colorScheme.onSurfaceVariant,
+            ),
+            _ActionButton(
+              icon: Icons.lightbulb_outline_rounded,
+              label: 'Hint',
+              isEnabled: hintsRemaining > 0,
+              onTap: () => ref.read(gameControllerProvider.notifier).useHint(),
+              colorScheme: colorScheme,
+              badgeText: 'Free x$hintsRemaining',
+              badgeColor: colorScheme.primary,
+              badgeTextColor: colorScheme.onPrimary,
+            ),
+          ],
+        ),
+        const SizedBox(height: AppConstants.spacingMd),
+        _ActionCard(
+          colorScheme: colorScheme,
+          children: List.generate(9, (index) {
+            final number = index + 1;
+            final isDisabled = disabledNumbers.contains(number);
+            final isSelected = selectedNumber == number;
+
+            return Expanded(
+              child: InkWell(
+                borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                onTap: isDisabled ? null : () => onNumberSelected(number),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(
+                    number.toString(),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight:
+                          isSelected ? FontWeight.w800 : FontWeight.w600,
+                      color:
+                          isDisabled
+                              ? colorScheme.onSurfaceVariant.withValues(
+                                alpha: 0.35,
+                              )
+                              : colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+}
+
+/// The rounded white card shared by the action row and the number row.
+class _ActionCard extends StatelessWidget {
+  const _ActionCard({required this.children, required this.colorScheme});
+
+  final List<Widget> children;
+  final ColorScheme colorScheme;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppConstants.spacingMd),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppConstants.spacingSm,
+        vertical: AppConstants.spacingSm,
+      ),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        border: Border(
-          top: BorderSide(color: colorScheme.outlineVariant, width: 1),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Mode Toggle
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: _buildModeButton(
-                  context: context,
-                  icon: Icons.format_size_rounded,
-                  label: 'Numbers',
-                  isSelected: !isNoteMode,
-                  onTap: () => onNoteModeToggle(),
-                ),
-              ),
-              Expanded(
-                child: _buildModeButton(
-                  context: context,
-                  icon: Icons.notes_rounded,
-                  label: 'Notes',
-                  isSelected: isNoteMode,
-                  onTap: () => onNoteModeToggle(),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppConstants.spacingMd),
-
-          // Number Buttons
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 5,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              childAspectRatio: 1,
-            ),
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              if (index == 9) {
-                return _buildActionButton(
-                  icon: Icons.backspace_rounded,
-                  tooltip: 'Erase',
-                  onTap: () {
-                    if (gameState.selectedCell != null) {
-                      ref
-                          .read(gameControllerProvider.notifier)
-                          .clearCell(
-                            gameState.selectedCell!.row,
-                            gameState.selectedCell!.col,
-                          );
-                    }
-                  },
-                  color: extension.eraseButtonBackground!,
-                  iconColor: extension.eraseButtonText!,
-                );
-              }
-
-              final number = index + 1;
-              final isSelected = selectedNumber == number;
-              final count = counts[number] ?? 9;
-              final isDisabled = disabledNumbers.contains(number);
-
-              return NumberButton(
-                number: number,
-                isSelected: isSelected,
-                isEnabled: !isDisabled,
-                onTap: () => onNumberSelected(number),
-                count: count,
-                showCount: true,
-              );
-            },
-          ),
-
-          const SizedBox(height: AppConstants.spacingMd),
-
-          // Hint Button
-          Center(
-            child: SizedBox(
-              width: 56,
-              height: 56,
-              child: _buildActionButton(
-                icon: Icons.lightbulb_rounded,
-                tooltip: 'Hint',
-                onTap:
-                    () => ref.read(gameControllerProvider.notifier).useHint(),
-                color: extension.hintButtonBackground!,
-                iconColor: extension.hintButtonText!,
-                isEnabled: gameState.hintsUsed < 3,
-              ),
-            ),
+        borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: children,
+      ),
     );
   }
+}
 
-  Widget _buildModeButton({
-    required BuildContext context,
-    required IconData icon,
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    required this.colorScheme,
+    this.isEnabled = true,
+    this.badgeText,
+    this.badgeColor,
+    this.badgeTextColor,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final ColorScheme colorScheme;
+  final bool isEnabled;
+  final String? badgeText;
+  final Color? badgeColor;
+  final Color? badgeTextColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final color =
+        isEnabled
+            ? colorScheme.onSurfaceVariant
+            : colorScheme.onSurfaceVariant.withValues(alpha: 0.35);
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
         borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: isSelected ? colorScheme.primary : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-            border: Border.all(
-              color:
-                  isSelected ? colorScheme.primary : colorScheme.outlineVariant,
-              width: 1.5,
-            ),
+        onTap: isEnabled ? onTap : null,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppConstants.spacingSm,
+            vertical: AppConstants.spacingXs,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                size: 20,
-                color:
-                    isSelected
-                        ? colorScheme.onPrimary
-                        : colorScheme.onSurfaceVariant,
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(icon, size: 24, color: color),
+                  if (badgeText != null)
+                    Positioned(
+                      right: -14,
+                      top: -8,
+                      child: _Badge(
+                        text: badgeText!,
+                        color: badgeColor ?? colorScheme.primary,
+                        textColor: badgeTextColor ?? colorScheme.onPrimary,
+                      ),
+                    ),
+                ],
               ),
-              const SizedBox(width: 8),
+              const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color:
-                      isSelected
-                          ? colorScheme.onPrimary
-                          : colorScheme.onSurfaceVariant,
+                  color: color,
                 ),
               ),
             ],
@@ -196,40 +229,34 @@ class NumberPad extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildActionButton({
-    required IconData icon,
-    required String tooltip,
-    required VoidCallback onTap,
-    required Color color,
-    required Color iconColor,
-    bool isEnabled = true,
-  }) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: isEnabled ? onTap : null,
-          borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            decoration: BoxDecoration(
-              color: isEnabled ? color : color.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-              border: Border.all(
-                color: isEnabled ? color : color.withValues(alpha: 0.3),
-                width: 1.5,
-              ),
-            ),
-            child: Center(
-              child: Icon(
-                icon,
-                size: 22,
-                color: isEnabled ? iconColor : iconColor.withValues(alpha: 0.3),
-              ),
-            ),
-          ),
+class _Badge extends StatelessWidget {
+  const _Badge({
+    required this.text,
+    required this.color,
+    required this.textColor,
+  });
+
+  final String text;
+  final Color color;
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 8,
+          fontWeight: FontWeight.w700,
+          color: textColor,
+          height: 1.2,
         ),
       ),
     );

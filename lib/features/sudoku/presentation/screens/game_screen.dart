@@ -7,6 +7,7 @@ import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.d
 import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/number_pad.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/game_header.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/widgets/game_top_bar.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/pause_menu.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/sudoku_board.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/hint_overlay.dart';
@@ -179,6 +180,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
       _checkHintState(gameState);
     });
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -187,16 +190,16 @@ class _GameScreenState extends ConsumerState<GameScreen>
         }
       },
       child: Scaffold(
+        backgroundColor: colorScheme.surfaceContainerHighest,
         body: SafeArea(
           child: Column(
             children: [
+              GameTopBar(onBack: _showPauseOverlay),
               GameHeader(
                 difficulty: widget.difficulty,
                 timeElapsed: gameState.timeElapsed,
                 mistakes: gameState.mistakes,
-                hintsUsed: gameState.hintsUsed,
                 onPause: _showPauseOverlay,
-                onUndo: () => ref.read(gameControllerProvider.notifier).undo(),
               ),
               Expanded(
                 child: Padding(
@@ -233,9 +236,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
                             .read(gameControllerProvider.notifier)
                             .toggleNoteMode(),
                 isNoteMode: gameState.isNoteMode,
-                counts: _getNumberCounts(gameState),
                 disabledNumbers: _getDisabledNumbers(gameState),
               ),
+              const SizedBox(height: AppConstants.spacingMd),
             ],
           ),
         ),

@@ -187,9 +187,7 @@ void main() {
       required String difficulty,
       required int timeElapsed,
       required int mistakes,
-      required int hintsUsed,
       required VoidCallback onPause,
-      required VoidCallback onUndo,
     }) {
       return MaterialApp(
         theme: ThemeData.light().copyWith(
@@ -200,23 +198,19 @@ void main() {
             difficulty: difficulty,
             timeElapsed: timeElapsed,
             mistakes: mistakes,
-            hintsUsed: hintsUsed,
             onPause: onPause,
-            onUndo: onUndo,
           ),
         ),
       );
     }
 
-    testWidgets('renders difficulty badge', (WidgetTester tester) async {
+    testWidgets('renders difficulty label', (WidgetTester tester) async {
       await tester.pumpWidget(
         createTestWidget(
           difficulty: 'medium',
           timeElapsed: 0,
           mistakes: 0,
-          hintsUsed: 0,
           onPause: () {},
-          onUndo: () {},
         ),
       );
 
@@ -229,9 +223,7 @@ void main() {
           difficulty: 'easy',
           timeElapsed: 125, // 2:05
           mistakes: 0,
-          hintsUsed: 0,
           onPause: () {},
-          onUndo: () {},
         ),
       );
 
@@ -244,28 +236,11 @@ void main() {
           difficulty: 'hard',
           timeElapsed: 0,
           mistakes: 2,
-          hintsUsed: 0,
           onPause: () {},
-          onUndo: () {},
         ),
       );
 
-      expect(find.text('2/3'), findsOneWidget);
-    });
-
-    testWidgets('renders hints counter', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        createTestWidget(
-          difficulty: 'expert',
-          timeElapsed: 0,
-          mistakes: 0,
-          hintsUsed: 1,
-          onPause: () {},
-          onUndo: () {},
-        ),
-      );
-
-      expect(find.text('1/3'), findsOneWidget);
+      expect(find.text('Mistake: 2/3'), findsOneWidget);
     });
 
     testWidgets('pause button calls onPause', (WidgetTester tester) async {
@@ -276,9 +251,7 @@ void main() {
           difficulty: 'easy',
           timeElapsed: 0,
           mistakes: 0,
-          hintsUsed: 0,
           onPause: () => pauseCalled = true,
-          onUndo: () {},
         ),
       );
 
@@ -286,26 +259,6 @@ void main() {
       await tester.pump();
 
       expect(pauseCalled, true);
-    });
-
-    testWidgets('undo button calls onUndo', (WidgetTester tester) async {
-      bool undoCalled = false;
-
-      await tester.pumpWidget(
-        createTestWidget(
-          difficulty: 'easy',
-          timeElapsed: 0,
-          mistakes: 0,
-          hintsUsed: 0,
-          onPause: () {},
-          onUndo: () => undoCalled = true,
-        ),
-      );
-
-      await tester.tap(find.byIcon(Icons.undo_rounded));
-      await tester.pump();
-
-      expect(undoCalled, true);
     });
   });
 
@@ -315,7 +268,6 @@ void main() {
       required void Function(int) onNumberSelected,
       required void Function() onNoteModeToggle,
       required bool isNoteMode,
-      required Map<int, int> counts,
       required Set<int> disabledNumbers,
     }) {
       return MaterialApp(
@@ -328,7 +280,6 @@ void main() {
             onNumberSelected: onNumberSelected,
             onNoteModeToggle: onNoteModeToggle,
             isNoteMode: isNoteMode,
-            counts: counts,
             disabledNumbers: disabledNumbers,
           ),
         ),
@@ -342,7 +293,6 @@ void main() {
           onNumberSelected: (_) {},
           onNoteModeToggle: () {},
           isNoteMode: false,
-          counts: {},
           disabledNumbers: {},
         ),
       );
@@ -359,28 +309,28 @@ void main() {
           onNumberSelected: (_) {},
           onNoteModeToggle: () {},
           isNoteMode: false,
-          counts: {},
           disabledNumbers: {},
         ),
       );
 
-      expect(find.byIcon(Icons.backspace_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.backspace_outlined), findsOneWidget);
     });
 
-    testWidgets('renders mode toggle buttons', (WidgetTester tester) async {
+    testWidgets('renders notes toggle with OFF badge', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createTestWidget(
           selectedNumber: null,
           onNumberSelected: (_) {},
           onNoteModeToggle: () {},
           isNoteMode: false,
-          counts: {},
           disabledNumbers: {},
         ),
       );
 
-      expect(find.text('Numbers'), findsOneWidget);
       expect(find.text('Notes'), findsOneWidget);
+      expect(find.text('OFF'), findsOneWidget);
     });
 
     testWidgets('highlights selected number', (WidgetTester tester) async {
@@ -390,7 +340,6 @@ void main() {
           onNumberSelected: (_) {},
           onNoteModeToggle: () {},
           isNoteMode: false,
-          counts: {},
           disabledNumbers: {},
         ),
       );
@@ -408,7 +357,6 @@ void main() {
           onNumberSelected: (_) {},
           onNoteModeToggle: () => noteModeToggled = true,
           isNoteMode: false,
-          counts: {},
           disabledNumbers: {},
         ),
       );

@@ -59,6 +59,8 @@ class PauseMenu extends ConsumerWidget {
             },
             variant: AppButtonVariant.filled,
             size: AppButtonSize.large,
+            backgroundColor: AppThemeExtension.brandOrange,
+            foregroundColor: Colors.white,
             icon: const Icon(Icons.play_arrow_rounded),
             child: const Text('Resume'),
           ),
@@ -87,8 +89,10 @@ class PauseMenu extends ConsumerWidget {
               }
               context.pop();
             },
-            variant: AppButtonVariant.tonal,
+            variant: AppButtonVariant.filled,
             size: AppButtonSize.large,
+            backgroundColor: AppThemeExtension.brandOrange,
+            foregroundColor: Colors.white,
             icon: const Icon(Icons.refresh_rounded),
             child: const Text('Restart'),
           ),

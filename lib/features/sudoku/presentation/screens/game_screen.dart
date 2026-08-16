@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/shared/widgets/buttons.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/providers/sudoku_providers.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/number_pad.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/game_header.dart';
@@ -30,25 +31,44 @@ class _GameScreenState extends ConsumerState<GameScreen>
   bool _hasNavigated = false;
   bool _showHintOverlay = false;
 
+  bool get _isDaily => widget.difficulty.startsWith('daily_');
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_onTabChanged);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final gameState = ref.read(gameControllerProvider);
-
-      // If there's no saved game state, create a new game
-      if (gameState == null || gameState.status != GameStatus.playing) {
-        final difficulty = Difficulty.values.firstWhere(
-          (d) => d.name == widget.difficulty,
-          orElse: () => Difficulty.easy,
-        );
-        ref.read(gameControllerProvider.notifier).newGame(difficulty);
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _startSession();
       ref.read(timerControllerProvider.notifier).start();
     });
+  }
+
+  /// Loads the puzzle for [widget.difficulty] unless a matching session is
+  /// already in progress. The daily challenge's `puzzleId` is the same
+  /// `daily_<date>` string passed as `widget.difficulty`, so this doubles
+  /// as the check for "already playing today's challenge".
+  Future<void> _startSession() async {
+    final gameState = ref.read(gameControllerProvider);
+    final hasMatchingSession =
+        gameState != null &&
+        gameState.status == GameStatus.playing &&
+        gameState.puzzleId == widget.difficulty;
+    if (hasMatchingSession) return;
+
+    if (_isDaily) {
+      final challenge = await ref.read(dailyChallengeProvider.future);
+      await ref
+          .read(gameControllerProvider.notifier)
+          .loadPuzzle(challenge.puzzle, difficulty: Difficulty.medium);
+    } else {
+      final difficulty = Difficulty.values.firstWhere(
+        (d) => d.name == widget.difficulty,
+        orElse: () => Difficulty.easy,
+      );
+      await ref.read(gameControllerProvider.notifier).newGame(difficulty);
+    }
   }
 
   @override
@@ -122,13 +142,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 child: const Text('Main Menu'),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   context.pop();
-                  final difficulty = Difficulty.values.firstWhere(
-                    (d) => d.name == widget.difficulty,
-                    orElse: () => Difficulty.easy,
-                  );
-                  ref.read(gameControllerProvider.notifier).newGame(difficulty);
+                  // Game-over state is never GameStatus.playing, so
+                  // _startSession always reloads a fresh session here.
+                  await _startSession();
                   ref.read(timerControllerProvider.notifier).reset();
                   ref.read(timerControllerProvider.notifier).start();
                   _hasNavigated = false;
@@ -196,7 +214,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
             children: [
               GameTopBar(onBack: _showPauseOverlay),
               GameHeader(
-                difficulty: widget.difficulty,
+                difficulty: _isDaily ? 'daily' : widget.difficulty,
                 timeElapsed: gameState.timeElapsed,
                 mistakes: gameState.mistakes,
                 onPause: _showPauseOverlay,

@@ -125,6 +125,18 @@ class HomeScreen extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: _QuickActionButton(
+                              icon: Icons.calendar_today_rounded,
+                              label: 'Daily',
+                              onPressed:
+                                  () => context.push(AppRoutes.dailyChallenge),
+                            )
+                            .animate()
+                            .fadeIn(duration: 300.ms, delay: 450.ms)
+                            .slideY(begin: 0.2, end: 0),
+                      ),
+                      const SizedBox(width: AppConstants.spacingMd),
+                      Expanded(
+                        child: _QuickActionButton(
                               icon: Icons.bar_chart_rounded,
                               label: 'Statistics',
                               onPressed:
@@ -169,7 +181,14 @@ class HomeScreen extends ConsumerWidget {
 
   void _continueGame(BuildContext context, WidgetRef ref, GameState gameState) {
     ref.read(gameControllerProvider.notifier).continueGame(gameState);
-    context.push(AppRoutes.game);
+    // The daily challenge's puzzleId (daily_<date>) doubles as the "extra"
+    // GameScreen expects, so it resumes the in-progress session instead of
+    // generating a fresh one.
+    final isDaily = gameState.puzzleId.startsWith('daily_');
+    context.push(
+      AppRoutes.game,
+      extra: isDaily ? gameState.puzzleId : gameState.difficulty.name,
+    );
   }
 }
 

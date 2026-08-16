@@ -216,5 +216,33 @@ void main() {
       },
       timeout: const Timeout(Duration(minutes: 5)),
     );
+
+    test('same seed produces an identical complete grid every time', () {
+      final gridA = PuzzleGenerator(seed: 20260816).generateCompleteGrid().toGrid();
+      final gridB = PuzzleGenerator(seed: 20260816).generateCompleteGrid().toGrid();
+      expect(gridA, equals(gridB));
+    });
+
+    test(
+      'same seed produces an identical puzzle every time (daily challenge determinism)',
+      () {
+        final puzzleA =
+            PuzzleGenerator(
+              seed: 20260816,
+            ).generatePuzzleWithDifficulty(Difficulty.medium).toGrid();
+        final puzzleB =
+            PuzzleGenerator(
+              seed: 20260816,
+            ).generatePuzzleWithDifficulty(Difficulty.medium).toGrid();
+        expect(puzzleA, equals(puzzleB));
+      },
+      timeout: const Timeout(Duration(minutes: 2)),
+    );
+
+    test('different seeds produce different complete grids', () {
+      final gridA = PuzzleGenerator(seed: 20260816).generateCompleteGrid().toGrid();
+      final gridB = PuzzleGenerator(seed: 20260817).generateCompleteGrid().toGrid();
+      expect(gridA, isNot(equals(gridB)));
+    });
   });
 }

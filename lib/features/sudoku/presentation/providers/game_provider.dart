@@ -59,6 +59,41 @@ class GameController extends _$GameController {
     _startAutoSave();
   }
 
+  /// Loads a specific [puzzle] (used for the daily challenge) instead of
+  /// generating a random one. Sessions whose [Puzzle.id] starts with
+  /// `daily_` are kept out of the single regular-game save slot — see
+  /// [_saveGame] — so playing today's challenge never clobbers a paused
+  /// regular game, and vice versa.
+  Future<void> loadPuzzle(Puzzle puzzle, {required Difficulty difficulty}) async {
+    final initialNotes = _recomputeNotesBitmask(
+      puzzle.grid.map((row) => List<int>.from(row)).toList(),
+      puzzle,
+    );
+    state = GameState(
+      puzzleId: puzzle.id,
+      puzzle: puzzle,
+      userGrid: puzzle.grid.map((row) => List<int>.from(row)).toList(),
+      notes: initialNotes,
+      timeElapsed: 0,
+      mistakes: 0,
+      hintsUsed: 0,
+      penaltyTime: 0,
+      moveHistory: [],
+      redoStack: [],
+      status: GameStatus.playing,
+      lastPlayed: DateTime.now(),
+      difficulty: difficulty,
+      selectedCell: null,
+      selectedNumber: null,
+      isNoteMode: false,
+      highlightedCells: {},
+      conflictCells: {},
+      hintState: null,
+      lastSaved: DateTime.now(),
+    );
+    _startAutoSave();
+  }
+
   Future<void> loadGame() async {
     final getGameState = ref.read(getGameStateUseCaseProvider);
     final result = await getGameState();
@@ -169,8 +204,28 @@ class GameController extends _$GameController {
       state = state!.copyWith(status: GameStatus.completed);
       _saveGame();
       _checkAndUnlockAchievements(currentState);
+      _completeDailyChallengeIfNeeded(currentState);
       ref.read(audioServiceProvider).playWin();
     }
+  }
+
+  /// Records completion + streak/stats for the daily challenge, and blocks
+  /// the puzzle from being replayed for credit: [CompleteDailyChallengeUseCase]
+  /// rejects a second completion for the same date at the storage layer.
+  void _completeDailyChallengeIfNeeded(GameState completedState) {
+    final puzzleId = completedState.puzzleId;
+    if (!puzzleId.startsWith('daily_')) return;
+
+    final date = puzzleId.substring('daily_'.length);
+    ref.read(completeDailyChallengeUseCaseProvider)(
+      date: date,
+      timeElapsed: completedState.timeElapsed,
+      mistakes: completedState.mistakes,
+      hintsUsed: completedState.hintsUsed,
+    );
+    ref.invalidate(dailyChallengeProvider);
+    ref.invalidate(dailyChallengeStatsProvider);
+    ref.read(incrementAchievementProgressUseCaseProvider)('daily_champion', 1);
   }
 
   void toggleNote(int row, int col, int note) {
@@ -440,8 +495,13 @@ class GameController extends _$GameController {
     ref.read(audioServiceProvider).playResume();
   }
 
+  bool get _isDailyChallenge => state?.puzzleId.startsWith('daily_') ?? false;
+
   void _saveGame() {
     if (state == null) return;
+    // The daily challenge shares no slot with the regular saved game — see
+    // loadPuzzle's doc comment.
+    if (_isDailyChallenge) return;
     final saveGame = ref.read(saveGameStateUseCaseProvider);
     saveGame(state!.copyWith(lastSaved: DateTime.now()));
   }

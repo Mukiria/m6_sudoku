@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 import '../models/board.dart';
 import '../solver/sudoku_solver.dart';
@@ -7,9 +9,13 @@ class PuzzleGenerator {
 
   final int? seed;
 
+  /// With a [seed], the complete grid is fully deterministic — solving the
+  /// same empty board with the same seeded shuffle order always produces
+  /// the same grid, which the daily challenge relies on to give every
+  /// player an identical puzzle. Without a seed, generation stays random.
   Board generateCompleteGrid() {
     final board = Board();
-    SudokuSolver.solve(board);
+    SudokuSolver.solve(board, random: seed != null ? Random(seed) : null);
     return board;
   }
 

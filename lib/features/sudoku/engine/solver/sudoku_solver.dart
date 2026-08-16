@@ -2,11 +2,11 @@ import '../models/board.dart';
 import 'dart:math';
 
 class SudokuSolver {
-  static bool solve(Board board) {
-    return _backtrack(board);
+  static bool solve(Board board, {Random? random}) {
+    return _backtrack(board, random ?? _random);
   }
 
-  static bool _backtrack(Board board) {
+  static bool _backtrack(Board board, Random random) {
     // Find empty cell with minimum candidates (MRV heuristic)
     int bestRow = -1;
     int bestCol = -1;
@@ -33,10 +33,10 @@ class SudokuSolver {
 
     final candidates = board.getCandidates(bestRow, bestCol);
     // Shuffle candidates for different solutions
-    final shuffled = List<int>.from(candidates)..shuffle(_random);
+    final shuffled = List<int>.from(candidates)..shuffle(random);
     for (final value in shuffled) {
       board.setValue(bestRow, bestCol, value);
-      if (_backtrack(board)) return true;
+      if (_backtrack(board, random)) return true;
       board.setValue(bestRow, bestCol, 0);
     }
 

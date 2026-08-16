@@ -29,16 +29,76 @@ void main() {
       },
     );
 
-    test('getOrGenerateDailyChallenge is idempotent for the same store', () async {
-      final ds = DailyChallengeLocalDataSource(FakeStorageService());
-      final first = await ds.getOrGenerateDailyChallenge();
-      final second = await ds.getOrGenerateDailyChallenge();
+    test(
+      'getOrGenerateDailyChallenge is idempotent for the same store',
+      () async {
+        final ds = DailyChallengeLocalDataSource(FakeStorageService());
+        final first = await ds.getOrGenerateDailyChallenge();
+        final second = await ds.getOrGenerateDailyChallenge();
 
-      final challenge1 = first.fold((f) => throw Exception(f.message), (c) => c);
-      final challenge2 = second.fold((f) => throw Exception(f.message), (c) => c);
+        final challenge1 = first.fold(
+          (f) => throw Exception(f.message),
+          (c) => c,
+        );
+        final challenge2 = second.fold(
+          (f) => throw Exception(f.message),
+          (c) => c,
+        );
 
-      expect(challenge1.puzzle.grid, challenge2.puzzle.grid);
-    });
+        expect(challenge1.puzzle.grid, challenge2.puzzle.grid);
+      },
+    );
+
+    test(
+      'the generated puzzle carries a real, complete solution (not the blanked-out puzzle itself)',
+      () async {
+        // Regression: _generateDailyPuzzle used to read the "solution" off
+        // the same board the blanked puzzle was derived from, so it was
+        // mostly zeros — every entered digit was judged a mistake because
+        // it could never equal solution[row][col].
+        final ds = DailyChallengeLocalDataSource(FakeStorageService());
+        final result = await ds.getOrGenerateDailyChallenge();
+        final challenge = result.fold(
+          (f) => throw Exception(f.message),
+          (c) => c,
+        );
+        final solution = challenge.puzzle.solution;
+        final grid = challenge.puzzle.grid;
+
+        // A real solution has no blanks and every row/column/box contains
+        // each digit 1-9 exactly once.
+        for (final row in solution) {
+          expect(row.contains(0), false);
+        }
+        const complete = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        for (var r = 0; r < 9; r++) {
+          expect(solution[r].toSet(), complete);
+        }
+        for (var c = 0; c < 9; c++) {
+          expect(solution.map((row) => row[c]).toSet(), complete);
+        }
+        for (var boxRow = 0; boxRow < 3; boxRow++) {
+          for (var boxCol = 0; boxCol < 3; boxCol++) {
+            final box = <int>{};
+            for (var r = boxRow * 3; r < boxRow * 3 + 3; r++) {
+              for (var c = boxCol * 3; c < boxCol * 3 + 3; c++) {
+                box.add(solution[r][c]);
+              }
+            }
+            expect(box, complete);
+          }
+        }
+
+        // Every given clue in the puzzle must agree with the solution.
+        for (var r = 0; r < 9; r++) {
+          for (var c = 0; c < 9; c++) {
+            if (grid[r][c] != 0) {
+              expect(grid[r][c], solution[r][c]);
+            }
+          }
+        }
+      },
+    );
 
     test('completing the challenge persists stats and blocks replay', () async {
       final ds = DailyChallengeLocalDataSource(FakeStorageService());

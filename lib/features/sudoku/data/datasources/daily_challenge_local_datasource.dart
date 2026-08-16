@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/daily_challenge.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/puzzle.dart';
-import 'package:m6_sudoku/features/sudoku/engine/models/board.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 import 'package:m6_sudoku/features/sudoku/engine/generator/puzzle_generator.dart';
 import 'package:m6_sudoku/core/errors/failures.dart';
@@ -147,12 +146,22 @@ class DailyChallengeLocalDataSource {
     final generator = PuzzleGenerator(seed: seed);
     final board = generator.generatePuzzleWithDifficulty(Difficulty.medium);
 
-    // Convert board to puzzle format
+    // generateCompleteGrid() is deterministic per seed (see
+    // PuzzleGenerator), so a fresh call with the same seed reproduces the
+    // exact solved grid `board` above was derived from. This is needed
+    // because `board` only holds the blanked-out puzzle — reading a
+    // "solution" from it (as this used to) meant almost every cell of the
+    // solution was 0, so no entered digit could ever be judged correct.
+    final solutionBoard = PuzzleGenerator(seed: seed).generateCompleteGrid();
+
     final grid = List.generate(
       9,
       (r) => List.generate(9, (c) => board.getValue(r, c)),
     );
-    final solution = _getSolutionFromBoard(board);
+    final solution = List.generate(
+      9,
+      (r) => List.generate(9, (c) => solutionBoard.getValue(r, c)),
+    );
 
     return Puzzle(
       id: 'daily_$date',
@@ -172,13 +181,6 @@ class DailyChallengeLocalDataSource {
     final day = int.parse(parts[2]);
     // Create deterministic seed: YYYYMMDD
     return year * 10000 + month * 100 + day;
-  }
-
-  List<List<int>> _getSolutionFromBoard(Board board) {
-    return List.generate(
-      9,
-      (r) => List.generate(9, (c) => board.getValue(r, c)),
-    );
   }
 
   String _getTodayDateString() {

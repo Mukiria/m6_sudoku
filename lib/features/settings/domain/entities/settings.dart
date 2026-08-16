@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 
 class Settings extends Equatable {
   const Settings({
-    this.themeMode = ThemeMode.system,
+    this.themeMode = ThemeMode.light,
     this.soundEnabled = true,
     this.hapticsEnabled = true,
     this.autoNotes = true,
@@ -127,7 +127,7 @@ class Settings extends Equatable {
     return Settings(
       themeMode: ThemeMode.values.firstWhere(
         (e) => e.name == json['themeMode'],
-        orElse: () => ThemeMode.system,
+        orElse: () => ThemeMode.light,
       ),
       soundEnabled: json['soundEnabled'] ?? true,
       hapticsEnabled: json['hapticsEnabled'] ?? true,

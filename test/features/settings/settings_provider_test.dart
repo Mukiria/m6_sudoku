@@ -32,7 +32,7 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       final notifier = container.read(settingsProvider.notifier);
-      expect(container.read(settingsProvider).themeMode, ThemeMode.system);
+      expect(container.read(settingsProvider).themeMode, ThemeMode.light);
 
       await notifier.updateThemeMode(ThemeMode.dark);
 

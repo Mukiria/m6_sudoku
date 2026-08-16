@@ -45,7 +45,7 @@ class SettingsLocalDataSource {
 
   Settings _defaultSettings() {
     return Settings(
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
       soundEnabled: true,
       hapticsEnabled: true,
       autoNotes: true,

@@ -51,7 +51,17 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // Falls back to debug signing when key.properties isn't present
+            // (CI runners, or a fresh checkout without the local upload
+            // keystore) so `flutter build apk/appbundle --release` still
+            // succeeds. Only a build signed with the real keystore is
+            // suitable for actual distribution.
+            signingConfig =
+                if (keystorePropertiesFile.exists()) {
+                    signingConfigs.getByName("release")
+                } else {
+                    signingConfigs.getByName("debug")
+                }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

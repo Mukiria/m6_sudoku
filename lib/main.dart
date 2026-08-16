@@ -7,6 +7,7 @@ import 'package:m6_sudoku/core/services/storage_service.dart';
 import 'package:m6_sudoku/core/theme/app_theme.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 import 'package:m6_sudoku/features/settings/presentation/providers/settings_provider.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/sudoku_providers.dart';
 
 void main() async {
@@ -15,11 +16,17 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   final storageService = StorageServiceImpl(prefs);
 
+  final container = ProviderContainer(
+    overrides: [storageServiceProvider.overrideWithValue(storageService)],
+  );
+
+  // Restore any in-progress game before the first frame renders, so
+  // "Continue Game" reflects it immediately after a cold start rather than
+  // only after some other screen happens to read gameControllerProvider.
+  await container.read(gameControllerProvider.notifier).loadGame();
+
   runApp(
-    ProviderScope(
-      overrides: [storageServiceProvider.overrideWithValue(storageService)],
-      child: const M6SudokuApp(),
-    ),
+    UncontrolledProviderScope(container: container, child: const M6SudokuApp()),
   );
 }
 

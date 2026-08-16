@@ -32,7 +32,10 @@ class _GameScreenState extends ConsumerState<GameScreen>
   bool _hasNavigated = false;
   bool _showHintOverlay = false;
 
-  bool get _isDaily => widget.difficulty.startsWith('daily_');
+  /// True once the initial "continue" hand-off (see [_startSession]) has
+  /// been consumed, so a later retry-after-failure knows to actually
+  /// regenerate a puzzle instead of no-op'ing again.
+  bool _initialContinueHandled = false;
 
   @override
   void initState() {
@@ -46,26 +49,45 @@ class _GameScreenState extends ConsumerState<GameScreen>
     });
   }
 
-  /// Loads the puzzle for [widget.difficulty] unless a matching session is
-  /// already in progress. The daily challenge's `puzzleId` is the same
-  /// `daily_<date>` string passed as `widget.difficulty`, so this doubles
-  /// as the check for "already playing today's challenge".
+  /// Loads a puzzle for [widget.difficulty] unless a matching session is
+  /// already in progress.
+  ///
+  /// `widget.difficulty` is one of: a `Difficulty.name` (new regular game),
+  /// a `daily_<date>` id (daily challenge — also its own puzzleId, so the
+  /// equality check below doubles as "already playing today's challenge"),
+  /// or the sentinel `'continue'` from HomeScreen's Continue Game button,
+  /// which already loaded the exact session into gameControllerProvider
+  /// before navigating here — regular puzzleIds are timestamps, not
+  /// difficulty names, so they can never be matched by equality the way the
+  /// daily id can, hence the sentinel instead of trying to encode it.
   Future<void> _startSession() async {
+    if (widget.difficulty == 'continue' && !_initialContinueHandled) {
+      _initialContinueHandled = true;
+      return;
+    }
+
     final gameState = ref.read(gameControllerProvider);
+    final mode =
+        widget.difficulty == 'continue'
+            ? (gameState?.puzzleId.startsWith('daily_') == true
+                ? gameState!.puzzleId
+                : (gameState?.difficulty.name ?? AppConstants.difficultyEasy))
+            : widget.difficulty;
+
     final hasMatchingSession =
         gameState != null &&
         gameState.status == GameStatus.playing &&
-        gameState.puzzleId == widget.difficulty;
+        gameState.puzzleId == mode;
     if (hasMatchingSession) return;
 
-    if (_isDaily) {
+    if (mode.startsWith('daily_')) {
       final challenge = await ref.read(dailyChallengeProvider.future);
       await ref
           .read(gameControllerProvider.notifier)
           .loadPuzzle(challenge.puzzle, difficulty: Difficulty.medium);
     } else {
       final difficulty = Difficulty.values.firstWhere(
-        (d) => d.name == widget.difficulty,
+        (d) => d.name == mode,
         orElse: () => Difficulty.easy,
       );
       await ref.read(gameControllerProvider.notifier).newGame(difficulty);
@@ -217,7 +239,10 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 children: [
                   GameTopBar(onBack: _showPauseOverlay),
                   GameHeader(
-                    difficulty: _isDaily ? 'daily' : widget.difficulty,
+                    difficulty:
+                        gameState.puzzleId.startsWith('daily_')
+                            ? 'daily'
+                            : gameState.difficulty.name,
                     timeElapsed: gameState.timeElapsed,
                     mistakes: gameState.mistakes,
                     onPause: _showPauseOverlay,

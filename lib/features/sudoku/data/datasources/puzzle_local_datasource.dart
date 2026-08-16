@@ -94,15 +94,31 @@ class PuzzleLocalDataSource {
       final jsonString = _storage.getString(_gameStateKey);
       if (jsonString == null) return const Right(null);
       final map = jsonDecode(jsonString) as Map<String, dynamic>;
+
+      // A save from an older/newer app version may not deserialize into a
+      // valid state (or may parse "successfully" into wrong semantics), so
+      // discard it outright rather than risk restoring a broken game.
+      final savedVersion = map['saveVersion'] as int?;
+      if (savedVersion != GameState.currentSaveVersion) {
+        await _storage.remove(_gameStateKey);
+        return const Right(null);
+      }
+
       return Right(GameState.fromJson(map));
     } catch (e) {
+      // Corrupt save data — clear it so future launches don't keep hitting
+      // the same failure.
+      await _storage.remove(_gameStateKey);
       return Left(CacheFailure('Failed to get game state: $e'));
     }
   }
 
   Future<Either<Failure, void>> saveGameState(GameState state) async {
     try {
-      await _storage.setString(_gameStateKey, jsonEncode(state.toJson()));
+      final versioned = state.copyWith(
+        saveVersion: GameState.currentSaveVersion,
+      );
+      await _storage.setString(_gameStateKey, jsonEncode(versioned.toJson()));
       return const Right(null);
     } catch (e) {
       return Left(StorageFailure('Failed to save game state: $e'));

@@ -193,14 +193,9 @@ class HomeScreen extends ConsumerWidget {
 
   void _continueGame(BuildContext context, WidgetRef ref, GameState gameState) {
     ref.read(gameControllerProvider.notifier).continueGame(gameState);
-    // The daily challenge's puzzleId (daily_<date>) doubles as the "extra"
-    // GameScreen expects, so it resumes the in-progress session instead of
-    // generating a fresh one.
-    final isDaily = gameState.puzzleId.startsWith('daily_');
-    context.push(
-      AppRoutes.game,
-      extra: isDaily ? gameState.puzzleId : gameState.difficulty.name,
-    );
+    // 'continue' tells GameScreen the session is already loaded (regular or
+    // daily) — it must not try to match/regenerate a puzzle from this string.
+    context.push(AppRoutes.game, extra: 'continue');
   }
 }
 

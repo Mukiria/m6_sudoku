@@ -820,5 +820,126 @@ void main() {
         }
       });
     });
+
+    group('loadGame - restore after restart', () {
+      test(
+        'restores an in-progress game persisted by a previous session',
+        () async {
+          final storage = FakeStorageService();
+
+          final containerA = ProviderContainer(
+            overrides: [
+              storageServiceProvider.overrideWithValue(storage),
+              settingsRepositoryProvider.overrideWithValue(
+                FakeSettingsRepository(),
+              ),
+              audioServiceProvider.overrideWithValue(FakeAudioService()),
+              getHintUseCaseProvider.overrideWithValue(FakeGetHintUseCase()),
+            ],
+          );
+          addTearDown(containerA.dispose);
+          // gameControllerProvider is autodispose; a bare .read() doesn't
+          // keep it alive across the awaits below, so pin it with a
+          // listener like the app's own widgets (ref.watch) do.
+          containerA.listen(gameControllerProvider, (_, __) {});
+
+          final controllerA = containerA.read(gameControllerProvider.notifier);
+          await controllerA.newGame(Difficulty.easy);
+          final stateA = containerA.read(gameControllerProvider)!;
+
+          int? emptyRow, emptyCol;
+          outer:
+          for (int r = 0; r < 9; r++) {
+            for (int c = 0; c < 9; c++) {
+              if (stateA.puzzle.grid[r][c] == 0) {
+                emptyRow = r;
+                emptyCol = c;
+                break outer;
+              }
+            }
+          }
+
+          // A real move, so autosave (per-move persistence) actually writes.
+          controllerA.selectCell(emptyRow!, emptyCol!);
+          controllerA.setValue(emptyRow, emptyCol, 5);
+          await Future<void>.delayed(Duration.zero);
+
+          final puzzleIdA = containerA.read(gameControllerProvider)!.puzzleId;
+          final timeElapsedA =
+              containerA.read(gameControllerProvider)!.timeElapsed;
+
+          // A fresh container over the same storage simulates a cold
+          // restart: a brand new GameController with no in-memory state.
+          final containerB = ProviderContainer(
+            overrides: [
+              storageServiceProvider.overrideWithValue(storage),
+              settingsRepositoryProvider.overrideWithValue(
+                FakeSettingsRepository(),
+              ),
+              audioServiceProvider.overrideWithValue(FakeAudioService()),
+              getHintUseCaseProvider.overrideWithValue(FakeGetHintUseCase()),
+            ],
+          );
+          addTearDown(containerB.dispose);
+          containerB.listen(gameControllerProvider, (_, __) {});
+
+          expect(containerB.read(gameControllerProvider), isNull);
+
+          await containerB.read(gameControllerProvider.notifier).loadGame();
+
+          final restored = containerB.read(gameControllerProvider);
+          expect(restored, isNotNull);
+          expect(restored!.puzzleId, puzzleIdA);
+          expect(restored.userGrid[emptyRow][emptyCol], 5);
+          expect(restored.timeElapsed, timeElapsedA);
+        },
+      );
+
+      test(
+        'does not clobber a session already started before it resolves',
+        () async {
+          final storage = FakeStorageService();
+
+          // Seed storage with a "previous session"'s save.
+          final seedContainer = ProviderContainer(
+            overrides: [storageServiceProvider.overrideWithValue(storage)],
+          );
+          seedContainer.listen(gameControllerProvider, (_, __) {});
+          await seedContainer
+              .read(gameControllerProvider.notifier)
+              .newGame(Difficulty.easy);
+          final seeded = seedContainer.read(gameControllerProvider)!;
+          await seedContainer.read(saveGameStateUseCaseProvider)(seeded);
+          seedContainer.dispose();
+
+          final container = ProviderContainer(
+            overrides: [
+              storageServiceProvider.overrideWithValue(storage),
+              settingsRepositoryProvider.overrideWithValue(
+                FakeSettingsRepository(),
+              ),
+              audioServiceProvider.overrideWithValue(FakeAudioService()),
+              getHintUseCaseProvider.overrideWithValue(FakeGetHintUseCase()),
+            ],
+          );
+          addTearDown(container.dispose);
+          container.listen(gameControllerProvider, (_, __) {});
+
+          final controller = container.read(gameControllerProvider.notifier);
+          await controller.newGame(Difficulty.hard);
+          final freshPuzzleId =
+              container.read(gameControllerProvider)!.puzzleId;
+
+          // loadGame() racing in afterward must not overwrite the session the
+          // user already started.
+          await controller.loadGame();
+
+          expect(
+            container.read(gameControllerProvider)!.puzzleId,
+            freshPuzzleId,
+          );
+        },
+      );
+    });
   });
 }

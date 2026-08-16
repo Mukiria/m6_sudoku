@@ -100,8 +100,13 @@ class GameController extends _$GameController {
   Future<void> loadGame() async {
     final getGameState = ref.read(getGameStateUseCaseProvider);
     final result = await getGameState();
+    final loaded = result.fold((failure) => null, (gameState) => gameState);
 
-    state = result.fold((failure) => null, (gameState) => gameState);
+    // Don't clobber a session that already started (e.g. the user began a
+    // new game) while this load was in flight.
+    if (state != null) return;
+
+    state = loaded;
     if (state != null && state!.status == GameStatus.playing) {
       _startAutoSave();
     }

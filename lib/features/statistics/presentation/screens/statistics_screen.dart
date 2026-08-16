@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
+import 'package:m6_sudoku/core/routing/app_router.dart';
 import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 import 'package:m6_sudoku/shared/widgets/cards.dart';
 import 'package:m6_sudoku/shared/widgets/buttons.dart';
@@ -19,7 +21,17 @@ class StatisticsScreen extends ConsumerWidget {
     final recentGames = ref.watch(recentGamesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Statistics'), centerTitle: true),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          tooltip: 'Home',
+          onPressed:
+              () =>
+                  context.canPop() ? context.pop() : context.go(AppRoutes.home),
+        ),
+        title: const Text('Statistics'),
+        centerTitle: true,
+      ),
       body: statisticsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
@@ -48,82 +60,64 @@ class StatisticsScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Overview Stats
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildStatCard(
-                                theme,
-                                extension,
-                                'Games Played',
-                                stats.gamesPlayed.toString(),
-                                Icons.games_rounded,
-                                extension.difficultyMediumColor,
-                              ),
-                            ),
-                            const SizedBox(width: AppConstants.spacingMd),
-                            Expanded(
-                              child: _buildStatCard(
-                                theme,
-                                extension,
-                                'Games Won',
-                                stats.gamesWon.toString(),
-                                Icons.emoji_events_rounded,
-                                extension.difficultyEasyColor,
-                              ),
-                            ),
-                          ],
+                        _buildStatCard(
+                          theme,
+                          extension,
+                          'Games Played',
+                          stats.gamesPlayed.toString(),
+                          Icons.games_rounded,
+                          extension.difficultyMediumColor,
+                          fullWidth: true,
                         ),
                         const SizedBox(height: AppConstants.spacingMd),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildStatCard(
-                                theme,
-                                extension,
-                                'Win Rate',
-                                '${(stats.winRate * 100).toStringAsFixed(1)}%',
-                                Icons.trending_up_rounded,
-                                extension.difficultyMediumColor,
-                              ),
-                            ),
-                            const SizedBox(width: AppConstants.spacingMd),
-                            Expanded(
-                              child: _buildStatCard(
-                                theme,
-                                extension,
-                                'Best Streak',
-                                '${stats.bestStreak}',
-                                Icons.local_fire_department_rounded,
-                                extension.difficultyHardColor,
-                              ),
-                            ),
-                          ],
+                        _buildStatCard(
+                          theme,
+                          extension,
+                          'Games Won',
+                          stats.gamesWon.toString(),
+                          Icons.emoji_events_rounded,
+                          extension.difficultyEasyColor,
+                          fullWidth: true,
                         ),
                         const SizedBox(height: AppConstants.spacingMd),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildStatCard(
-                                theme,
-                                extension,
-                                'Avg Time',
-                                stats.formattedAverageTime,
-                                Icons.timer_outlined,
-                                extension.difficultyExpertColor,
-                              ),
-                            ),
-                            const SizedBox(width: AppConstants.spacingMd),
-                            Expanded(
-                              child: _buildStatCard(
-                                theme,
-                                extension,
-                                'Current Streak',
-                                '${stats.currentStreak}',
-                                Icons.local_fire_department_outlined,
-                                extension.difficultyHardColor,
-                              ),
-                            ),
-                          ],
+                        _buildStatCard(
+                          theme,
+                          extension,
+                          'Win Rate',
+                          '${(stats.winRate * 100).toStringAsFixed(1)}%',
+                          Icons.trending_up_rounded,
+                          extension.difficultyMediumColor,
+                          fullWidth: true,
+                        ),
+                        const SizedBox(height: AppConstants.spacingMd),
+                        _buildStatCard(
+                          theme,
+                          extension,
+                          'Best Streak',
+                          '${stats.bestStreak}',
+                          Icons.local_fire_department_rounded,
+                          extension.difficultyHardColor,
+                          fullWidth: true,
+                        ),
+                        const SizedBox(height: AppConstants.spacingMd),
+                        _buildStatCard(
+                          theme,
+                          extension,
+                          'Avg Time',
+                          stats.formattedAverageTime,
+                          Icons.timer_outlined,
+                          extension.difficultyExpertColor,
+                          fullWidth: true,
+                        ),
+                        const SizedBox(height: AppConstants.spacingMd),
+                        _buildStatCard(
+                          theme,
+                          extension,
+                          'Current Streak',
+                          '${stats.currentStreak}',
+                          Icons.local_fire_department_outlined,
+                          extension.difficultyHardColor,
+                          fullWidth: true,
                         ),
                         const SizedBox(height: AppConstants.spacingMd),
                         _buildStatCard(

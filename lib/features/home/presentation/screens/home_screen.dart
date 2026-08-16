@@ -146,7 +146,11 @@ class HomeScreen extends ConsumerWidget {
                             .fadeIn(duration: 300.ms, delay: 500.ms)
                             .slideY(begin: 0.2, end: 0),
                       ),
-                      const SizedBox(width: AppConstants.spacingMd),
+                    ],
+                  ),
+                  const SizedBox(height: AppConstants.spacingMd),
+                  Row(
+                    children: [
                       Expanded(
                         child: _QuickActionButton(
                               icon: Icons.emoji_events_rounded,

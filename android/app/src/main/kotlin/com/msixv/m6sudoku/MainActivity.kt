@@ -1,4 +1,4 @@
-package com.example.m6_sudoku
+package com.msixv.m6sudoku
 
 import io.flutter.embedding.android.FlutterActivity
 

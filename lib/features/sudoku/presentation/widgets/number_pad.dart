@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
+import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
 
 /// The game's control panel: an action row (Undo / Erase / Notes / Hint)
@@ -28,6 +29,7 @@ class NumberPad extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameControllerProvider);
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (gameState == null) return const SizedBox.shrink();
 
@@ -111,7 +113,9 @@ class NumberPad extends ConsumerWidget {
                               ? colorScheme.onSurfaceVariant.withValues(
                                 alpha: 0.35,
                               )
-                              : colorScheme.primary,
+                              : (isDark
+                                  ? Colors.white
+                                  : AppThemeExtension.brandBlue),
                     ),
                   ),
                 ),

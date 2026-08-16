@@ -279,6 +279,7 @@ class _NumberCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fontSize = (cellSize * 0.38).clamp(11.0, 26.0);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return FittedBox(
       fit: BoxFit.scaleDown,
@@ -290,7 +291,7 @@ class _NumberCell extends StatelessWidget {
           color:
               isConflicted
                   ? Colors.redAccent
-                  : (isFixed ? Colors.white : Colors.lightBlueAccent),
+                  : (isDark ? Colors.white : AppThemeExtension.brandBlue),
           height: 1.0,
         ),
       ),

@@ -16,6 +16,8 @@ class AppButton extends StatelessWidget {
     this.height,
     this.borderRadius,
     this.padding,
+    this.backgroundColor,
+    this.foregroundColor,
   });
 
   final VoidCallback? onPressed;
@@ -30,6 +32,8 @@ class AppButton extends StatelessWidget {
   final double? height;
   final double? borderRadius;
   final EdgeInsetsGeometry? padding;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +62,12 @@ class AppButton extends StatelessWidget {
                 ),
               ),
             )
-            : _buildChildWithIcon(context, textStyle);
+            : _buildChildWithIcon(
+              context,
+              foregroundColor != null
+                  ? textStyle.copyWith(color: foregroundColor)
+                  : textStyle,
+            );
 
     switch (variant) {
       case AppButtonVariant.filled:
@@ -79,8 +88,15 @@ class AppButton extends StatelessWidget {
                 if (states.contains(WidgetState.disabled)) {
                   return colorScheme.onSurface.withValues(alpha: 0.12);
                 }
-                return null;
+                return backgroundColor;
               }),
+              foregroundColor:
+                  foregroundColor != null
+                      ? WidgetStateProperty.resolveWith((states) {
+                        if (states.contains(WidgetState.disabled)) return null;
+                        return foregroundColor;
+                      })
+                      : null,
             ),
             child: buttonChild,
           ),
@@ -180,13 +196,19 @@ class AppButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (iconPosition == IconPosition.start) ...[
-            IconTheme(data: IconThemeData(size: iconSize), child: icon!),
+            IconTheme(
+              data: IconThemeData(size: iconSize, color: textStyle.color),
+              child: icon!,
+            ),
             SizedBox(width: spacing),
           ],
           Flexible(child: child),
           if (iconPosition == IconPosition.end) ...[
             SizedBox(width: spacing),
-            IconTheme(data: IconThemeData(size: iconSize), child: icon!),
+            IconTheme(
+              data: IconThemeData(size: iconSize, color: textStyle.color),
+              child: icon!,
+            ),
           ],
         ],
       ),

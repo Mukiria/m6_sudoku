@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m6_sudoku/core/constants/app_constants.dart';
 import 'package:m6_sudoku/core/routing/app_router.dart';
+import 'package:m6_sudoku/core/theme/app_theme_extension.dart';
 import 'package:m6_sudoku/features/sudoku/domain/entities/game_state.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/providers/game_provider.dart';
 import 'package:m6_sudoku/shared/widgets/buttons.dart';
@@ -42,20 +43,13 @@ class HomeScreen extends ConsumerWidget {
                   const SizedBox(height: AppConstants.spacingXl),
 
                   // Title
-                  Text(
-                        AppConstants.appName,
-                        style: theme.textTheme.displayMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          shadows: const [
-                            Shadow(
-                              color: Colors.black45,
-                              blurRadius: 12,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
+                  Semantics(
+                        label: AppConstants.appName,
+                        child: Image.asset(
+                          'assets/images/m6-sudokulogotype.png',
+                          height: 64,
+                          fit: BoxFit.contain,
                         ),
-                        textAlign: TextAlign.center,
                       )
                       .animate()
                       .fadeIn(duration: 400.ms)
@@ -84,6 +78,9 @@ class HomeScreen extends ConsumerWidget {
                                       ),
                                   variant: AppButtonVariant.filled,
                                   size: AppButtonSize.large,
+                                  backgroundColor:
+                                      AppThemeExtension.brandOrange,
+                                  foregroundColor: Colors.white,
                                   child: const Text('Continue Game'),
                                 )
                                 .animate()
@@ -98,6 +95,8 @@ class HomeScreen extends ConsumerWidget {
                                     ),
                                 variant: AppButtonVariant.filled,
                                 size: AppButtonSize.large,
+                                backgroundColor: AppThemeExtension.brandOrange,
+                                foregroundColor: Colors.white,
                                 icon: const Icon(Icons.add_rounded),
                                 child: const Text('New Game'),
                               )

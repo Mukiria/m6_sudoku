@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
 class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
+  /// Fixed brand colors that stay constant across light and dark themes.
+  static const Color brandOrange = Color(0xFFFF9800);
+  static const Color brandOrangeLight = Color(0xFFFFB74D);
+  static const Color brandBlue = Color(0xFF1976D2);
+
   const AppThemeExtension({
     required this.cellBackground,
     required this.cellBorder,
@@ -89,18 +94,18 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
 
   static const AppThemeExtension light = AppThemeExtension(
     cellBackground: Color(0xFFFFFFFF),
-    cellBorder: Color(0xFFE0E0E0),
+    cellBorder: brandOrangeLight,
     cellSelectedBackground: Color(0xFFE3F2FD),
     cellSelectedBorder: Color(0xFF1976D2),
     cellErrorBackground: Color(0xFFFFCDD2),
     cellErrorBorder: Color(0xFFD32F2F),
     cellFixedBackground: Color(0xFFFFFFFF),
-    cellFixedBorder: Color(0xFFE0E0E0),
+    cellFixedBorder: brandOrangeLight,
     cellNoteBackground: Color(0xFFF5F5F5),
     cellHighlightBackground: Color(0xFFE3F2FD),
     cellRelatedBackground: Color(0xFFBBDEFB),
     gridBackgroundColor: Color(0xFFFFFFFF),
-    subGridLineColor: Color(0xFF9E9E9E),
+    subGridLineColor: brandOrange,
     numberButtonBackground: Color(0xFFE3F2FD),
     numberButtonSelectedBackground: Color(0xFF1976D2),
     numberButtonDisabledBackground: Color(0xFFE0E0E0),
@@ -133,18 +138,18 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
 
   static const AppThemeExtension dark = AppThemeExtension(
     cellBackground: Color(0xFF2C2C2C),
-    cellBorder: Color(0xFF444444),
+    cellBorder: brandOrangeLight,
     cellSelectedBackground: Color(0xFF1565C0),
     cellSelectedBorder: Color(0xFF90CAF9),
     cellErrorBackground: Color(0xFFC62828),
     cellErrorBorder: Color(0xFFEF5350),
     cellFixedBackground: Color(0xFF2C2C2C),
-    cellFixedBorder: Color(0xFF444444),
+    cellFixedBorder: brandOrangeLight,
     cellNoteBackground: Color(0xFF1E1E1E),
     cellHighlightBackground: Color(0xFF1565C0),
     cellRelatedBackground: Color(0xFF0D47A1),
     gridBackgroundColor: Color(0xFF2C2C2C),
-    subGridLineColor: Color(0xFF616161),
+    subGridLineColor: brandOrange,
     numberButtonBackground: Color(0xFF1565C0),
     numberButtonSelectedBackground: Color(0xFF90CAF9),
     numberButtonDisabledBackground: Color(0xFF444444),

@@ -3,12 +3,8 @@ import 'package:m6_sudoku/features/statistics/domain/entities/statistics.dart';
 import 'package:m6_sudoku/features/statistics/domain/repositories/statistics_repository.dart';
 import 'package:m6_sudoku/features/statistics/data/repositories/statistics_repository_impl.dart';
 import 'package:m6_sudoku/features/statistics/data/datasources/statistics_local_datasource.dart';
-import 'package:m6_sudoku/core/services/storage_service.dart';
 import 'package:m6_sudoku/features/statistics/domain/usecases/statistics_usecases.dart';
-
-final storageServiceProvider = Provider<StorageService>((ref) {
-  throw UnimplementedError('Initialize storage service in main.dart');
-});
+import 'package:m6_sudoku/features/sudoku/presentation/providers/sudoku_providers.dart';
 
 final statisticsLocalDataSourceProvider = Provider<StatisticsLocalDataSource>((
   ref,

@@ -71,11 +71,11 @@ flutter_launcher_icons:
 flutter_native_splash:
   color: "#1E1E1E"
   background_image: assets/images/m6-splash-screen.jpg
-  image: assets/images/m6-logo.png
+  image: assets/images/m6-sudoku-logo.png
   android: true
   web: true
   fullscreen: true
   android_gravity: center
   android_12:
     color: "#1E1E1E"
-    image: assets/images/m6-logo.png
+    image: assets/images/m6-sudoku-logo.png

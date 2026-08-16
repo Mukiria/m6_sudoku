@@ -296,7 +296,14 @@ class AchievementLocalDataSource {
     });
   }
 
-  Future<Either<Failure, void>> incrementProgress(String id, int amount) async {
+  /// Returns the achievement's new state if this call is the one that
+  /// unlocked it, or `null` if progress moved without unlocking (or the
+  /// achievement was already unlocked, a no-op) — the caller uses this to
+  /// know when to fire an unlock animation.
+  Future<Either<Failure, Achievement?>> incrementProgress(
+    String id,
+    int amount,
+  ) async {
     final result = await getAchievements();
     return result.fold((failure) => Left(failure), (achievements) async {
       final index = achievements.indexWhere((a) => a.id == id);
@@ -311,15 +318,15 @@ class AchievementLocalDataSource {
         0,
         achievement.targetValue,
       );
+      final justUnlocked = newProgress >= achievement.targetValue;
       final updated = achievement.copyWith(
         currentProgress: newProgress,
-        isUnlocked: newProgress >= achievement.targetValue,
-        unlockedAt:
-            newProgress >= achievement.targetValue ? DateTime.now() : null,
+        isUnlocked: justUnlocked,
+        unlockedAt: justUnlocked ? DateTime.now() : null,
       );
       achievements[index] = updated;
       await _saveAchievements(achievements);
-      return const Right(null);
+      return Right(justUnlocked ? updated : null);
     });
   }
 

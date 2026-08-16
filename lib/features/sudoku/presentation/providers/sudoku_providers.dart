@@ -190,6 +190,29 @@ final unlockedAchievementsProvider = FutureProvider<List<Achievement>>((
   );
 });
 
+/// Queue of achievements newly unlocked during the current session, in the
+/// order they unlocked. [AchievementUnlockBanner] watches this to animate
+/// each one in turn, popping the front entry once its animation finishes
+/// (or the player taps to dismiss it early).
+class AchievementUnlockQueue extends Notifier<List<Achievement>> {
+  @override
+  List<Achievement> build() => [];
+
+  void push(Achievement achievement) {
+    state = [...state, achievement];
+  }
+
+  void popFirst() {
+    if (state.isEmpty) return;
+    state = state.sublist(1);
+  }
+}
+
+final achievementUnlockQueueProvider =
+    NotifierProvider<AchievementUnlockQueue, List<Achievement>>(
+      AchievementUnlockQueue.new,
+    );
+
 final audioManagerProvider = Provider<AudioManager>((ref) {
   return AudioManager.instance;
 });

@@ -64,7 +64,10 @@ class GameController extends _$GameController {
   /// `daily_` are kept out of the single regular-game save slot — see
   /// [_saveGame] — so playing today's challenge never clobbers a paused
   /// regular game, and vice versa.
-  Future<void> loadPuzzle(Puzzle puzzle, {required Difficulty difficulty}) async {
+  Future<void> loadPuzzle(
+    Puzzle puzzle, {
+    required Difficulty difficulty,
+  }) async {
     final initialNotes = _recomputeNotesBitmask(
       puzzle.grid.map((row) => List<int>.from(row)).toList(),
       puzzle,
@@ -225,7 +228,7 @@ class GameController extends _$GameController {
     );
     ref.invalidate(dailyChallengeProvider);
     ref.invalidate(dailyChallengeStatsProvider);
-    ref.read(incrementAchievementProgressUseCaseProvider)('daily_champion', 1);
+    _incrementAchievement('daily_champion', 1);
   }
 
   void toggleNote(int row, int col, int note) {
@@ -775,37 +778,34 @@ class GameController extends _$GameController {
     final hour = DateTime.now().hour;
 
     // First Win
-    ref.read(incrementAchievementProgressUseCaseProvider)('first_win', 1);
+    _incrementAchievement('first_win', 1);
 
     // Ten Wins
-    ref.read(incrementAchievementProgressUseCaseProvider)('ten_wins', 1);
+    _incrementAchievement('ten_wins', 1);
 
     // Hundred Wins
-    ref.read(incrementAchievementProgressUseCaseProvider)('hundred_wins', 1);
+    _incrementAchievement('hundred_wins', 1);
 
     // Perfect Game (0 mistakes, 0 hints)
     if (mistakes == 0 && hintsUsed == 0) {
-      ref.read(incrementAchievementProgressUseCaseProvider)('perfect_game', 1);
-      ref.read(incrementAchievementProgressUseCaseProvider)('five_perfect', 1);
+      _incrementAchievement('perfect_game', 1);
+      _incrementAchievement('five_perfect', 1);
     }
 
     // No Hints
     if (hintsUsed == 0) {
-      ref.read(incrementAchievementProgressUseCaseProvider)('no_hints', 1);
-      ref.read(incrementAchievementProgressUseCaseProvider)('ten_no_hints', 1);
+      _incrementAchievement('no_hints', 1);
+      _incrementAchievement('ten_no_hints', 1);
     }
 
     // Expert Winner
     if (difficulty == 'expert') {
-      ref.read(incrementAchievementProgressUseCaseProvider)('expert_winner', 1);
+      _incrementAchievement('expert_winner', 1);
     }
 
     // Evil Conqueror (secret)
     if (difficulty == 'evil') {
-      ref.read(incrementAchievementProgressUseCaseProvider)(
-        'evil_conqueror',
-        1,
-      );
+      _incrementAchievement('evil_conqueror', 1);
     }
 
     // All Difficulties - check what difficulties have been won
@@ -815,12 +815,12 @@ class GameController extends _$GameController {
 
     // Speed Runner (under 3 minutes = 180 seconds)
     if (timeElapsed < 180) {
-      ref.read(incrementAchievementProgressUseCaseProvider)('speed_runner', 1);
+      _incrementAchievement('speed_runner', 1);
     }
 
     // Lightning Fast (Easy under 1 minute = 60 seconds)
     if (difficulty == 'easy' && timeElapsed < 60) {
-      ref.read(incrementAchievementProgressUseCaseProvider)('lightning', 1);
+      _incrementAchievement('lightning', 1);
     }
 
     // Streaks are handled by statistics
@@ -829,13 +829,34 @@ class GameController extends _$GameController {
 
     // Night Owl (midnight - 4 AM)
     if (hour >= 0 && hour < 4) {
-      ref.read(incrementAchievementProgressUseCaseProvider)('night_owl', 1);
+      _incrementAchievement('night_owl', 1);
     }
 
     // Early Bird (4 AM - 7 AM)
     if (hour >= 4 && hour < 7) {
-      ref.read(incrementAchievementProgressUseCaseProvider)('early_bird', 1);
+      _incrementAchievement('early_bird', 1);
     }
+  }
+
+  /// Increments achievement [id]'s progress and, if this is the call that
+  /// crosses its target, queues it for [AchievementUnlockBanner] to animate.
+  Future<void> _incrementAchievement(String id, int amount) async {
+    final result = await ref.read(incrementAchievementProgressUseCaseProvider)(
+      id,
+      amount,
+    );
+    result.fold((_) {}, (unlocked) {
+      if (unlocked == null) return;
+      try {
+        ref.read(achievementUnlockQueueProvider.notifier).push(unlocked);
+      } on StateError {
+        // gameControllerProvider is autodispose: completing a game
+        // navigates away almost immediately, which can dispose this
+        // controller before this await resumes. The achievement is
+        // already persisted at this point; there's just no screen left
+        // to animate the unlock on.
+      }
+    });
   }
 }
 

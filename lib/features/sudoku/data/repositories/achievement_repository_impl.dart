@@ -25,7 +25,10 @@ class AchievementRepositoryImpl implements AchievementRepository {
   }
 
   @override
-  Future<Either<Failure, void>> incrementProgress(String id, int amount) {
+  Future<Either<Failure, Achievement?>> incrementProgress(
+    String id,
+    int amount,
+  ) {
     return _dataSource.incrementProgress(id, amount);
   }
 

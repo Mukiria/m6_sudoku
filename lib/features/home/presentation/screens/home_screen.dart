@@ -149,6 +149,18 @@ class HomeScreen extends ConsumerWidget {
                       const SizedBox(width: AppConstants.spacingMd),
                       Expanded(
                         child: _QuickActionButton(
+                              icon: Icons.emoji_events_rounded,
+                              label: 'Awards',
+                              onPressed:
+                                  () => context.push(AppRoutes.achievements),
+                            )
+                            .animate()
+                            .fadeIn(duration: 300.ms, delay: 550.ms)
+                            .slideY(begin: 0.2, end: 0),
+                      ),
+                      const SizedBox(width: AppConstants.spacingMd),
+                      Expanded(
+                        child: _QuickActionButton(
                               icon: Icons.settings_rounded,
                               label: 'Settings',
                               onPressed: () => context.push(AppRoutes.settings),

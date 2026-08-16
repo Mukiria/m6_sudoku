@@ -38,7 +38,9 @@ class IncrementAchievementProgressUseCase {
 
   final AchievementRepository _repository;
 
-  Future<Either<Failure, void>> call(String id, int amount) {
+  /// Returns the unlocked [Achievement] if this call just unlocked it,
+  /// otherwise `null`.
+  Future<Either<Failure, Achievement?>> call(String id, int amount) {
     return _repository.incrementProgress(id, amount);
   }
 }

@@ -12,6 +12,7 @@ import 'package:m6_sudoku/features/sudoku/presentation/widgets/game_top_bar.dart
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/pause_menu.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/sudoku_board.dart';
 import 'package:m6_sudoku/features/sudoku/presentation/widgets/hint_overlay.dart';
+import 'package:m6_sudoku/features/sudoku/presentation/widgets/achievement_unlock_banner.dart';
 import 'package:m6_sudoku/core/routing/app_router.dart';
 import 'package:m6_sudoku/features/sudoku/engine/models/difficulty.dart';
 
@@ -209,56 +210,61 @@ class _GameScreenState extends ConsumerState<GameScreen>
       },
       child: Scaffold(
         backgroundColor: colorScheme.surfaceContainerHighest,
-        body: SafeArea(
-          child: Column(
-            children: [
-              GameTopBar(onBack: _showPauseOverlay),
-              GameHeader(
-                difficulty: _isDaily ? 'daily' : widget.difficulty,
-                timeElapsed: gameState.timeElapsed,
-                mistakes: gameState.mistakes,
-                onPause: _showPauseOverlay,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppConstants.spacingSm,
+        body: Stack(
+          children: [
+            SafeArea(
+              child: Column(
+                children: [
+                  GameTopBar(onBack: _showPauseOverlay),
+                  GameHeader(
+                    difficulty: _isDaily ? 'daily' : widget.difficulty,
+                    timeElapsed: gameState.timeElapsed,
+                    mistakes: gameState.mistakes,
+                    onPause: _showPauseOverlay,
                   ),
-                  child: SudokuBoard(
-                    puzzle: gameState.puzzle,
-                    userGrid: gameState.userGrid,
-                    notes: gameState.notes,
-                    selectedCell: gameState.selectedCell,
-                    highlightedCells: gameState.highlightedCells,
-                    conflictCells: gameState.conflictCells,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppConstants.spacingSm,
+                      ),
+                      child: SudokuBoard(
+                        puzzle: gameState.puzzle,
+                        userGrid: gameState.userGrid,
+                        notes: gameState.notes,
+                        selectedCell: gameState.selectedCell,
+                        highlightedCells: gameState.highlightedCells,
+                        conflictCells: gameState.conflictCells,
+                        isNoteMode: gameState.isNoteMode,
+                        onCellTap:
+                            (row, col) => ref
+                                .read(gameControllerProvider.notifier)
+                                .selectCell(row, col),
+                        onCellLongPress:
+                            (row, col) => _showCellOptions(row, col, gameState),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppConstants.spacingMd),
+                  NumberPad(
+                    selectedNumber: gameState.selectedNumber,
+                    onNumberSelected:
+                        (number) => ref
+                            .read(gameControllerProvider.notifier)
+                            .selectNumber(number),
+                    onNoteModeToggle:
+                        () =>
+                            ref
+                                .read(gameControllerProvider.notifier)
+                                .toggleNoteMode(),
                     isNoteMode: gameState.isNoteMode,
-                    onCellTap:
-                        (row, col) => ref
-                            .read(gameControllerProvider.notifier)
-                            .selectCell(row, col),
-                    onCellLongPress:
-                        (row, col) => _showCellOptions(row, col, gameState),
+                    disabledNumbers: _getDisabledNumbers(gameState),
                   ),
-                ),
+                  const SizedBox(height: AppConstants.spacingMd),
+                ],
               ),
-              const SizedBox(height: AppConstants.spacingMd),
-              NumberPad(
-                selectedNumber: gameState.selectedNumber,
-                onNumberSelected:
-                    (number) => ref
-                        .read(gameControllerProvider.notifier)
-                        .selectNumber(number),
-                onNoteModeToggle:
-                    () =>
-                        ref
-                            .read(gameControllerProvider.notifier)
-                            .toggleNoteMode(),
-                isNoteMode: gameState.isNoteMode,
-                disabledNumbers: _getDisabledNumbers(gameState),
-              ),
-              const SizedBox(height: AppConstants.spacingMd),
-            ],
-          ),
+            ),
+            const AchievementUnlockBanner(),
+          ],
         ),
       ),
     );
